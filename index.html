@@ -49,21 +49,21 @@ $('exportData').onclick=()=>{const blob=new Blob([JSON.stringify({products,histo
 $('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
 function parseVoice(text){
  const low=text.toLowerCase();
- const cleanName=s=>s.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\\s+/g,' ').trim();
+ const cleanName=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
  const spoken=cleanName(low);
  const found=products.find(p=>spoken.includes(cleanName(p.name)));
- const amount=n=>{let s=String(n).trim();if(/\\.\\d{3}$/.test(s))s=s.replace(/\\./g,'');if(/,\\d{3}$/.test(s))s=s.replace(/,/g,'');else s=s.replace(',','.');return Number(s)||0};
- const qtyPart=low.split(/\\bharga\\b/)[0];
- const qMatch=qtyPart.match(/(\\d+(?:[.,]\\d+)?)\\s*(lusin|dozen|kodi|buah|pcs|biji|unit|batang|set)?/);
+ const amount=n=>{let s=String(n).trim();if(/\.\d{3}$/.test(s))s=s.replace(/\./g,'');if(/,\d{3}$/.test(s))s=s.replace(/,/g,'');else s=s.replace(',','.');return Number(s)||0;};
+ const qtyPart=low.split(/\bharga\b/)[0];
+ const qMatch=qtyPart.match(/(\d+(?:[.,]\d+)?)\s*(lusin|dozen|kodi|buah|pcs|biji|unit|batang|set)?/);
  let qty=qMatch?amount(qMatch[1]):1;
  const unit=qMatch&&qMatch[2]?qMatch[2]:'';
  if(unit==='lusin'||unit==='dozen')qty*=12;
  else if(unit==='kodi')qty*=20;
  let explicitPrice=null;
- const pm=low.match(/\\bharga\\s*(\\d[\\d.,]*)\\s*(ribu|rb)?/);
+ const pm=low.match(/\bharga\s*(\d[\d.,]*)\s*(ribu|rb)?/);
  if(pm){explicitPrice=amount(pm[1]);if(pm[2])explicitPrice*=1000;}
  else {
-   const pm2=low.match(/(\\d[\\d.,]*)\\s*(ribu|rb)\\b/);
+   const pm2=low.match(/(\d[\d.,]*)\s*(ribu|rb)\b/);
    if(pm2 && (!qMatch || pm2[1]!==qMatch[1])) explicitPrice=amount(pm2[1])*1000;
  }
  let selected=found;
