@@ -14,6 +14,18 @@
 <div class="buttons"><button type="button" id="addProduct" class="secondary">＋ Tambah produk</button><button type="button" id="voiceBtn">🎙 Input dengan suara</button></div>
 <p class="muted">Contoh ucapan: “Sapu ijuk 10 buah harga 15000”. Mohon periksa lagi jumlah dan harga setelah input suara. Pengenalan suara membutuhkan browser yang mendukungnya dan koneksi internet.</p>
 <div id="items"></div><button type="button" id="addBlank" class="secondary" style="width:100%">＋ Tambah baris barang manual</button><div class="total" id="grandTotal">TOTAL: Rp0</div>
+<details class="catalog" id="catalogManager" style="margin-top:14px;border:1px solid #d8e2ef;border-radius:12px;padding:12px">
+<summary style="font-weight:750;color:#123c7a;cursor:pointer">⚙️ Kelola daftar produk (nama &amp; harga)</summary>
+<p class="muted">Gunakan bagian ini untuk menambah produk atau mengubah nama dan harga standar produk. Perubahan disimpan di browser perangkat ini saja, bukan disinkronkan ke perangkat lain.</p>
+<div class="field"><label>Pilih produk yang ingin diubah atau dihapus</label><select id="manageProductSelect"><option value="">Pilih produk untuk diedit...</option></select></div>
+<div class="grid">
+ <div class="field"><label>Nama produk</label><input id="manageProductName" placeholder="Nama produk"></div>
+ <div class="field"><label>Harga standar (Rp)</label><input id="manageProductPrice" type="number" min="0" inputmode="numeric" placeholder="Contoh: 58000"></div>
+</div>
+<div class="buttons"><button type="button" id="updateCatalogProduct" class="green">Simpan perubahan</button><button type="button" id="deleteCatalogProduct" class="red">Hapus produk terpilih</button></div>
+<div class="buttons" style="margin-top:8px"><button type="button" id="addCatalogProduct" class="secondary">＋ Tambah produk baru</button><button type="button" id="clearCatalogForm" class="secondary">Kosongkan formulir</button></div>
+<p class="muted">Setelah mengubah katalog, barang yang sudah dimasukkan ke nota yang sedang dibuat tidak berubah otomatis. Pilih kembali produk yang diinginkan untuk menggunakan harga katalog terbaru.</p>
+</details>
 </section>
 <section class="card"><h2>3. Catatan</h2><div class="field"><label>Catatan transaksi (opsional)</label><textarea id="notes" rows="3" placeholder="Contoh: Pembayaran tunai. Barang diterima dengan baik."></textarea></div></section>
 <section class="card"><h2>4. Tanda Tangan</h2><div class="siggrid">
@@ -33,10 +45,62 @@ let historyData=JSON.parse(localStorage.getItem('asido_history')||'[]');
 let rows=[];
 const now=new Date();$('date').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function renderProducts(){$('productSelect').innerHTML='<option value="">Pilih produk...</option>'+products.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+' — '+money(p.price)+'</option>').join('')}
+function renderProducts(){
+ $('productSelect').innerHTML='<option value="">Pilih produk...</option>'+products.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+' — '+money(p.price)+'</option>').join('');
+ const ms=$('manageProductSelect');
+ if(ms){const prior=ms.value;ms.innerHTML='<option value="">Pilih produk untuk diedit...</option>'+products.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+' — '+money(p.price)+'</option>').join('');if(prior!==''&&Number(prior)<products.length)ms.value=prior;}
+}
 function addRow(name='',qty=1,price=0){rows.push({name,qty,price});renderRows()}
 function renderTotal(){const sum=rows.reduce((a,r)=>a+(Number(r.qty)||0)*(Number(r.price)||0),0);$('grandTotal').textContent='TOTAL: '+money(sum);return sum}
 function renderRows(){$('items').innerHTML=rows.map((r,i)=>'<div class="item"><div class="itemgrid"><div class="namefield"><label>Nama barang</label><input data-i="'+i+'" data-k="name" value="'+esc(r.name)+'" placeholder="Nama barang"></div><div><label>Jumlah</label><input data-i="'+i+'" data-k="qty" type="number" min="0" step="any" value="'+r.qty+'" inputmode="decimal"></div><div><label>Harga satuan (Rp)</label><input data-i="'+i+'" data-k="price" type="number" min="0" value="'+r.price+'" inputmode="numeric"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><strong>Subtotal: '+money(r.qty*r.price)+'</strong><button type="button" class="red" data-remove="'+i+'" style="padding:7px 10px">Hapus</button></div></div>').join('');$('items').querySelectorAll('input').forEach(el=>el.addEventListener('input',e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;rows[i][k]=k==='name'?e.target.value:(Number(e.target.value)||0);e.target.closest('.item').querySelector('strong').textContent='Subtotal: '+money(rows[i].qty*rows[i].price);renderTotal()}));$('items').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{rows.splice(+b.dataset.remove,1);renderRows()});renderTotal()}
+function clearCatalogForm(){ $('manageProductSelect').value='';$('manageProductName').value='';$('manageProductPrice').value=''; }
+$('manageProductSelect').addEventListener('change',()=>{
+ const v=$('manageProductSelect').value;
+ if(v===''||!products[Number(v)])return;
+ $('manageProductName').value=products[Number(v)].name;
+ $('manageProductPrice').value=products[Number(v)].price;
+});
+$('clearCatalogForm').onclick=clearCatalogForm;
+$('addCatalogProduct').onclick=()=>{
+ const name=$('manageProductName').value.trim();
+ const price=Number($('manageProductPrice').value);
+ if(!name){alert('Isi nama produk terlebih dahulu.');return;}
+ if($('manageProductPrice').value===''||!Number.isFinite(price)||price<0){alert('Masukkan harga yang valid.');return;}
+ if(products.some(p=>p.name.trim().toLowerCase()===name.toLowerCase())){alert('Nama produk ini sudah ada. Pilih produk tersebut untuk mengubahnya, atau gunakan nama yang berbeda.');return;}
+ products.push({name,price});
+ localStorage.setItem('asido_products',JSON.stringify(products));
+ renderProducts();
+ $('manageProductSelect').value=String(products.length-1);
+ $('status').textContent='Produk baru ditambahkan ke daftar katalog pada perangkat ini.';
+};
+$('updateCatalogProduct').onclick=()=>{
+ const raw=$('manageProductSelect').value;
+ if(raw===''){alert('Pilih produk dari daftar yang ingin diubah.');return;}
+ const i=Number(raw),name=$('manageProductName').value.trim(),price=Number($('manageProductPrice').value);
+ if(!products[i]){alert('Produk tidak ditemukan. Pilih ulang produk.');return;}
+ if(!name){alert('Nama produk tidak boleh kosong.');return;}
+ if($('manageProductPrice').value===''||!Number.isFinite(price)||price<0){alert('Masukkan harga yang valid.');return;}
+ if(products.some((p,j)=>j!==i&&p.name.trim().toLowerCase()===name.toLowerCase())){alert('Nama produk tersebut sudah digunakan oleh produk lain.');return;}
+ products[i]={name,price};
+ localStorage.setItem('asido_products',JSON.stringify(products));
+ renderProducts();
+ $('manageProductSelect').value=String(i);
+ $('manageProductName').value=name;
+ $('manageProductPrice').value=price;
+ $('status').textContent='Katalog diperbarui: '+name+' — '+money(price)+'.';
+};
+$('deleteCatalogProduct').onclick=()=>{
+ const raw=$('manageProductSelect').value;
+ if(raw===''){alert('Pilih produk yang ingin dihapus terlebih dahulu.');return;}
+ const i=Number(raw);
+ if(!products[i]){alert('Produk tidak ditemukan.');return;}
+ if(!confirm('Hapus produk "'+products[i].name+'" dari daftar produk? Nota yang sudah dibuat tidak dihapus.'))return;
+ const deleted=products[i].name;
+ products.splice(i,1);
+ localStorage.setItem('asido_products',JSON.stringify(products));
+ renderProducts();clearCatalogForm();
+ $('status').textContent='Produk "'+deleted+'" dihapus dari katalog pada perangkat ini.';
+};
 $('addProduct').onclick=()=>{const i=$('productSelect').value;if(i===''){alert('Pilih produk dahulu.');return}const p=products[+i];addRow(p.name,1,p.price);$('productSelect').value=''};
 $('addBlank').onclick=()=>addRow();
 function invoice(){return {date:$('date').value,customer:$('customer').value.trim(),items:rows.map(r=>({...r})),total:renderTotal(),notes:$('notes').value.trim(),buyer:signatureData('buyerSig'),seller:signatureData('sellerSig'),savedAt:new Date().toISOString()}}
