@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123c7a"><title>ASIDO Nota Digital</title>
 <style>
-:root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#172435;background:#f2f6fb}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#123c7a,#1769aa);color:#fff;padding:20px 14px}header h1{font-size:24px;margin:0}header p{margin:5px 0 0;font-size:14px}.wrap{max-width:850px;margin:auto;padding:12px}.card{background:#fff;border-radius:16px;margin:0 0 13px;padding:15px;box-shadow:0 4px 18px #152f5010}h2{font-size:18px;margin:0 0 12px;color:#123c7a}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}label{font-size:13px;font-weight:650;color:#47566b}input,select,textarea{font:inherit;width:100%;min-width:0;border:1px solid #d2dce8;border-radius:10px;padding:11px;background:#fff;color:#172435}button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:12px 14px;cursor:pointer;background:#123c7a;color:#fff}.secondary{background:#e8eef8;color:#123c7a}.green{background:#13814b}.red{background:#a52b36}.buttons{display:flex;gap:8px;flex-wrap:wrap}.buttons button{flex:1}.item{border:1px solid #e0e7f0;border-radius:12px;padding:11px;margin:9px 0}.itemgrid{display:grid;grid-template-columns:1.5fr .65fr .95fr;gap:8px}.itemgrid label{display:block;margin-bottom:5px}.itemgrid .namefield{min-width:0}.muted{color:#68778b;font-size:12px;line-height:1.5}.total{text-align:right;color:#123c7a;font-size:23px;font-weight:800;margin:12px 0}.siggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sigbox{border:1px solid #e0e7f0;border-radius:12px;padding:10px}.sig{display:block;width:100%;height:140px;border:1px dashed #aab9ce;border-radius:9px;touch-action:none;background:white}.historyrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #edf0f5}.historyrow:last-child{border:0}.small{font-size:12px}@media(max-width:520px){.grid,.siggrid{grid-template-columns:1fr}.itemgrid{grid-template-columns:1fr 1fr}.itemgrid .namefield{grid-column:1/-1}.wrap{padding:9px}.card{padding:12px}header h1{font-size:22px}}
+:root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#172435;background:#f2f6fb}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#123c7a,#1769aa);color:#fff;padding:20px 14px}header h1{font-size:24px;margin:0}header p{margin:5px 0 0;font-size:14px}.wrap{max-width:850px;margin:auto;padding:12px}.card{background:#fff;border-radius:16px;margin:0 0 13px;padding:15px;box-shadow:0 4px 18px #152f5010}h2{font-size:18px;margin:0 0 12px;color:#123c7a}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}label{font-size:13px;font-weight:650;color:#47566b}input,select,textarea{font:inherit;width:100%;min-width:0;border:1px solid #d2dce8;border-radius:10px;padding:11px;background:#fff;color:#172435}button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:12px 14px;cursor:pointer;background:#123c7a;color:#fff}.secondary{background:#e8eef8;color:#123c7a}.green{background:#13814b}.red{background:#a52b36}.buttons{display:flex;gap:8px;flex-wrap:wrap}.buttons button{flex:1}.item{border:1px solid #e0e7f0;border-radius:12px;padding:11px;margin:9px 0}.itemgrid{display:grid;grid-template-columns:1.5fr .65fr .95fr;gap:8px}.itemgrid label{display:block;margin-bottom:5px}.itemgrid .namefield{min-width:0}.muted{color:#68778b;font-size:12px;line-height:1.5}.total{text-align:right;color:#123c7a;font-size:23px;font-weight:800;margin:12px 0}.siggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sigbox{border:1px solid #e0e7f0;border-radius:12px;padding:10px}.sig{display:block;width:100%;height:150px;min-height:150px;border:1px dashed #7f94ad;border-radius:9px;touch-action:none;-ms-touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;background:#fff;cursor:crosshair;}.historyrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #edf0f5}.historyrow:last-child{border:0}.small{font-size:12px}@media(max-width:520px){.grid,.siggrid{grid-template-columns:1fr}.itemgrid{grid-template-columns:1fr 1fr}.itemgrid .namefield{grid-column:1/-1}.wrap{padding:9px}.card{padding:12px}header h1{font-size:22px}}
 </style></head><body>
 <header><div class="wrap"><h1>ASIDO Nota Digital</h1><p>Nota penjualan · input suara · dua tanda tangan · PDF</p></div></header>
 <main class="wrap">
@@ -149,10 +149,66 @@ function parseVoice(text){
 }
 $('voiceBtn').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Browser belum mendukung input suara. Gunakan Chrome terbaru atau masukkan barang manual.');return}const rec=new SR();rec.lang='id-ID';rec.interimResults=false;rec.maxAlternatives=1;$('voiceBtn').textContent='🎙 Mendengarkan…';rec.onresult=e=>{const t=e.results[0][0].transcript;$('status').textContent='Ucapan dikenali: “'+t+'”. Mohon periksa hasilnya.';parseVoice(t)};rec.onerror=e=>$('status').textContent='Input suara gagal ('+e.error+'). Silakan masukkan secara manual.';rec.onend=()=>$('voiceBtn').textContent='🎙 Input dengan suara';rec.start()};
 const sigInk={};const canvases=['buyerSig','sellerSig'];
-function setupCanvas(id){const c=$(id),rect=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=Math.round(rect.width*dpr);c.height=Math.round(rect.height*dpr);const cx=c.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);cx.lineWidth=2.2;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#172435';let drawing=false,last=null;function pos(e){const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}c.addEventListener('pointerdown',e=>{drawing=true;sigInk[id]=true;last=pos(e);c.setPointerCapture(e.pointerId)});c.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);cx.beginPath();cx.moveTo(last.x,last.y);cx.lineTo(p.x,p.y);cx.stroke();last=p});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>c.addEventListener(ev,()=>drawing=false))}
-function clearSignature(id){const c=$(id);c.getContext('2d').clearRect(0,0,c.width,c.height);sigInk[id]=false}
+function setupCanvas(id){
+ const c=$(id);
+ const cx=c.getContext('2d');
+ let drawing=false,last=null;
+ function styleContext(){
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  cx.lineWidth=2.4;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#172435';
+ }
+ function pos(clientX,clientY){
+  const r=c.getBoundingClientRect();
+  return {x:clientX-r.left,y:clientY-r.top};
+ }
+ function startAt(x,y,e){
+  if(e&&e.cancelable)e.preventDefault();
+  drawing=true;sigInk[id]=true;last=pos(x,y);
+  // Draw a small dot for a tap, so a brief touch is still visible.
+  cx.beginPath();cx.arc(last.x,last.y,1.2,0,Math.PI*2);cx.fillStyle='#172435';cx.fill();
+  try{if(e&&typeof e.pointerId==='number'&&c.setPointerCapture)c.setPointerCapture(e.pointerId)}catch(_){}
+ }
+ function moveTo(x,y,e){
+  if(!drawing)return;
+  if(e&&e.cancelable)e.preventDefault();
+  const p=pos(x,y);
+  cx.beginPath();cx.moveTo(last.x,last.y);cx.lineTo(p.x,p.y);cx.stroke();last=p;
+ }
+ function finish(e){if(e&&e.cancelable)e.preventDefault();drawing=false;last=null}
+ function resizeCanvas(){
+  const r=c.getBoundingClientRect();
+  if(!r.width)return;
+  let saved=null;
+  if(sigInk[id]){try{saved=c.toDataURL('image/png')}catch(_){}}
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  c.width=Math.round(r.width*dpr);
+  c.height=Math.round(Math.max(r.height,150)*dpr);
+  styleContext();
+  if(saved){const im=new Image();im.onload=()=>{const rr=c.getBoundingClientRect();cx.drawImage(im,0,0,rr.width,rr.height)};im.src=saved;}
+ }
+ resizeCanvas();
+ if('PointerEvent' in window){
+  c.addEventListener('pointerdown',e=>startAt(e.clientX,e.clientY,e),{passive:false});
+  c.addEventListener('pointermove',e=>moveTo(e.clientX,e.clientY,e),{passive:false});
+  c.addEventListener('pointerup',finish,{passive:false});
+  c.addEventListener('pointercancel',finish,{passive:false});
+  c.addEventListener('lostpointercapture',()=>{drawing=false;last=null});
+ }else{
+  c.addEventListener('touchstart',e=>{if(e.touches.length){const t=e.touches[0];startAt(t.clientX,t.clientY,e)}},{passive:false});
+  c.addEventListener('touchmove',e=>{if(e.touches.length){const t=e.touches[0];moveTo(t.clientX,t.clientY,e)}},{passive:false});
+  c.addEventListener('touchend',finish,{passive:false});
+  c.addEventListener('touchcancel',finish,{passive:false});
+  c.addEventListener('mousedown',e=>startAt(e.clientX,e.clientY,e));
+  window.addEventListener('mousemove',e=>moveTo(e.clientX,e.clientY,e));
+  window.addEventListener('mouseup',finish);
+ }
+}
+function clearSignature(id){const c=$(id),cx=c.getContext('2d');cx.clearRect(0,0,c.width,c.height);sigInk[id]=false}
 function signatureData(id){return sigInk[id]?$(id).toDataURL('image/png'):null}
-document.querySelectorAll('.clearSig').forEach(b=>b.onclick=()=>clearSignature(b.dataset.canvas));canvases.forEach(setupCanvas);
+document.querySelectorAll('.clearSig').forEach(b=>b.onclick=()=>clearSignature(b.dataset.canvas));
+canvases.forEach(setupCanvas);
+window.addEventListener('resize',()=>{canvases.forEach(id=>{const c=$(id),cx=c.getContext('2d');let saved=null;if(sigInk[id]){try{saved=c.toDataURL('image/png')}catch(_){}}const r=c.getBoundingClientRect(),dpr=Math.max(1,window.devicePixelRatio||1);if(!r.width)return;c.width=Math.round(r.width*dpr);c.height=Math.round(Math.max(r.height,150)*dpr);cx.setTransform(dpr,0,0,dpr,0,0);cx.lineWidth=2.4;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#172435';if(saved){const im=new Image();im.onload=()=>cx.drawImage(im,0,0,r.width,r.height);im.src=saved;}})});
 $('savePdf').onclick=()=>{const v=invoice();if(!validate(v))return;if(!window.jspdf){alert('Pustaka PDF belum termuat. Periksa koneksi internet lalu coba lagi.');return}const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4'});const blue=[18,60,122],pale=[230,238,248];d.setTextColor(...blue);d.setFont('helvetica','bold');d.setFontSize(22);d.text('ASIDO',14,19);d.setDrawColor(...blue);d.setLineWidth(.5);d.line(47,9,47,21);d.setFontSize(15);d.text('NOTA PENJUALAN',51,18);d.setTextColor(30);d.setFont('helvetica','normal');d.setFontSize(10);d.text('Tanggal: '+(v.date||'-'),196,29,{align:'right'});d.setTextColor(90);d.text('Pelanggan:',14,35);d.setTextColor(25);d.setFont('helvetica','bold');d.setFontSize(12);d.text(v.customer,14,42);let y=51;d.setFillColor(...pale);d.rect(14,y-5,182,8,'F');d.setFont('helvetica','bold');d.setFontSize(10);d.text('Barang',17,y);d.text('Qty',112,y,{align:'right'});d.text('Harga',147,y,{align:'right'});d.text('Subtotal',193,y,{align:'right'});d.setFont('helvetica','normal');y+=8;v.items.filter(r=>r.name.trim()&&r.qty>0).forEach(r=>{const lines=d.splitTextToSize(r.name,85);if(y+Math.max(7,lines.length*5)>245){d.addPage();y=20}d.text(lines,17,y);d.text(String(r.qty),112,y,{align:'right'});d.text(money(r.price),147,y,{align:'right'});d.text(money(r.qty*r.price),193,y,{align:'right'});y+=Math.max(8,lines.length*5)});y+=2;d.setDrawColor(30);d.line(120,y,196,y);y+=7;d.setFontSize(10);d.text('Subtotal:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=8;d.setFont('helvetica','bold');d.setFontSize(13);d.text('TOTAL:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=11;
 if(v.notes){d.setFont('helvetica','bold');d.setTextColor(...blue);d.setFontSize(11);d.text('Catatan:',14,y);y+=6;d.setDrawColor(175,190,210);d.setLineWidth(.3);const noteLines=d.splitTextToSize(v.notes,172);const h=Math.min(28,Math.max(13,noteLines.length*5+5));d.roundedRect(14,y-4,182,h,2,2,'S');d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(9);d.text(noteLines.slice(0,5),17,y+2);y+=h+8}else y+=3;
 let sigY=Math.max(y+8,218);if(sigY>258){d.addPage();sigY=35}d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(10);d.text('Pelanggan,',20,sigY);d.text('ASIDO,',145,sigY);if(v.buyer)d.addImage(v.buyer,'PNG',17,sigY+2,63,20);if(v.seller)d.addImage(v.seller,'PNG',132,sigY+2,63,20);d.setDrawColor(50);d.line(16,sigY+24,82,sigY+24);d.line(130,sigY+24,196,sigY+24);d.setFontSize(9);d.text('('+v.customer+')',49,sigY+30,{align:'center'});d.text('(David Asido)',163,sigY+30,{align:'center'});d.setTextColor(80);d.setFontSize(8);d.text('Dibuat dengan ASIDO Nota Digital',14,287);const file='ASIDO-Nota-'+(v.date||'').replaceAll('-','')+'-'+v.customer.replace(/[^a-z0-9]/gi,'-').slice(0,20)+'.pdf';d.save(file);$('status').textContent='PDF berhasil dibuat dan diunduh. Simpan riwayat juga bila ingin membuka nota ini lagi.'};
