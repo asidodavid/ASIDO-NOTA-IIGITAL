@@ -47,7 +47,42 @@ function renderHistory(){$('history').innerHTML=historyData.slice(0,20).map((h,i
 function loadInvoice(v){$('date').value=v.date||'';$('customer').value=v.customer||'';$('notes').value=v.notes||'';rows=(v.items||[]).map(r=>({...r}));renderRows();['buyerSig','sellerSig'].forEach(id=>clearSignature(id));[['buyerSig',v.buyer],['sellerSig',v.seller]].forEach(([id,data])=>{if(data){const im=new Image();im.onload=()=>{const c=$(id),cx=c.getContext('2d'),rect=c.getBoundingClientRect();cx.drawImage(im,0,0,rect.width,rect.height);sigInk[id]=true};im.src=data}});window.scrollTo({top:0,behavior:'smooth'});$('status').textContent='Nota lama dimuat.'}
 $('exportData').onclick=()=>{const blob=new Blob([JSON.stringify({products,history:historyData},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='asido-backup.json';a.click();URL.revokeObjectURL(a.href)};
 $('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
-function parseVoice(text){const low=text.toLowerCase();const found=products.find(p=>low.includes(p.name.toLowerCase()));if(!found){const name=prompt('Nama barang yang diucapkan:\n'+text);if(!name)return;const q=Number(prompt('Jumlah barang:','1'));const p=Number(prompt('Harga satuan dalam rupiah:','0'));if(q>0&&p>=0)addRow(name,q,p);return}const rest=low.replace(found.name.toLowerCase(),' ');const nums=(rest.match(/\d[\d.,]*/g)||[]).map(x=>Number(x.replace(/\./g,'').replace(',','.'))).filter(Number.isFinite);let qty=nums[0]||1,price=nums[1]||found.price;const priceMatch=low.match(/harga\s*(\d+)\s*(ribu|rb)/);if(priceMatch)price=Number(priceMatch[1])*1000;addRow(found.name,qty,price)}
+function parseVoice(text){
+ const low=text.toLowerCase();
+ const cleanName=s=>s.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\\s+/g,' ').trim();
+ const spoken=cleanName(low);
+ const found=products.find(p=>spoken.includes(cleanName(p.name)));
+ const amount=n=>{let s=String(n).trim();if(/\\.\\d{3}$/.test(s))s=s.replace(/\\./g,'');if(/,\\d{3}$/.test(s))s=s.replace(/,/g,'');else s=s.replace(',','.');return Number(s)||0};
+ const qtyPart=low.split(/\\bharga\\b/)[0];
+ const qMatch=qtyPart.match(/(\\d+(?:[.,]\\d+)?)\\s*(lusin|dozen|kodi|buah|pcs|biji|unit|batang|set)?/);
+ let qty=qMatch?amount(qMatch[1]):1;
+ const unit=qMatch&&qMatch[2]?qMatch[2]:'';
+ if(unit==='lusin'||unit==='dozen')qty*=12;
+ else if(unit==='kodi')qty*=20;
+ let explicitPrice=null;
+ const pm=low.match(/\\bharga\\s*(\\d[\\d.,]*)\\s*(ribu|rb)?/);
+ if(pm){explicitPrice=amount(pm[1]);if(pm[2])explicitPrice*=1000;}
+ else {
+   const pm2=low.match(/(\\d[\\d.,]*)\\s*(ribu|rb)\\b/);
+   if(pm2 && (!qMatch || pm2[1]!==qMatch[1])) explicitPrice=amount(pm2[1])*1000;
+ }
+ let selected=found;
+ if(!selected){
+   const typed=prompt('Saya menangkap ucapan: "'+text+'". Nama barang belum terdengar atau tidak cocok dengan daftar produk. Ketik nama barangnya, misalnya Sapu ijuk atau Pel capit katun.','');
+   if(!typed)return;
+   const typedNorm=cleanName(typed);
+   selected=products.find(p=>typedNorm===cleanName(p.name)||typedNorm.includes(cleanName(p.name))||cleanName(p.name).includes(typedNorm));
+   const productName=selected?selected.name:typed.trim();
+   if(!qMatch){const q=prompt('Jumlah barang (gunakan satuan dasar/buah):','1');if(q===null)return;qty=Number(q)||0;}
+   let price=explicitPrice!==null?explicitPrice:(selected?selected.price:null);
+   if(price===null){const p=prompt('Harga satuan dalam rupiah (angka saja):','0');if(p===null)return;price=amount(p);}
+   if(qty>0 && price>=0){addRow(productName,qty,price);$('status').textContent='Ditambahkan: '+productName+' · '+qty+' unit · '+money(price)+' per unit. Periksa kembali data barang.';}
+   return;
+ }
+ if(!qMatch){const q=prompt('Jumlah untuk '+found.name+' (satuan dasar/buah):','1');if(q===null)return;qty=Number(q)||0;}
+ const price=explicitPrice!==null?explicitPrice:found.price;
+ if(qty>0 && price>=0){addRow(found.name,qty,price);$('status').textContent='Ditambahkan: '+found.name+' · '+qty+' unit · '+money(price)+' per unit. Periksa kembali data barang.';}
+}
 $('voiceBtn').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Browser belum mendukung input suara. Gunakan Chrome terbaru atau masukkan barang manual.');return}const rec=new SR();rec.lang='id-ID';rec.interimResults=false;rec.maxAlternatives=1;$('voiceBtn').textContent='🎙 Mendengarkan…';rec.onresult=e=>{const t=e.results[0][0].transcript;$('status').textContent='Ucapan dikenali: “'+t+'”. Mohon periksa hasilnya.';parseVoice(t)};rec.onerror=e=>$('status').textContent='Input suara gagal ('+e.error+'). Silakan masukkan secara manual.';rec.onend=()=>$('voiceBtn').textContent='🎙 Input dengan suara';rec.start()};
 const sigInk={};const canvases=['buyerSig','sellerSig'];
 function setupCanvas(id){const c=$(id),rect=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=Math.round(rect.width*dpr);c.height=Math.round(rect.height*dpr);const cx=c.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);cx.lineWidth=2.2;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#172435';let drawing=false,last=null;function pos(e){const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}c.addEventListener('pointerdown',e=>{drawing=true;sigInk[id]=true;last=pos(e);c.setPointerCapture(e.pointerId)});c.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);cx.beginPath();cx.moveTo(last.x,last.y);cx.lineTo(p.x,p.y);cx.stroke();last=p});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>c.addEventListener(ev,()=>drawing=false))}
