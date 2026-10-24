@@ -3,7 +3,7 @@
 <style>
 :root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#172435;background:#f2f6fb}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#123c7a,#1769aa);color:#fff;padding:20px 14px}header h1{font-size:24px;margin:0}header p{margin:5px 0 0;font-size:14px}.wrap{max-width:850px;margin:auto;padding:12px}.card{background:#fff;border-radius:16px;margin:0 0 13px;padding:15px;box-shadow:0 4px 18px #152f5010}h2{font-size:18px;margin:0 0 12px;color:#123c7a}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}label{font-size:13px;font-weight:650;color:#47566b}input,select,textarea{font:inherit;width:100%;min-width:0;border:1px solid #d2dce8;border-radius:10px;padding:11px;background:#fff;color:#172435}button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:12px 14px;cursor:pointer;background:#123c7a;color:#fff}.secondary{background:#e8eef8;color:#123c7a}.green{background:#13814b}.red{background:#a52b36}.buttons{display:flex;gap:8px;flex-wrap:wrap}.buttons button{flex:1}.pdf-action-link{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;font:inherit;font-weight:700;border-radius:10px;padding:12px 14px;flex:1;min-width:0}.pdf-action-link.secondary{background:#e8eef8;color:#123c7a}.pdf-action-link.green{background:#13814b;color:#fff}.item{border:1px solid #e0e7f0;border-radius:12px;padding:11px;margin:9px 0}.itemgrid{display:grid;grid-template-columns:1.5fr .65fr .95fr;gap:8px}.itemgrid label{display:block;margin-bottom:5px}.itemgrid .namefield{min-width:0}.muted{color:#68778b;font-size:12px;line-height:1.5}.total{text-align:right;color:#123c7a;font-size:23px;font-weight:800;margin:12px 0}.siggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sigbox{border:1px solid #e0e7f0;border-radius:12px;padding:10px}.sig{display:block;width:100%;height:150px;min-height:150px;border:1px dashed #7f94ad;border-radius:9px;touch-action:none;-ms-touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;background:#fff;cursor:crosshair;}.historyrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #edf0f5}.historyrow:last-child{border:0}.small{font-size:12px}@media(max-width:520px){.grid,.siggrid{grid-template-columns:1fr}.itemgrid{grid-template-columns:1fr 1fr}.itemgrid .namefield{grid-column:1/-1}.wrap{padding:9px}.card{padding:12px}header h1{font-size:22px}}
 </style></head><body>
-<header><div class="wrap"><h1>ASIDO Nota Digital</h1><p>Nota penjualan · input suara · dua tanda tangan · PDF</p><p style="font-size:11px;opacity:.85">Versi Android: cetak / simpan PDF</p></div></header>
+<header><div class="wrap"><h1>ASIDO Nota Digital</h1><p>Nota penjualan · input suara · dua tanda tangan · PDF</p><p style="font-size:11px;opacity:.85">PDF dan gambar nota untuk WhatsApp</p></div></header>
 <main class="wrap">
 <section class="card"><h2>1. Informasi Nota</h2><div class="grid">
 <div class="field"><label>Tanggal nota</label><input id="date" type="date"></div>
@@ -32,7 +32,17 @@
 <div class="sigbox"><label>Tanda tangan pelanggan</label><canvas id="buyerSig" class="sig"></canvas><div class="buttons" style="margin-top:7px"><button type="button" class="secondary clearSig" data-canvas="buyerSig">Hapus</button></div></div>
 <div class="sigbox"><label>Tanda tangan penjual / ASIDO</label><canvas id="sellerSig" class="sig"></canvas><div class="buttons" style="margin-top:7px"><button type="button" class="secondary clearSig" data-canvas="sellerSig">Hapus</button></div></div>
 </div><p class="muted">Minta pelanggan dan penjual menggambar tanda tangan masing-masing dengan jari di area kotak.</p></section>
-<section class="card"><h2>5. Simpan Nota</h2><div class="buttons"><button type="button" id="savePdf" class="green">Buat / Simpan PDF</button><button type="button" id="printPdfPhone" class="secondary">Cetak / Simpan PDF (HP)</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="saveHistory" class="secondary">Simpan Riwayat</button></div><p id="status" class="muted" role="status"></p><div id="pdfActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px"><strong style="color:#123c7a">PDF sudah dibuat</strong><p class="muted">Di HP Android, pilihan Cetak / Simpan PDF membuka dialog cetak perangkat. Pada dialog tersebut, pilih printer “Save as PDF / Simpan sebagai PDF”, kemudian tekan tombol simpan. Setelah file tersimpan, bagikan dari My Files &gt; Downloads.</p><div class="buttons"><a id="pdfDownloadLink" class="pdf-action-link secondary" href="#" download>Unduh PDF</a><a id="pdfShareLink" class="pdf-action-link green" href="#" download>Unduh untuk dibagikan</a></div><div class="buttons" style="margin-top:8px"><a id="pdfPreviewLink" class="pdf-action-link secondary" href="#" target="_blank" rel="noopener">Buka PDF di tab baru</a></div></div></section>
+<section class="card"><h2>5. Simpan Nota</h2>
+<div class="buttons"><button type="button" id="makeNotaImage" class="green">Buat Gambar Nota untuk WhatsApp</button></div>
+<div id="notaImageActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px">
+ <strong style="color:#123c7a">Gambar nota siap</strong>
+ <p class="muted">Gambar ini bisa dikirim sebagai foto di WhatsApp, sehingga pelanggan dapat langsung membacanya di chat. Tekan Bagikan Gambar untuk memilih WhatsApp, atau unduh PNG lalu bagikan melalui Galeri / My Files.</p>
+ <img id="notaImagePreview" alt="Pratinjau gambar nota ASIDO" style="display:block;width:100%;height:auto;border:1px solid #d8e2ef;border-radius:8px;background:#fff;margin:10px 0">
+ <div class="buttons"><button type="button" id="shareNotaImage" class="green">Bagikan Gambar</button><a id="downloadNotaImage" class="pdf-action-link secondary" href="#" download="ASIDO-Nota.png">Unduh Gambar PNG</a></div>
+ <p id="notaImageStatus" class="muted" role="status"></p>
+</div>
+<div style="margin-top:14px"><strong>PDF (pilihan tambahan)</strong></div>
+<div class="buttons"><button type="button" id="savePdf" class="secondary">Buat / Simpan PDF</button><button type="button" id="printPdfPhone" class="secondary">Cetak / Simpan PDF (HP)</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="saveHistory" class="secondary">Simpan Riwayat</button></div><p id="status" class="muted" role="status"></p><div id="pdfActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px"><strong style="color:#123c7a">PDF sudah dibuat</strong><p class="muted">Di HP Android, pilihan Cetak / Simpan PDF membuka dialog cetak perangkat. Pada dialog tersebut, pilih printer “Save as PDF / Simpan sebagai PDF”, kemudian tekan tombol simpan. Setelah file tersimpan, bagikan dari My Files &gt; Downloads.</p><div class="buttons"><a id="pdfDownloadLink" class="pdf-action-link secondary" href="#" download>Unduh PDF</a><a id="pdfShareLink" class="pdf-action-link green" href="#" download>Unduh untuk dibagikan</a></div><div class="buttons" style="margin-top:8px"><a id="pdfPreviewLink" class="pdf-action-link secondary" href="#" target="_blank" rel="noopener">Buka PDF di tab baru</a></div></div></section>
 <section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memindahkan data antara komputer dan HP, ekspor cadangan dari perangkat pertama, pindahkan file JSON melalui Google Drive, lalu impor di perangkat kedua. Data tidak otomatis tersinkron.</p><div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button><button type="button" id="importDataBtn" class="secondary">Impor cadangan</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><div class="buttons" style="margin-top:8px"><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -319,6 +329,107 @@ function printInvoiceForPhone(){
  window.print();
 }
 $('printPdfPhone').onclick=()=>printInvoiceForPhone();
+async function loadSignatureImage(dataUrl){
+ if(!dataUrl)return null;
+ return new Promise(resolve=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=dataUrl;});
+}
+function wrapCanvasText(ctx,text,maxWidth){
+ const words=String(text||'').split(/\s+/);const lines=[];let line='';
+ words.forEach(word=>{const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}else line=test;});
+ if(line)lines.push(line);return lines.length?lines:[''];
+}
+function roundedRect(ctx,x,y,w,h,r){
+ const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+}
+function createCanvasNota(v,buyerImage,sellerImage){
+ const W=1400,pad=76,rowFont=28,lineHeight=36;
+ const rows=v.items.filter(r=>String(r.name||'').trim()&&Number(r.qty)>0);
+ const measure=document.createElement('canvas').getContext('2d');measure.font='28px Arial, sans-serif';
+ const rowData=rows.map(r=>({r,lines:wrapCanvasText(measure,r.name,620)}));
+ let H=360;
+ rowData.forEach(d=>{H+=Math.max(76,d.lines.length*lineHeight+28);});
+ H+=155;
+ let noteLines=[];
+ if(v.notes){measure.font='25px Arial, sans-serif';noteLines=wrapCanvasText(measure,v.notes,W-pad*2-42);H+=62+noteLines.length*34+28;}
+ H+=330;
+ const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+ const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+ const blue='#123c7a',pale='#e6eef8',dark='#172435',gray='#556477',border='#c9d5e4';
+ ctx.fillStyle=blue;ctx.font='bold 66px Arial, sans-serif';ctx.fillText('ASIDO',pad,106);
+ ctx.strokeStyle=blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(320,49);ctx.lineTo(320,118);ctx.stroke();
+ ctx.font='bold 44px Arial, sans-serif';ctx.fillText('NOTA PENJUALAN',355,99);
+ ctx.fillStyle=gray;ctx.textAlign='right';ctx.font='26px Arial, sans-serif';ctx.fillText('Tanggal: '+(v.date||'-'),W-pad,154);ctx.textAlign='left';
+ ctx.fillStyle=gray;ctx.font='26px Arial, sans-serif';ctx.fillText('Pelanggan:',pad,205);
+ ctx.fillStyle=dark;ctx.font='bold 38px Arial, sans-serif';
+ const custLines=wrapCanvasText(ctx,v.customer,W-pad*2);let cy=252;custLines.forEach(line=>{ctx.fillText(line,pad,cy);cy+=45;});
+ let y=Math.max(305,cy+18);
+ ctx.fillStyle=pale;roundedRect(ctx,pad,y,W-pad*2,58,8);ctx.fill();
+ ctx.fillStyle=dark;ctx.font='bold 25px Arial, sans-serif';ctx.textAlign='left';ctx.fillText('Barang',pad+18,y+38);ctx.textAlign='right';ctx.fillText('Qty',860,y+38);ctx.fillText('Harga',1095,y+38);ctx.fillText('Subtotal',W-pad-18,y+38);ctx.textAlign='left';
+ y+=58;
+ rowData.forEach(({r,lines})=>{
+  const rh=Math.max(76,lines.length*lineHeight+28);
+  ctx.strokeStyle='#e6eaf0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,y+rh);ctx.lineTo(W-pad,y+rh);ctx.stroke();
+  ctx.fillStyle=dark;ctx.font='27px Arial, sans-serif';let ty=y+39;lines.forEach(line=>{ctx.fillText(line,pad+18,ty);ty+=lineHeight;});
+  ctx.textAlign='right';ctx.font='26px Arial, sans-serif';ctx.fillText(String(r.qty),860,y+42);ctx.fillText(money(r.price),1095,y+42);ctx.font='bold 26px Arial, sans-serif';ctx.fillText(money((Number(r.qty)||0)*(Number(r.price)||0)),W-pad-18,y+42);ctx.textAlign='left';
+  y+=rh;
+ });
+ y+=26;ctx.strokeStyle='#343b45';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(855,y);ctx.lineTo(W-pad,y);ctx.stroke();y+=48;
+ ctx.fillStyle=dark;ctx.font='27px Arial, sans-serif';ctx.fillText('Subtotal:',900,y);ctx.textAlign='right';ctx.fillText(money(v.total),W-pad-18,y);y+=48;
+ ctx.fillStyle=blue;ctx.font='bold 36px Arial, sans-serif';ctx.fillText('TOTAL:',900,y);ctx.fillText(money(v.total),W-pad-18,y);ctx.textAlign='left';y+=40;
+ if(v.notes){
+  y+=20;ctx.fillStyle=blue;ctx.font='bold 27px Arial, sans-serif';ctx.fillText('Catatan:',pad,y);y+=18;
+  const boxH=noteLines.length*34+32;ctx.strokeStyle=border;ctx.lineWidth=2;roundedRect(ctx,pad,y,W-pad*2,boxH,8);ctx.stroke();
+  ctx.fillStyle=dark;ctx.font='25px Arial, sans-serif';let ny=y+38;noteLines.forEach(line=>{ctx.fillText(line,pad+18,ny);ny+=34;});y+=boxH+8;
+ }
+ y+=34;ctx.fillStyle=dark;ctx.font='25px Arial, sans-serif';ctx.fillText('Pelanggan,',pad+35,y);ctx.fillText('ASIDO,',W/2+80,y);y+=10;
+ const sigW=440,sigH=125,sigLeft=pad+35,sigRight=W/2+65;
+ if(buyerImage){ctx.drawImage(buyerImage,sigLeft,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigLeft,y,sigW,sigH);}
+ if(sellerImage){ctx.drawImage(sellerImage,sigRight,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigRight,y,sigW,sigH);}
+ y+=sigH+8;ctx.strokeStyle='#454b55';ctx.lineWidth=2;
+ ctx.beginPath();ctx.moveTo(sigLeft,y);ctx.lineTo(sigLeft+sigW,y);ctx.moveTo(sigRight,y);ctx.lineTo(sigRight+sigW,y);ctx.stroke();y+=38;
+ ctx.fillStyle=dark;ctx.font='23px Arial, sans-serif';ctx.textAlign='center';ctx.fillText('('+v.customer+')',sigLeft+sigW/2,y);ctx.fillText('(David Asido)',sigRight+sigW/2,y);ctx.textAlign='left';
+ ctx.fillStyle=gray;ctx.font='19px Arial, sans-serif';ctx.fillText('Dibuat dengan ASIDO Nota Digital',pad,H-24);
+ return canvas;
+}
+let latestNotaImageBlob=null,latestNotaImageFile=null,latestNotaImageUrl='';
+$('makeNotaImage').onclick=async()=>{
+ try{
+  const v=invoice();if(!validate(v))return;
+  $('notaImageStatus').textContent='Sedang membuat gambar nota…';
+  const [buyerImage,sellerImage]=await Promise.all([loadSignatureImage(v.buyer),loadSignatureImage(v.seller)]);
+  const canvas=createCanvasNota(v,buyerImage,sellerImage);
+  latestNotaImageBlob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Browser tidak dapat membuat gambar PNG.')),'image/png'));
+  const datePart=(v.date||'').replace(/-/g,'');
+  const safeCustomer=(v.customer||'Pelanggan').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,32)||'Pelanggan';
+  const fileName='ASIDO-Nota-'+datePart+'-'+safeCustomer+'.png';
+  latestNotaImageFile=new File([latestNotaImageBlob],fileName,{type:'image/png'});
+  if(latestNotaImageUrl){try{URL.revokeObjectURL(latestNotaImageUrl)}catch(_){}}
+  latestNotaImageUrl=URL.createObjectURL(latestNotaImageBlob);
+  $('notaImagePreview').src=latestNotaImageUrl;
+  $('downloadNotaImage').href=latestNotaImageUrl;
+  $('downloadNotaImage').download=fileName;
+  $('notaImageActions').hidden=false;
+  $('notaImageStatus').textContent='Gambar nota siap. Untuk mengirim lewat WhatsApp sebagai foto, tekan Bagikan Gambar. Jika pilihan berbagi tidak menyertakan gambar, unduh PNG lalu bagikan dari Galeri atau My Files.';
+  $('pdfActions').hidden=true;
+  $('status').textContent='Gambar nota berhasil dibuat.';
+ }catch(err){
+  $('notaImageStatus').textContent='Gagal membuat gambar nota: '+(err&&err.message?err.message:String(err));
+ }
+};
+$('shareNotaImage').onclick=async()=>{
+ if(!latestNotaImageFile){$('notaImageStatus').textContent='Buat Gambar Nota untuk WhatsApp terlebih dahulu.';return;}
+ try{
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[latestNotaImageFile]})){
+   await navigator.share({files:[latestNotaImageFile],title:'Nota ASIDO'});
+   $('notaImageStatus').textContent='Menu berbagi ditutup. Jika Anda memilih WhatsApp, pastikan pratinjau foto tampil sebelum menekan Kirim. Jika gambar tidak muncul, gunakan Unduh Gambar PNG lalu bagikan melalui Galeri.';
+  }else{
+   $('notaImageStatus').textContent='Berbagi gambar langsung tidak didukung pada tampilan browser ini. Tekan Unduh Gambar PNG, lalu buka Galeri / My Files, pilih gambar ASIDO-Nota terbaru, tekan Bagikan, dan pilih WhatsApp.';
+  }
+ }catch(err){
+  if(err&&err.name==='AbortError')$('notaImageStatus').textContent='Berbagi dibatalkan. Gambar tetap tersedia untuk diunduh.';
+  else $('notaImageStatus').textContent='Gagal membuka menu berbagi. Unduh Gambar PNG lalu bagikan dari Galeri / My Files.';
+ }
+};
 $('savePdf').onclick=()=>{try{const v=invoice();if(!validate(v))return;if(!window.jspdf){$('status').textContent='Pustaka PDF belum termuat. Periksa koneksi internet, muat ulang halaman, lalu coba lagi.';alert('Pustaka PDF belum termuat. Periksa koneksi internet lalu coba lagi.');return}const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4'});const blue=[18,60,122],pale=[230,238,248];d.setTextColor(...blue);d.setFont('helvetica','bold');d.setFontSize(22);d.text('ASIDO',14,19);d.setDrawColor(...blue);d.setLineWidth(.5);d.line(47,9,47,21);d.setFontSize(15);d.text('NOTA PENJUALAN',51,18);d.setTextColor(30);d.setFont('helvetica','normal');d.setFontSize(10);d.text('Tanggal: '+(v.date||'-'),196,29,{align:'right'});d.setTextColor(90);d.text('Pelanggan:',14,35);d.setTextColor(25);d.setFont('helvetica','bold');d.setFontSize(12);d.text(v.customer,14,42);let y=51;d.setFillColor(...pale);d.rect(14,y-5,182,8,'F');d.setFont('helvetica','bold');d.setFontSize(10);d.text('Barang',17,y);d.text('Qty',112,y,{align:'right'});d.text('Harga',147,y,{align:'right'});d.text('Subtotal',193,y,{align:'right'});d.setFont('helvetica','normal');y+=8;v.items.filter(r=>r.name.trim()&&r.qty>0).forEach(r=>{const lines=d.splitTextToSize(r.name,85);if(y+Math.max(7,lines.length*5)>245){d.addPage();y=20}d.text(lines,17,y);d.text(String(r.qty),112,y,{align:'right'});d.text(money(r.price),147,y,{align:'right'});d.text(money(r.qty*r.price),193,y,{align:'right'});y+=Math.max(8,lines.length*5)});y+=2;d.setDrawColor(30);d.line(120,y,196,y);y+=7;d.setFontSize(10);d.text('Subtotal:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=8;d.setFont('helvetica','bold');d.setFontSize(13);d.text('TOTAL:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=11;
 if(v.notes){d.setFont('helvetica','bold');d.setTextColor(...blue);d.setFontSize(11);d.text('Catatan:',14,y);y+=6;d.setDrawColor(175,190,210);d.setLineWidth(.3);const noteLines=d.splitTextToSize(v.notes,172);const h=Math.min(28,Math.max(13,noteLines.length*5+5));d.roundedRect(14,y-4,182,h,2,2,'S');d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(9);d.text(noteLines.slice(0,5),17,y+2);y+=h+8}else y+=3;
 let sigY=Math.max(y+8,218);if(sigY>258){d.addPage();sigY=35}d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(10);d.text('Pelanggan,',20,sigY);d.text('ASIDO,',145,sigY);if(v.buyer)d.addImage(v.buyer,'PNG',17,sigY+2,63,20);if(v.seller)d.addImage(v.seller,'PNG',132,sigY+2,63,20);d.setDrawColor(50);d.line(16,sigY+24,82,sigY+24);d.line(130,sigY+24,196,sigY+24);d.setFontSize(9);d.text('('+v.customer+')',49,sigY+30,{align:'center'});d.text('(David Asido)',163,sigY+30,{align:'center'});d.setTextColor(80);d.setFontSize(8);d.text('Dibuat dengan ASIDO Nota Digital',14,287);const file='ASIDO-Nota-'+(v.date||'').replaceAll('-','')+'-'+v.customer.replace(/[^a-z0-9]/gi,'-').slice(0,20)+'.pdf';const blob=d.output('blob');preparePdfActions(blob,file,d);$('status').textContent='PDF siap. Sekarang ketuk tautan Unduh PDF di dalam kotak PDF sudah dibuat. Jika tidak berjalan, ketuk Buka PDF di tab baru.';}catch(err){console.error(err);$('status').textContent='PDF belum berhasil dibuat: '+(err&&err.message?err.message:'kesalahan tidak dikenal')+'. Muat ulang halaman dan coba lagi.';alert('PDF belum berhasil dibuat. Periksa pesan di bawah tombol PDF; bila perlu muat ulang halaman.');}};
