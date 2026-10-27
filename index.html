@@ -27,7 +27,7 @@
 <p class="muted">Setelah mengubah katalog, barang yang sudah dimasukkan ke nota yang sedang dibuat tidak berubah otomatis. Pilih kembali produk yang diinginkan untuk menggunakan harga katalog terbaru.</p>
 </details>
 </section>
-<section class="card"><h2>3. Catatan</h2><div class="field"><label>Catatan transaksi (opsional)</label><textarea id="notes" rows="3" placeholder="Contoh: Pembayaran tunai. Barang diterima dengan baik."></textarea></div></section>
+<section class="card"><h2>3. Catatan</h2><div class="field"><label>Catatan transaksi (opsional)</label><textarea id="notes" rows="3" placeholder="Contoh: Toko A akan mentransfer uang tanggal 30/10/26"></textarea></div><div class="buttons"><button type="button" id="addCalendarReminder" class="secondary">📅 Buat pengingat Google Kalender</button></div><p class="muted">Tulis tanggal pada catatan, misalnya 30/10/26. Tombol ini akan membuka Google Kalender dengan acara dan tanggal sudah terisi. Anda tetap perlu menekan Simpan di Google Kalender agar acara masuk ke kalender.</p><p id="calendarStatus" class="muted" role="status"></p></section>
 <section class="card"><h2>4. Tanda Tangan</h2><div class="siggrid">
 <div class="sigbox"><label>Tanda tangan pelanggan</label><canvas id="buyerSig" class="sig"></canvas><div class="buttons" style="margin-top:7px"><button type="button" class="secondary clearSig" data-canvas="buyerSig">Hapus</button></div></div>
 <div class="sigbox"><label>Tanda tangan penjual / ASIDO</label><canvas id="sellerSig" class="sig"></canvas><div class="buttons" style="margin-top:7px"><button type="button" class="secondary clearSig" data-canvas="sellerSig">Hapus</button></div></div>
@@ -113,6 +113,35 @@ $('deleteCatalogProduct').onclick=()=>{
 };
 $('addProduct').onclick=()=>{const i=$('productSelect').value;if(i===''){alert('Pilih produk dahulu.');return}const p=products[+i];addRow(p.name,1,p.price);$('productSelect').value=''};
 $('addBlank').onclick=()=>addRow();
+function parseDateFromCalendarNote(text){
+ const iso=text.match(/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/);
+ let year,month,day;
+ if(iso){year=Number(iso[1]);month=Number(iso[2]);day=Number(iso[3]);}
+ else{
+  const local=text.match(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2}|\d{4})\b/);
+  if(!local)return null;
+  day=Number(local[1]);month=Number(local[2]);year=Number(local[3]);if(year<100)year+=2000;
+ }
+ const dt=new Date(Date.UTC(year,month-1,day));
+ if(dt.getUTCFullYear()!==year||dt.getUTCMonth()!==month-1||dt.getUTCDate()!==day)return null;
+ return {year,month,day,date:year+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0')};
+}
+$('addCalendarReminder').onclick=()=>{
+ const note=$('notes').value.trim();
+ if(!note){$('calendarStatus').textContent='Isi Catatan terlebih dahulu, termasuk tanggal pengingat. Contoh: Toko A akan mentransfer uang tanggal 30/10/26.';alert('Isi Catatan terlebih dahulu, termasuk tanggal pengingat.');return;}
+ const parsed=parseDateFromCalendarNote(note);
+ if(!parsed){$('calendarStatus').textContent='Tanggal belum dikenali. Gunakan format DD/MM/YY atau DD/MM/YYYY, misalnya 30/10/26.';alert('Tanggal pada Catatan belum dikenali. Gunakan format DD/MM/YY atau DD/MM/YYYY, misalnya 30/10/26.');return;}
+ const start=String(parsed.year)+String(parsed.month).padStart(2,'0')+String(parsed.day).padStart(2,'0');
+ const endDate=new Date(Date.UTC(parsed.year,parsed.month-1,parsed.day+1));
+ const end=String(endDate.getUTCFullYear())+String(endDate.getUTCMonth()+1).padStart(2,'0')+String(endDate.getUTCDate()).padStart(2,'0');
+ const customer=$('customer').value.trim();
+ const title=(note.length>120?note.slice(0,117)+'…':note);
+ const details='Pengingat dari ASIDO Nota Digital.\nPelanggan/toko: '+(customer||'-')+'\nCatatan lengkap: '+note;
+ const url='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+'&dates='+start+'/'+end+'&details='+encodeURIComponent(details);
+ $('calendarStatus').textContent='Membuka Google Kalender untuk '+String(parsed.day).padStart(2,'0')+'/'+String(parsed.month).padStart(2,'0')+'/'+parsed.year+'. Periksa lalu tekan Simpan di Kalender.';
+ const win=window.open(url,'_blank');
+ if(!win)window.location.href=url;
+};
 function invoice(){return {date:$('date').value,customer:$('customer').value.trim(),items:rows.map(r=>({...r})),total:renderTotal(),notes:$('notes').value.trim(),buyer:signatureData('buyerSig'),seller:signatureData('sellerSig'),savedAt:new Date().toISOString()}}
 function validate(v){if(!v.customer){alert('Isi nama pelanggan terlebih dahulu.');return false}if(!v.items.some(r=>r.name.trim()&&r.qty>0)){alert('Tambahkan setidaknya satu barang dengan jumlah lebih dari nol.');return false}return true}
 function saveHistory(){const v=invoice();if(!validate(v))return;v.id=v.id||('ASD-'+Date.now());historyData.unshift(v);historyData=historyData.slice(0,100);localStorage.setItem('asido_history',JSON.stringify(historyData));renderHistory();$('status').textContent='Nota tersimpan di riwayat browser perangkat ini.'}
