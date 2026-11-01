@@ -535,6 +535,7 @@ $('makeNotaImage').onclick=async()=>{
   const [buyerImage,sellerImage]=await Promise.all([loadSignatureImage(v.buyer),loadSignatureImage(v.seller)]);
   const canvas=createCanvasNota(v,buyerImage,sellerImage);
   latestNotaImageBlob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Browser tidak dapat membuat gambar PNG.')),'image/png'));
+  if(!latestNotaImageBlob||latestNotaImageBlob.size<1000)throw new Error('File gambar nota kosong atau terlalu kecil. Coba buat gambar nota sekali lagi.');
   const datePart=(v.date||'').replace(/-/g,'');
   const safeCustomer=(v.customer||'Pelanggan').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,32)||'Pelanggan';
   const fileName='ASIDO-Nota-'+datePart+'-'+safeCustomer+'.png';
@@ -553,17 +554,35 @@ $('makeNotaImage').onclick=async()=>{
  }
 };
 $('shareNotaImage').onclick=async()=>{
- if(!latestNotaImageFile){$('notaImageStatus').textContent='Buat Gambar Nota untuk WhatsApp terlebih dahulu.';return;}
+ if(!latestNotaImageFile||!latestNotaImageBlob||latestNotaImageBlob.size<1000){
+  $('notaImageStatus').textContent='Buat Gambar Nota untuk WhatsApp terlebih dahulu. Pastikan pratinjau gambar sudah terlihat.';
+  return;
+ }
+ const customer=$('customer').value.trim()||'pelanggan';
+ const note=$('notes').value.trim();
+ const shareText='Nota penjualan ASIDO untuk '+customer+'. Total '+money(renderTotal())+'.'+(note?' Catatan: '+note:'');
  try{
-  if(navigator.share && navigator.canShare && navigator.canShare({files:[latestNotaImageFile]})){
-   await navigator.share({files:[latestNotaImageFile],title:'Nota ASIDO'});
-   $('notaImageStatus').textContent='Menu berbagi ditutup. Jika Anda memilih WhatsApp, pastikan pratinjau foto tampil sebelum menekan Kirim. Jika gambar tidak muncul, gunakan Unduh Gambar PNG lalu bagikan melalui Galeri.';
-  }else{
-   $('notaImageStatus').textContent='Berbagi gambar langsung tidak didukung pada tampilan browser ini. Tekan Unduh Gambar PNG, lalu buka Galeri / My Files, pilih gambar ASIDO-Nota terbaru, tekan Bagikan, dan pilih WhatsApp.';
+  const file=new File([latestNotaImageBlob],latestNotaImageFile.name,{type:'image/png',lastModified:Date.now()});
+  if(!navigator.share){
+   $('notaImageStatus').textContent='Browser tidak mendukung berbagi file langsung. Tekan Unduh Gambar PNG, lalu buka Galeri / My Files dan bagikan file PNG tersebut.';
+   return;
   }
+  if(navigator.canShare&&!navigator.canShare({files:[file]})){
+   $('notaImageStatus').textContent='Browser tidak dapat melampirkan file gambar langsung. Tekan Unduh Gambar PNG, lalu bagikan dari Galeri / My Files.';
+   return;
+  }
+  await navigator.share({
+   files:[file],
+   title:'Nota ASIDO - '+customer,
+   text:shareText
+  });
+  $('notaImageStatus').textContent='Permintaan berbagi selesai. Di WhatsApp, periksa bahwa pratinjau gambar nota ikut muncul bersama teks sebelum menekan Kirim. Jika hanya teks yang muncul, batalkan dan gunakan Unduh Gambar PNG lalu bagikan dari Galeri.';
  }catch(err){
-  if(err&&err.name==='AbortError')$('notaImageStatus').textContent='Berbagi dibatalkan. Gambar tetap tersedia untuk diunduh.';
-  else $('notaImageStatus').textContent='Gagal membuka menu berbagi. Unduh Gambar PNG lalu bagikan dari Galeri / My Files.';
+  if(err&&err.name==='AbortError'){
+   $('notaImageStatus').textContent='Berbagi dibatalkan. File PNG tetap tersedia; Anda dapat mengunduhnya lalu mengirim dari Galeri.';
+  }else{
+   $('notaImageStatus').textContent='WhatsApp tidak menerima lampiran dari menu berbagi ini. Unduh Gambar PNG, lalu buka Galeri / My Files > pilih gambar nota > Bagikan > WhatsApp. Detail: '+(err&&err.message?err.message:'kesalahan berbagi');
+  }
  }
 };
 $('savePdf').onclick=()=>{try{const v=invoice();if(!validate(v))return;if(!window.jspdf){$('status').textContent='Pustaka PDF belum termuat. Periksa koneksi internet, muat ulang halaman, lalu coba lagi.';alert('Pustaka PDF belum termuat. Periksa koneksi internet lalu coba lagi.');return}const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4'});const blue=[18,60,122],pale=[230,238,248];d.setTextColor(...blue);d.setFont('helvetica','bold');d.setFontSize(22);d.text('ASIDO',14,19);d.setDrawColor(...blue);d.setLineWidth(.5);d.line(47,9,47,21);d.setFontSize(15);d.text('NOTA PENJUALAN',51,18);d.setTextColor(30);d.setFont('helvetica','normal');d.setFontSize(10);d.text('Tanggal: '+(v.date||'-'),196,29,{align:'right'});d.setTextColor(90);d.text('Pelanggan:',14,35);d.setTextColor(25);d.setFont('helvetica','bold');d.setFontSize(12);d.text(v.customer,14,42);let y=51;d.setFillColor(...pale);d.rect(14,y-5,182,8,'F');d.setFont('helvetica','bold');d.setFontSize(10);d.text('Barang',17,y);d.text('Qty',112,y,{align:'right'});d.text('Harga',147,y,{align:'right'});d.text('Subtotal',193,y,{align:'right'});d.setFont('helvetica','normal');y+=8;v.items.filter(r=>r.name.trim()&&r.qty>0).forEach(r=>{const lines=d.splitTextToSize(r.name,85);if(y+Math.max(7,lines.length*5)>245){d.addPage();y=20}d.text(lines,17,y);d.text(String(r.qty),112,y,{align:'right'});d.text(money(r.price),147,y,{align:'right'});d.text(money(r.qty*r.price),193,y,{align:'right'});y+=Math.max(8,lines.length*5)});y+=2;d.setDrawColor(30);d.line(120,y,196,y);y+=7;d.setFontSize(10);d.text('Subtotal:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=8;d.setFont('helvetica','bold');d.setFontSize(13);d.text('TOTAL:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=11;
