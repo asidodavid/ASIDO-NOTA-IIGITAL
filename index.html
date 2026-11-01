@@ -36,7 +36,7 @@
 <div class="buttons"><button type="button" id="makeNotaImage" class="green">📲 Kirim Nota ke WhatsApp</button></div>
 <div id="notaImageActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px">
  <strong style="color:#123c7a">Gambar nota siap</strong>
- <p class="muted">Saat tombol ditekan, gambar PNG dibuat dari nota dan kanvas tanda tangan, lalu menu Bagikan Android langsung dibuka dalam sentuhan yang sama. Pilih WhatsApp dan chat pelanggan; pastikan pratinjau foto nota terlihat sebelum Kirim. Jika browser menolak lampiran, gunakan Unduh Gambar PNG (cadangan).</p>
+ <p class="muted">Saat tombol ditekan, gambar PNG dibuat dari nota dan kanvas tanda tangan, lalu menu Bagikan Android langsung dibuka dalam sentuhan yang sama. Pilih WhatsApp dan chat pelanggan. Keterangan singkat ikut disertakan agar WhatsApp tidak menerima pesan kosong; pastikan foto nota putih tetap terlihat sebagai lampiran sebelum Kirim. Jika browser menolak lampiran, gunakan Unduh Gambar PNG (cadangan).</p>
  <img id="notaImagePreview" alt="Pratinjau gambar nota ASIDO" style="display:block;width:100%;height:auto;border:1px solid #d8e2ef;border-radius:8px;background:#fff;margin:10px 0">
  <div class="buttons"><a id="downloadNotaImage" class="pdf-action-link secondary" href="#" download="ASIDO-Nota.png">Unduh Gambar PNG</a></div>
  <p id="notaImageStatus" class="muted" role="status"></p>
@@ -579,7 +579,12 @@ $('makeNotaImage').onclick=()=>{
   }
 
   $('notaImageStatus').textContent='Membuka menu Bagikan Android dengan satu lampiran gambar nota '+v.customer+'. Pilih WhatsApp.';
-  const sharePromise=navigator.share({files:[file]});
+  const shareCaption='Nota penjualan ASIDO untuk '+v.customer+'. Total '+money(v.total)+'.';
+  const sharePromise=navigator.share({
+   files:[file],
+   title:'Nota ASIDO - '+v.customer,
+   text:shareCaption
+  });
   sharePromise.then(()=>{
    $('notaImageStatus').textContent='Menu berbagi ditutup. Jika Anda memilih WhatsApp, pastikan foto nota putih terlihat di pratinjau, lalu tekan Kirim.';
   }).catch(err=>{
