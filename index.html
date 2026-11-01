@@ -168,12 +168,21 @@ function downloadBlobFile(blob,name){
  setTimeout(()=>{try{URL.revokeObjectURL(url)}catch(_){}},60000);
 }
 $('exportData').onclick=()=>{
+ const status=$('backupStatus');
  try{
   const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData};
   const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
-  downloadBlobFile(blob,'asido-backup.json');
-  $('backupStatus').textContent='Cadangan dibuat. Cari asido-backup.json di folder Downloads. Simpan file ini di Google Drive pribadi agar mudah dipindahkan ke perangkat lain.';
- }catch(err){$('backupStatus').textContent='Gagal membuat cadangan: '+(err.message||String(err));}
+  const url=URL.createObjectURL(blob);
+  const oldLink=$('backupDownloadLink');if(oldLink)oldLink.remove();
+  const link=document.createElement('a');
+  link.id='backupDownloadLink';link.href=url;link.download='asido-backup.json';
+  link.className='pdf-action-link green';link.textContent='Unduh file JSON sekarang';
+  link.style.display='inline-block';link.style.marginTop='8px';
+  status.textContent='File cadangan siap. Bila unduhan otomatis tidak muncul, tekan tautan hijau di bawah ini. Setelah terunduh, cari asido-backup.json di folder Download.';
+  status.appendChild(document.createElement('br'));status.appendChild(link);
+  try{link.click();}catch(downloadErr){}
+  setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(_){}},10*60*1000);
+ }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
 };
 let importMode='merge';
 $('importMergeBtn').onclick=()=>{importMode='merge';$('importDataFile').value='';$('importDataFile').click();};
