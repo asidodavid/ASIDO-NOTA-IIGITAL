@@ -43,7 +43,7 @@
 </div>
 <div style="margin-top:14px"><strong>PDF (pilihan tambahan)</strong></div>
 <div class="buttons"><button type="button" id="savePdf" class="secondary">Buat / Simpan PDF</button><button type="button" id="printPdfPhone" class="secondary">Cetak / Simpan PDF (HP)</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="saveHistory" class="secondary">Simpan Riwayat</button></div><p id="status" class="muted" role="status"></p><div id="pdfActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px"><strong style="color:#123c7a">PDF sudah dibuat</strong><p class="muted">Di HP Android, pilihan Cetak / Simpan PDF membuka dialog cetak perangkat. Pada dialog tersebut, pilih printer “Save as PDF / Simpan sebagai PDF”, kemudian tekan tombol simpan. Setelah file tersimpan, bagikan dari My Files &gt; Downloads.</p><div class="buttons"><a id="pdfDownloadLink" class="pdf-action-link secondary" href="#" download>Unduh PDF</a><a id="pdfShareLink" class="pdf-action-link green" href="#" download>Unduh untuk dibagikan</a></div><div class="buttons" style="margin-top:8px"><a id="pdfPreviewLink" class="pdf-action-link secondary" href="#" target="_blank" rel="noopener">Buka PDF di tab baru</a></div></div></section>
-<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memperbarui perangkat lain, ekspor cadangan dari perangkat sumber, pindahkan file JSON melalui Google Drive, lalu pilih salah satu cara impor di perangkat tujuan.</p><div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importMergeBtn" class="secondary">Impor &amp; Gabungkan</button><button type="button" id="importReplaceBtn" class="green">Impor &amp; Samakan Data</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><p class="muted">Gabungkan: mempertahankan data lama dan menambahkan data dari file. Samakan Data: mengganti seluruh daftar produk dan riwayat pada perangkat ini agar sama dengan file cadangan yang dipilih.</p><div class="buttons" style="margin-top:8px"><button type="button" id="restorePreSyncBtn" class="secondary" hidden>Pulihkan data sebelum penyamaan</button><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
+<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memperbarui perangkat lain, ekspor cadangan dari perangkat sumber, pindahkan file JSON melalui Google Drive, lalu pilih salah satu cara impor di perangkat tujuan.</p><div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importMergeBtn" class="secondary">Impor &amp; Gabungkan</button><button type="button" id="importReplaceBtn" class="green">Impor &amp; Samakan Data</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importProductsOnlyBtn" class="secondary">Samakan Daftar Barang Saja</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><p class="muted">Gabungkan: pertahankan data lama dan tambahkan isi cadangan. Samakan Data: ganti daftar barang dan seluruh riwayat. Samakan Daftar Barang Saja: ganti hanya katalog barang dan harga; riwayat nota pada perangkat ini tetap dipertahankan.</p><div class="buttons" style="margin-top:8px"><button type="button" id="restorePreSyncBtn" class="secondary" hidden>Pulihkan data sebelum penyamaan</button><button type="button" id="restorePreCatalogBtn" class="secondary" hidden>Pulihkan daftar barang sebelumnya</button><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
@@ -178,6 +178,7 @@ $('exportData').onclick=()=>{
 let importMode='merge';
 $('importMergeBtn').onclick=()=>{importMode='merge';$('importDataFile').value='';$('importDataFile').click();};
 $('importReplaceBtn').onclick=()=>{importMode='replace';$('importDataFile').value='';$('importDataFile').click();};
+$('importProductsOnlyBtn').onclick=()=>{importMode='products-only';$('importDataFile').value='';$('importDataFile').click();};
 function validateBackupData(backup){
  if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('File bukan cadangan ASIDO yang valid.');
  const cleanProducts=backup.products.map((p,i)=>{
@@ -197,7 +198,20 @@ $('importDataFile').addEventListener('change',e=>{
   try{
    const backup=JSON.parse(String(reader.result||''));
    const incoming=validateBackupData(backup);
-   if(importMode==='replace'){
+   if(importMode==='products-only'){
+    const ok=confirm('SAMAKAN DAFTAR BARANG SAJA?\n\nKatalog barang dan harga pada perangkat ini akan DIGANTI dengan '+incoming.products.length+' produk dari file cadangan. Riwayat nota pada perangkat ini TIDAK DIUBAH.\n\nAplikasi akan menyimpan cadangan daftar barang sebelumnya agar bisa dipulihkan. Lanjutkan?');
+    if(!ok){$('backupStatus').textContent='Penyamaan daftar barang dibatalkan. Data tidak berubah.';e.target.value='';return;}
+    const previousCatalog={format:'asido-catalog-restore-v1',savedAt:new Date().toISOString(),products:products};
+    try{localStorage.setItem('asido_pre_catalog_sync_backup',JSON.stringify(previousCatalog));}
+    catch(storageErr){throw new Error('Tidak cukup ruang untuk menyimpan cadangan katalog lama. Ekspor cadangan perangkat ini terlebih dahulu, lalu coba lagi.');}
+    const oldProducts=localStorage.getItem('asido_products');
+    try{localStorage.setItem('asido_products',JSON.stringify(incoming.products));}
+    catch(storageErr){if(oldProducts===null)localStorage.removeItem('asido_products');else localStorage.setItem('asido_products',oldProducts);throw new Error('Penyimpanan katalog gagal. Daftar barang lama dipertahankan.');}
+    products=incoming.products;
+    $('restorePreCatalogBtn').hidden=false;
+    renderProducts();
+    $('backupStatus').textContent='PENYAMAAN DAFTAR BARANG BERHASIL. Katalog perangkat ini sekarang berisi '+products.length+' produk dari file cadangan. Riwayat nota perangkat ini tetap utuh.';
+   }else if(importMode==='replace'){
     const ok=confirm('SAMAKAN DATA PERANGKAT INI?\n\nDaftar produk ('+incoming.products.length+') dan riwayat nota ('+incoming.history.length+') pada perangkat ini akan DIGANTI dengan isi file cadangan. Data lokal yang tidak ada di file akan hilang dari perangkat ini.\n\nSebelum mengganti, aplikasi akan membuat cadangan pemulihan lokal. Lanjutkan?');
     if(!ok){$('backupStatus').textContent='Penyamaan dibatalkan. Data perangkat tidak berubah.';e.target.value='';return;}
     const previous={format:'asido-nota-restore-v1',savedAt:new Date().toISOString(),products:products,history:historyData};
@@ -255,6 +269,22 @@ $('restorePreSyncBtn').onclick=()=>{
   $('backupStatus').textContent='Cadangan sebelum penyamaan berhasil dipulihkan.';
  }catch(err){$('backupStatus').textContent='Pemulihan gagal: '+(err.message||String(err));}
 };
+$('restorePreCatalogBtn').onclick=()=>{
+ const raw=localStorage.getItem('asido_pre_catalog_sync_backup');
+ if(!raw){$('backupStatus').textContent='Tidak ada cadangan daftar barang sebelumnya pada perangkat ini.';$('restorePreCatalogBtn').hidden=true;return;}
+ if(!confirm('Pulihkan daftar barang yang tersimpan tepat sebelum penyamaan katalog terakhir? Riwayat nota tidak diubah.'))return;
+ try{
+  const backup=JSON.parse(raw);
+  if(!backup||!Array.isArray(backup.products))throw new Error('Cadangan katalog tidak valid.');
+  localStorage.setItem('asido_products',JSON.stringify(backup.products));
+  products=backup.products;
+  renderProducts();
+  localStorage.removeItem('asido_pre_catalog_sync_backup');
+  $('restorePreCatalogBtn').hidden=true;
+  $('backupStatus').textContent='Daftar barang sebelumnya berhasil dipulihkan. Riwayat nota tetap utuh.';
+ }catch(err){$('backupStatus').textContent='Pemulihan katalog gagal: '+(err.message||String(err));}
+};
+if(localStorage.getItem('asido_pre_catalog_sync_backup'))$('restorePreCatalogBtn').hidden=false;
 if(localStorage.getItem('asido_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
 $('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
 function parseVoice(text){
