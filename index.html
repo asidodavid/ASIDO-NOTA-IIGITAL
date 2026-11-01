@@ -135,6 +135,11 @@ $('addCalendarReminder').onclick=()=>{
  const endDate=new Date(Date.UTC(parsed.year,parsed.month-1,parsed.day+1));
  const end=String(endDate.getUTCFullYear())+String(endDate.getUTCMonth()+1).padStart(2,'0')+String(endDate.getUTCDate()).padStart(2,'0');
  const customer=$('customer').value.trim();
+ if(window.AndroidAsido&&typeof window.AndroidAsido.addCalendarReminder==='function'){
+  $('calendarStatus').textContent='Membuka aplikasi Kalender Android dengan pengingat yang sudah diisi…';
+  window.AndroidAsido.addCalendarReminder(note,customer);
+  return;
+ }
  const title=(note.length>120?note.slice(0,117)+'…':note);
  const details='Pengingat dari ASIDO Nota Digital.\nPelanggan/toko: '+(customer||'-')+'\nCatatan lengkap: '+note;
  const url='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+'&dates='+start+'/'+end+'&details='+encodeURIComponent(details);
@@ -332,7 +337,8 @@ function parseVoice(text){
  const price=explicitPrice!==null?explicitPrice:found.price;
  if(qty>0 && price>=0){addRow(found.name,qty,price);$('status').textContent='Ditambahkan: '+found.name+' · '+qty+' unit · '+money(price)+' per unit. Periksa kembali data barang.';}
 }
-$('voiceBtn').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Browser belum mendukung input suara. Gunakan Chrome terbaru atau masukkan barang manual.');return}const rec=new SR();rec.lang='id-ID';rec.interimResults=false;rec.maxAlternatives=1;$('voiceBtn').textContent='🎙 Mendengarkan…';rec.onresult=e=>{const t=e.results[0][0].transcript;$('status').textContent='Ucapan dikenali: “'+t+'”. Mohon periksa hasilnya.';parseVoice(t)};rec.onerror=e=>$('status').textContent='Input suara gagal ('+e.error+'). Silakan masukkan secara manual.';rec.onend=()=>$('voiceBtn').textContent='🎙 Input dengan suara';rec.start()};
+window.onAsidoVoiceResult=function(t){$('voiceBtn').textContent='🎙 Input dengan suara';$('status').textContent='Ucapan dikenali: “'+t+'”. Mohon periksa hasilnya.';parseVoice(t);};
+$('voiceBtn').onclick=()=>{if(window.AndroidAsido&&typeof window.AndroidAsido.startVoiceInput==='function'){$('voiceBtn').textContent='🎙 Mendengarkan…';window.AndroidAsido.startVoiceInput();return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Browser belum mendukung input suara. Gunakan Chrome terbaru atau masukkan barang manual.');return}const rec=new SR();rec.lang='id-ID';rec.interimResults=false;rec.maxAlternatives=1;$('voiceBtn').textContent='🎙 Mendengarkan…';rec.onresult=e=>{const t=e.results[0][0].transcript;$('status').textContent='Ucapan dikenali: “'+t+'”. Mohon periksa hasilnya.';parseVoice(t)};rec.onerror=e=>$('status').textContent='Input suara gagal ('+e.error+'). Silakan masukkan secara manual.';rec.onend=()=>$('voiceBtn').textContent='🎙 Input dengan suara';rec.start()};
 const sigInk={};const canvases=['buyerSig','sellerSig'];
 function setupCanvas(id){
  const c=$(id);
@@ -566,6 +572,15 @@ $('makeNotaImage').onclick=()=>{
   $('downloadNotaImage').download=fileName;
   $('notaImageActions').hidden=false;
   $('pdfActions').hidden=true;
+
+  // Native Android APK bridge: pass the actual PNG bytes to Android MediaStore,
+  // then share the resulting content:// URI with WhatsApp using ACTION_SEND.
+  // This branch avoids browser Web Share entirely inside the installed APK.
+  if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
+   $('notaImageStatus').textContent='Aplikasi Android sedang menyimpan gambar nota dan membuka WhatsApp…';
+   window.AndroidAsido.sharePng(dataUrl,fileName);
+   return;
+  }
 
   // Android Web Share: share the PNG file only (no text payload).
   // Call synchronously in the original button tap to preserve user activation.
