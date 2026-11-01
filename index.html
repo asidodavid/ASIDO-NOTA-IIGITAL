@@ -33,12 +33,12 @@
 <div class="sigbox"><label>Tanda tangan penjual / ASIDO</label><canvas id="sellerSig" class="sig"></canvas><div class="buttons" style="margin-top:7px"><button type="button" class="secondary clearSig" data-canvas="sellerSig">Hapus</button></div></div>
 </div><p class="muted">Minta pelanggan dan penjual menggambar tanda tangan masing-masing dengan jari di area kotak.</p></section>
 <section class="card"><h2>5. Simpan Nota</h2>
-<div class="buttons"><button type="button" id="makeNotaImage" class="green">Buat Gambar Nota untuk WhatsApp</button></div>
+<div class="buttons"><button type="button" id="makeNotaImage" class="green">📤 Kirim Nota + Gambar</button></div>
 <div id="notaImageActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px">
  <strong style="color:#123c7a">Gambar nota siap</strong>
- <p class="muted"><strong>PENTING — tombol WhatsApp di bawah hanya menyiapkan teks, bukan melampirkan gambar.</strong> Untuk mengirim foto nota: pertama tekan Unduh Gambar PNG dan pastikan file tersimpan. Lalu buka chat pelanggan di WhatsApp, tekan ikon klip / + di samping kolom pesan, pilih Galeri untuk mencari gambar atau Dokumen &gt; Telusuri &gt; Downloads untuk memilih file ASIDO-Nota PNG. Pastikan pratinjau foto muncul. Tambahkan keterangan pada kolom caption bila perlu, lalu tekan Kirim.</p>
+ <p class="muted">Setelah gambar dibuat, HP akan membuka menu Bagikan Android dengan gambar PNG dan teks nota sebagai lampiran. Pilih WhatsApp, lalu pilih chat pelanggan dan tekan Kirim. Jika HP/browser tidak mendukung berbagi file langsung, tautan Unduh Gambar PNG di bawah tetap tersedia untuk cara manual.</p>
  <img id="notaImagePreview" alt="Pratinjau gambar nota ASIDO" style="display:block;width:100%;height:auto;border:1px solid #d8e2ef;border-radius:8px;background:#fff;margin:10px 0">
- <div class="buttons"><a id="downloadNotaImage" class="pdf-action-link secondary" href="#" download="ASIDO-Nota.png">Unduh Gambar PNG</a><button type="button" id="shareNotaImage" class="green">Buka WhatsApp (teks saja)</button></div>
+ <div class="buttons"><a id="downloadNotaImage" class="pdf-action-link secondary" href="#" download="ASIDO-Nota.png">Unduh Gambar PNG (cadangan)</a></div>
  <p id="notaImageStatus" class="muted" role="status"></p>
 </div>
 <div style="margin-top:14px"><strong>PDF (pilihan tambahan)</strong></div>
@@ -529,40 +529,57 @@ function createCanvasNota(v,buyerImage,sellerImage){
 }
 let latestNotaImageBlob=null,latestNotaImageFile=null,latestNotaImageUrl='';
 $('makeNotaImage').onclick=async()=>{
+ const btn=$('makeNotaImage');
+ btn.disabled=true;
+ btn.textContent='Menyiapkan gambar nota…';
  try{
   const v=invoice();if(!validate(v))return;
-  $('notaImageStatus').textContent='Sedang membuat gambar nota…';
+  $('notaImageStatus').textContent='Membuat gambar nota '+v.customer+'…';
   const [buyerImage,sellerImage]=await Promise.all([loadSignatureImage(v.buyer),loadSignatureImage(v.seller)]);
   const canvas=createCanvasNota(v,buyerImage,sellerImage);
   latestNotaImageBlob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Browser tidak dapat membuat gambar PNG.')),'image/png'));
-  if(!latestNotaImageBlob||latestNotaImageBlob.size<1000)throw new Error('File gambar nota kosong atau terlalu kecil. Coba buat gambar nota sekali lagi.');
+  if(!latestNotaImageBlob||latestNotaImageBlob.size<1000)throw new Error('File gambar kosong atau terlalu kecil. Coba lagi.');
   const datePart=(v.date||'').replace(/-/g,'');
   const safeCustomer=(v.customer||'Pelanggan').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,32)||'Pelanggan';
   const fileName='ASIDO-Nota-'+datePart+'-'+safeCustomer+'.png';
-  latestNotaImageFile=new File([latestNotaImageBlob],fileName,{type:'image/png'});
+  latestNotaImageFile=new File([latestNotaImageBlob],fileName,{type:'image/png',lastModified:Date.now()});
   if(latestNotaImageUrl){try{URL.revokeObjectURL(latestNotaImageUrl)}catch(_){}}
   latestNotaImageUrl=URL.createObjectURL(latestNotaImageBlob);
   $('notaImagePreview').src=latestNotaImageUrl;
   $('downloadNotaImage').href=latestNotaImageUrl;
   $('downloadNotaImage').download=fileName;
   $('notaImageActions').hidden=false;
-  $('notaImageStatus').textContent='Gambar nota siap. Untuk mengirim lewat WhatsApp sebagai foto, tekan Bagikan Gambar. Jika pilihan berbagi tidak menyertakan gambar, unduh PNG lalu bagikan dari Galeri atau My Files.';
   $('pdfActions').hidden=true;
-  $('status').textContent='Gambar nota berhasil dibuat.';
+
+  const shareText='Nota penjualan ASIDO untuk '+v.customer+'. Total '+money(v.total)+'.';
+  if(!navigator.share){
+   $('notaImageStatus').textContent='Browser ini tidak mendukung menu berbagi file. Gambar sudah dibuat. Tekan Unduh Gambar PNG (cadangan), lalu lampirkan dari WhatsApp.';
+   $('status').textContent='Gambar nota '+v.customer+' berhasil dibuat.';
+   return;
+  }
+  if(!navigator.canShare||!navigator.canShare({files:[latestNotaImageFile]})){
+   $('notaImageStatus').textContent='HP/browser ini tidak mengizinkan berbagi file gambar langsung. Gambar sudah dibuat. Tekan Unduh Gambar PNG (cadangan), lalu lampirkan dari WhatsApp.';
+   $('status').textContent='Gambar nota '+v.customer+' berhasil dibuat.';
+   return;
+  }
+  $('notaImageStatus').textContent='Membuka menu berbagi Android dengan gambar nota '+v.customer+' terlampir…';
+  await navigator.share({
+   files:[latestNotaImageFile],
+   title:'Nota ASIDO - '+v.customer,
+   text:shareText
+  });
+  $('notaImageStatus').textContent='Menu berbagi selesai. Pilih WhatsApp, pilih chat pelanggan, pastikan foto nota ikut tampil, lalu tekan Kirim.';
+  $('status').textContent='Nota '+v.customer+' dibagikan melalui menu Android.';
  }catch(err){
-  $('notaImageStatus').textContent='Gagal membuat gambar nota: '+(err&&err.message?err.message:String(err));
+  if(err&&err.name==='AbortError'){
+   $('notaImageStatus').textContent='Berbagi dibatalkan. Gambar nota tetap tersedia. Tekan Unduh Gambar PNG (cadangan) bila ingin mengirim manual.';
+  }else{
+   $('notaImageStatus').textContent='Gambar berhasil/atau gagal dibagikan: '+(err&&err.message?err.message:String(err))+'. Bila menu berbagi tidak muncul, gunakan Unduh Gambar PNG (cadangan).';
+  }
+ }finally{
+  btn.disabled=false;
+  btn.textContent='📤 Kirim Nota + Gambar';
  }
-};
-$('shareNotaImage').onclick=()=>{
- if(!latestNotaImageBlob||latestNotaImageBlob.size<1000){
-  $('notaImageStatus').textContent='Buat Gambar Nota terlebih dahulu dan pastikan pratinjau sudah terlihat.';
-  return;
- }
- const customer=$('customer').value.trim()||'pelanggan';
- const message='Berikut nota penjualan ASIDO untuk '+customer+'. Total '+money(renderTotal())+'. Saya lampirkan gambar nota pada pesan ini.';
- const url='https://wa.me/?text='+encodeURIComponent(message);
- $('notaImageStatus').textContent='Tombol ini hanya menyiapkan teks. Untuk satu kiriman berisi foto + pesan, buka chat WhatsApp, lampirkan PNG dari Downloads, lalu ketik pesan di kolom caption pada pratinjau foto sebelum menekan Kirim.';
- window.location.href=url;
 };
 $('savePdf').onclick=()=>{try{const v=invoice();if(!validate(v))return;if(!window.jspdf){$('status').textContent='Pustaka PDF belum termuat. Periksa koneksi internet, muat ulang halaman, lalu coba lagi.';alert('Pustaka PDF belum termuat. Periksa koneksi internet lalu coba lagi.');return}const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4'});const blue=[18,60,122],pale=[230,238,248];d.setTextColor(...blue);d.setFont('helvetica','bold');d.setFontSize(22);d.text('ASIDO',14,19);d.setDrawColor(...blue);d.setLineWidth(.5);d.line(47,9,47,21);d.setFontSize(15);d.text('NOTA PENJUALAN',51,18);d.setTextColor(30);d.setFont('helvetica','normal');d.setFontSize(10);d.text('Tanggal: '+(v.date||'-'),196,29,{align:'right'});d.setTextColor(90);d.text('Pelanggan:',14,35);d.setTextColor(25);d.setFont('helvetica','bold');d.setFontSize(12);d.text(v.customer,14,42);let y=51;d.setFillColor(...pale);d.rect(14,y-5,182,8,'F');d.setFont('helvetica','bold');d.setFontSize(10);d.text('Barang',17,y);d.text('Qty',112,y,{align:'right'});d.text('Harga',147,y,{align:'right'});d.text('Subtotal',193,y,{align:'right'});d.setFont('helvetica','normal');y+=8;v.items.filter(r=>r.name.trim()&&r.qty>0).forEach(r=>{const lines=d.splitTextToSize(r.name,85);if(y+Math.max(7,lines.length*5)>245){d.addPage();y=20}d.text(lines,17,y);d.text(String(r.qty),112,y,{align:'right'});d.text(money(r.price),147,y,{align:'right'});d.text(money(r.qty*r.price),193,y,{align:'right'});y+=Math.max(8,lines.length*5)});y+=2;d.setDrawColor(30);d.line(120,y,196,y);y+=7;d.setFontSize(10);d.text('Subtotal:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=8;d.setFont('helvetica','bold');d.setFontSize(13);d.text('TOTAL:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=11;
 if(v.notes){d.setFont('helvetica','bold');d.setTextColor(...blue);d.setFontSize(11);d.text('Catatan:',14,y);y+=6;d.setDrawColor(175,190,210);d.setLineWidth(.3);const noteLines=d.splitTextToSize(v.notes,172);const h=Math.min(28,Math.max(13,noteLines.length*5+5));d.roundedRect(14,y-4,182,h,2,2,'S');d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(9);d.text(noteLines.slice(0,5),17,y+2);y+=h+8}else y+=3;
