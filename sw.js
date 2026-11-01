@@ -1,4 +1,4 @@
-const CACHE_NAME = 'asido-nota-shell-v7';
+const CACHE_NAME = 'asido-nota-shell-v8';
 const APP_SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
@@ -7,6 +7,10 @@ self.addEventListener('install', event => {
       .then(cache => cache.addAll(APP_SHELL))
       .then(() => self.skipWaiting())
   );
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
@@ -27,7 +31,7 @@ self.addEventListener('fetch', event => {
 
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request).then(response => {
+      fetch(request, {cache: 'no-store'}).then(response => {
         if (response && response.ok) {
           const copy = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
