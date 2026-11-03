@@ -58,8 +58,14 @@
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>'Rp'+Math.max(0,Number(n)||0).toLocaleString('id-ID');
-const defaultProducts=[{name:'Sapu ijuk',price:15000},{name:'Sapu lidi',price:10000},{name:'Pengki sampah',price:12000},{name:'Pel lobi besi',price:58000},{name:'Pel capit katun',price:35000},{name:'Sikat dorong senar',price:25000},{name:'Sikat dorong ijuk',price:25000},{name:'Wiper lantai gagang besi',price:30000}];
+const ASIDO_REMOVED_PRODUCTS=new Set(['pengki sampah','wiper lantai gagang besi']);
+const defaultProducts=[{name:'Sapu ijuk',price:15000},{name:'Sapu lidi',price:10000},{name:'Pel lobi besi',price:58000},{name:'Pel capit katun',price:35000},{name:'Sikat dorong senar',price:25000},{name:'Sikat dorong ijuk',price:25000},{name:'Wiper lantai gagang besi',price:30000}].filter(p=>!ASIDO_REMOVED_PRODUCTS.has(p.name.trim().toLocaleLowerCase('id')));
 let products=JSON.parse(localStorage.getItem('asido_products')||'null')||defaultProducts;
+// One-time catalogue cleanup: remove the two products requested by ASIDO.
+// Invoice history is stored separately and is intentionally left unchanged.
+const productsBeforeCleanup=products.length;
+products=products.filter(p=>!ASIDO_REMOVED_PRODUCTS.has(String(p.name||'').trim().toLocaleLowerCase('id')));
+if(products.length!==productsBeforeCleanup)localStorage.setItem('asido_products',JSON.stringify(products));
 let historyData=JSON.parse(localStorage.getItem('asido_history')||'[]');
 let rows=[];
 const now=new Date();$('date').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
@@ -216,7 +222,7 @@ function validateBackupData(backup){
  const cleanProducts=backup.products.map((p,i)=>{
   if(!p||typeof p.name!=='string'||!p.name.trim()||!Number.isFinite(Number(p.price))||Number(p.price)<0)throw new Error('Data produk nomor '+(i+1)+' tidak valid. Tidak ada data yang diubah.');
   return {name:p.name.trim(),price:Number(p.price)};
- });
+ }).filter(p=>!ASIDO_REMOVED_PRODUCTS.has(p.name.trim().toLocaleLowerCase('id')));
  const cleanHistory=backup.history.map((h,i)=>{
   if(!h||typeof h!=='object'||!Array.isArray(h.items))throw new Error('Data nota nomor '+(i+1)+' tidak valid. Tidak ada data yang diubah.');
   return h;
