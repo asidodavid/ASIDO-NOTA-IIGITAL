@@ -1,5 +1,5 @@
-const CACHE_NAME = 'asido-nota-shell-v9';
-const APP_SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
+const CACHE_NAME = 'asido-nota-shell-v10';
+const APP_SHELL = ['./', './index.html', './pembukuan/', './pembukuan/index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -34,11 +34,11 @@ self.addEventListener('fetch', event => {
       fetch(request, {cache: 'no-store'}).then(response => {
         if (response && response.ok) {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
         }
         return response;
       }).catch(async () => {
-        return (await caches.match('./index.html')) || (await caches.match('./'));
+        return (await caches.match(request)) || (await caches.match('./index.html')) || (await caches.match('./'));
       })
     );
     return;
