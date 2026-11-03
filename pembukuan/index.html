@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#143c73">
+<title>Pembukuan ASIDO</title>
+<style>
+:root{--blue:#143c73;--blue2:#1d4f91;--bg:#edf2f8;--card:#fff;--ink:#1d2939;--muted:#687587;--line:#dce3ec;--cash:#16834b;--tempo:#b66a13}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:15px}.top{background:linear-gradient(120deg,var(--blue),#2166a7);color:white;padding:22px 18px 18px}.top h1{margin:0;font-size:25px}.top p{margin:7px 0 0;opacity:.9}.wrap{max-width:900px;margin:auto;padding:14px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}.btn{border:0;border-radius:10px;background:#e3ebf5;color:#173f75;font-weight:700;font-size:15px;padding:12px 14px;min-height:46px;cursor:pointer}.btn.primary{background:#16834b;color:#fff}.btn.dark{background:#143c73;color:#fff}.btn:disabled{opacity:.55}.card{background:var(--card);border-radius:16px;padding:16px;margin:13px 0;box-shadow:0 2px 12px #0d23400a}.card h2{font-size:19px;color:var(--blue);margin:0 0 13px}.muted{color:var(--muted);line-height:1.55}.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.metric{border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}.metric label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.metric strong{display:block;font-size:17px;overflow-wrap:anywhere}.metric.cash strong{color:var(--cash)}.metric.tempo strong{color:var(--tempo)}.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{display:block;font-size:13px;font-weight:700;color:#4a596b;margin-bottom:6px}.field select,.field input{width:100%;padding:11px;border:1px solid #cfd8e3;border-radius:9px;background:#fff;color:#1d2939;font-size:15px}.day{margin:14px 0 18px}.dayhead{background:#e6edf7;border-radius:10px;padding:11px 12px;font-weight:700;color:#173f75;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px}.daymeta{font-weight:400;color:#53657d;font-size:12px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:540px}th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}th{font-size:12px;color:var(--muted);font-weight:700}td.amount{text-align:right;font-weight:700;white-space:nowrap}td.date{white-space:nowrap;color:#526176;font-size:13px}.statusselect{border:1px solid #cbd5e1;background:white;border-radius:8px;padding:8px;min-width:100px;font-weight:700}.statusselect.cash{color:var(--cash)}.statusselect.tempo{color:var(--tempo)}.due{font-size:12px;color:var(--tempo);margin-top:5px}.remind{font-size:12px;padding:8px 9px;margin-top:5px;border-radius:8px;border:0;background:#fff0dc;color:#87500f;font-weight:700}.empty{text-align:center;padding:25px 10px;color:var(--muted)}.foot{font-size:12px;color:var(--muted);line-height:1.5;margin:18px 4px}.status{background:#eef7f1;border:1px solid #cce8d5;color:#17643d;padding:10px;border-radius:9px;margin:10px 0;display:none}.group-sum{font-size:12px;color:#53657d;margin:7px 2px 2px}.pill{display:inline-block;border-radius:100px;padding:3px 8px;font-size:11px;background:#edf2f8;color:#53657d}
+@media(max-width:520px){.summary{grid-template-columns:1fr 1fr}.metric.total{grid-column:1/-1}.filters{grid-template-columns:1fr}.wrap{padding:10px}.card{padding:13px}.top{padding:19px 14px}}
+@media print{body{background:white}.top{background:white;color:#143c73;padding:0 0 12px}.wrap{max-width:none;padding:0}.actions,.filters,.remind,.btn,.foot{display:none!important}.card{box-shadow:none;border:0;padding:0}.dayhead{background:#eee;print-color-adjust:exact}.statusselect{border:0;padding:0;appearance:none}table{min-width:0}th,td{font-size:11px;padding:6px 4px}}
+</style>
+</head>
+<body>
+<header class="top"><h1>Pembukuan ASIDO</h1><p>Laporan penjualan harian · Cash · Tempo · Pengingat 30 hari</p></header>
+<main class="wrap">
+ <div class="actions">
+  <a class="btn dark" href="../" style="text-decoration:none;display:inline-flex;align-items:center">← Kembali ke Nota Digital</a>
+  <button class="btn" id="refresh">Muat ulang data nota</button>
+  <button class="btn" id="print">Cetak laporan</button>
+ </div>
+ <section class="card">
+  <h2>Ringkasan Pembukuan</h2>
+  <div class="summary">
+   <div class="metric total"><label>Total penjualan</label><strong id="allTotal">Rp0</strong></div>
+   <div class="metric cash"><label>Cash</label><strong id="cashTotal">Rp0</strong></div>
+   <div class="metric tempo"><label>Tempo</label><strong id="tempoTotal">Rp0</strong></div>
+  </div>
+  <p class="muted" id="reportMeta" style="margin:12px 0 0">Data dibaca langsung dari Riwayat Nota pada perangkat ini.</p>
+ </section>
+ <section class="card">
+  <h2>Daftar Transaksi</h2>
+  <div class="filters">
+   <div class="field"><label for="monthFilter">Pilih bulan</label><input id="monthFilter" type="month"></div>
+   <div class="field"><label for="statusFilter">Keterangan pembayaran</label><select id="statusFilter"><option value="all">Semua: Cash + Tempo</option><option value="Cash">Cash</option><option value="Tempo">Tempo</option></select></div>
+  </div>
+  <div class="actions"><button class="btn" id="clearFilters">Tampilkan semua</button></div>
+  <div id="status" class="status" role="status"></div>
+  <div id="transactions"></div>
+ </section>
+ <p class="foot">Catatan: transaksi dengan keterangan “tempo”, “bon”, “piutang”, “transfer”, atau “belum bayar” pada catatan nota akan dikenali sebagai Tempo. Transaksi lainnya mulai sebagai Cash. Silakan koreksi keterangan melalui pilihan Cash/Tempo pada setiap baris. Perubahan keterangan disimpan di perangkat ini dan tidak mengubah nota aslinya. Nota dengan tanggal sama dikelompokkan bersama; total harian dan total Cash/Tempo dihitung otomatis.</p>
+</main>
+<script>
+(function(){
+ const $=id=>document.getElementById(id);
+ const money=n=>'Rp'+Math.round(Number(n)||0).toLocaleString('id-ID');
+ const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ const statusStoreKey='asido_bookkeeping_status_v1';
+ let historyData=[];
+ let statusMap={};
+ try{statusMap=JSON.parse(localStorage.getItem(statusStoreKey)||'{}')||{};}catch(_){statusMap={};}
+ const showStatus=msg=>{const el=$('status');el.textContent=msg;el.style.display='block';};
+ const hideStatus=()=>{$('status').style.display='none';};
+ function invoiceKey(h){
+  return String(h.id||[h.date||'',h.customer||'',h.savedAt||'',h.total??''].join('|'));
+ }
+ function guessStatus(h){
+  const key=invoiceKey(h);
+  if(statusMap[key]==='Cash'||statusMap[key]==='Tempo')return statusMap[key];
+  if(h.paymentStatus==='Cash'||h.paymentStatus==='Tempo')return h.paymentStatus;
+  const note=String(h.notes||'').toLocaleLowerCase('id');
+  if(/\b(tempo|bon|piutang|belum bayar|belum dibayar|tagih|jatuh tempo|transfer|bayar nanti|kredit)\b/.test(note))return 'Tempo';
+  return 'Cash';
+ }
+ function dayDate(date){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(date||'')))return null;
+  const [y,m,d]=date.split('-').map(Number);
+  const dt=new Date(y,m-1,d,12,0,0);
+  return Number.isNaN(dt.getTime())?null:dt;
+ }
+ function displayDate(date){
+  const dt=dayDate(date);
+  return dt?dt.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):(date||'Tanggal tidak tersedia');
+ }
+ function addDays(date,days){
+  const dt=dayDate(date);if(!dt)return null;
+  dt.setDate(dt.getDate()+days);
+  return dt;
+ }
+ function formatSlash(dt){
+  return String(dt.getDate()).padStart(2,'0')+'/'+String(dt.getMonth()+1).padStart(2,'0')+'/'+dt.getFullYear();
+ }
+ function dueLabel(h){
+  const dt=addDays(h.date,30);return dt?formatSlash(dt):'Tanggal nota belum valid';
+ }
+ function totalOf(h){
+  if(Number.isFinite(Number(h.total)))return Number(h.total);
+  return (h.items||[]).reduce((sum,r)=>sum+(Number(r.qty)||0)*(Number(r.price)||0),0);
+ }
+ function loadData(){
+  hideStatus();
+  try{
+   const data=JSON.parse(localStorage.getItem('asido_history')||'[]');
+   historyData=Array.isArray(data)?data:[];
+  }catch(e){historyData=[];showStatus('Data Riwayat Nota tidak dapat dibaca. Jangan hapus penyimpanan aplikasi.');}
+  render();
+ }
+ function filteredRows(){
+  const month=$('monthFilter').value;
+  const filter=$('statusFilter').value;
+  return historyData.map((h,index)=>({h,index,key:invoiceKey(h),status:guessStatus(h),total:totalOf(h)}))
+   .filter(x=>(!month||String(x.h.date||'').startsWith(month))&&(filter==='all'||x.status===filter))
+   .sort((a,b)=>String(b.h.date||'').localeCompare(String(a.h.date||''))||String(b.h.savedAt||'').localeCompare(String(a.h.savedAt||'')));
+ }
+ function render(){
+  const rows=filteredRows();
+  const cash=rows.filter(x=>x.status==='Cash').reduce((s,x)=>s+x.total,0);
+  const tempo=rows.filter(x=>x.status==='Tempo').reduce((s,x)=>s+x.total,0);
+  const total=cash+tempo;
+  $('allTotal').textContent=money(total);$('cashTotal').textContent=money(cash);$('tempoTotal').textContent=money(tempo);
+  $('reportMeta').textContent=rows.length+' transaksi ditampilkan · '+new Set(rows.map(x=>x.h.date||'')).size+' tanggal penjualan · sumber: Riwayat Nota perangkat ini.';
+  if(!rows.length){$('transactions').innerHTML='<div class="empty">Belum ada nota pada pilihan filter ini.</div>';return;}
+  const groups=new Map();
+  rows.forEach(x=>{const day=x.h.date||'Tanpa tanggal';if(!groups.has(day))groups.set(day,[]);groups.get(day).push(x);});
+  let html='';
+  for(const [day,items] of groups){
+   const dayCash=items.filter(x=>x.status==='Cash').reduce((s,x)=>s+x.total,0);
+   const dayTempo=items.filter(x=>x.status==='Tempo').reduce((s,x)=>s+x.total,0);
+   const dayAll=dayCash+dayTempo;
+   html+='<div class="day"><div class="dayhead"><span>'+escapeHtml(displayDate(day))+'</span><span class="daymeta">'+items.length+' nota · Total '+money(dayAll)+'</span></div>';
+   html+='<div class="group-sum">Cash '+money(dayCash)+' &nbsp;·&nbsp; Tempo '+money(dayTempo)+'</div>';
+   html+='<div class="tablewrap"><table><thead><tr><th>Tgl</th><th>Nama toko</th><th style="text-align:right">Total</th><th>Keterangan</th></tr></thead><tbody>';
+   for(const x of items){
+    const customer=String(x.h.customer||'Pelanggan');
+    const id=escapeHtml(x.key);
+    html+='<tr><td class="date">'+escapeHtml(String(x.h.date||'-'))+'</td><td><strong>'+escapeHtml(customer)+'</strong>'+(x.h.id?'<div class="daymeta">'+escapeHtml(x.h.id)+'</div>':'')+'</td><td class="amount">'+money(x.total)+'</td><td><select class="statusselect '+(x.status==='Tempo'?'tempo':'cash')+'" data-status-key="'+id+'"><option value="Cash" '+(x.status==='Cash'?'selected':'')+'>Cash</option><option value="Tempo" '+(x.status==='Tempo'?'selected':'')+'>Tempo</option></select>'+(x.status==='Tempo'?'<div class="due">Jatuh tempo: '+escapeHtml(dueLabel(x.h))+'</div><button type="button" class="remind" data-remind="'+id+'">📅 Buat pengingat 30 hari</button>':'')+'</td></tr>';
+   }
+   html+='</tbody></table></div></div>';
+  }
+  $('transactions').innerHTML=html;
+  $('transactions').querySelectorAll('[data-status-key]').forEach(sel=>sel.addEventListener('change',()=>{
+   const key=sel.dataset.statusKey;statusMap[key]=sel.value;
+   try{localStorage.setItem(statusStoreKey,JSON.stringify(statusMap));showStatus('Keterangan transaksi disimpan: '+sel.value+'. Riwayat nota asli tidak diubah.');}catch(_){showStatus('Tidak dapat menyimpan keterangan pada perangkat ini.');}
+   render();
+  }));
+  $('transactions').querySelectorAll('[data-remind]').forEach(btn=>btn.addEventListener('click',()=>{
+   const x=rows.find(r=>r.key===btn.dataset.remind);if(x)createReminder(x);
+  }));
+ }
+ function createReminder(x){
+  const due=addDays(x.h.date,30);
+  if(!due){showStatus('Tanggal nota tidak valid; pengingat tidak dapat dibuat.');return;}
+  const customer=String(x.h.customer||'Pelanggan');
+  const amount=money(x.total);
+  const note='Jatuh tempo pembayaran ASIDO: '+formatSlash(due)+'. Total '+amount+'. Nota '+String(x.h.id||'')+'. Mohon tagih pembayaran Tempo.';
+  if(window.AndroidAsido&&typeof window.AndroidAsido.addCalendarReminder==='function'){
+   try{
+    window.AndroidAsido.addCalendarReminder(note,customer);
+    showStatus('Google Calendar dibuka dengan tanggal jatuh tempo '+formatSlash(due)+' untuk '+customer+'. Periksa kalender yang dipilih lalu tekan Simpan.');
+   }catch(e){showStatus('Tidak dapat membuka Kalender: '+(e.message||String(e)));}
+   return;
+  }
+  const start=new Date(due.getFullYear(),due.getMonth(),due.getDate(),9,0,0);
+  const end=new Date(due.getFullYear(),due.getMonth(),due.getDate(),10,0,0);
+  const fmt=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'T'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+'00';
+  const params=new URLSearchParams({action:'TEMPLATE',text:'Jatuh Tempo ASIDO — '+customer,dates:fmt(start)+'/'+fmt(end),details:note});
+  window.open('https://calendar.google.com/calendar/render?'+params.toString(),'_blank');
+  showStatus('Halaman Google Calendar dibuka dengan rincian pengingat. Tekan Simpan agar masuk ke kalender.');
+ }
+ $('refresh').addEventListener('click',loadData);
+ $('monthFilter').addEventListener('change',render);
+ $('statusFilter').addEventListener('change',render);
+ $('clearFilters').addEventListener('click',()=>{$('monthFilter').value='';$('statusFilter').value='all';render();});
+ $('print').addEventListener('click',()=>window.print());
+ loadData();
+})();
+</script>
+</body>
+</html>
