@@ -35,7 +35,7 @@
    <div class="field"><label for="monthFilter">Pilih bulan</label><input id="monthFilter" type="month"></div>
    <div class="field"><label for="statusFilter">Keterangan pembayaran</label><select id="statusFilter"><option value="all">Semua: Cash + Tempo</option><option value="Cash">Cash</option><option value="Tempo">Tempo</option></select></div>
   </div>
-  <div class="actions"><button class="btn" id="clearFilters">Tampilkan semua</button></div>
+  <div class="actions"><button class="btn" id="clearFilters">Tampilkan semua</button><button class="btn primary" id="remindAllTempo">📅 Jadwalkan semua Tempo +30 hari</button></div>
   <div id="status" class="status" role="status"></div>
   <div id="transactions"></div>
  </section>
@@ -138,26 +138,53 @@
    const x=rows.find(r=>r.key===btn.dataset.remind);if(x)createReminder(x);
   }));
  }
+ function reminderPayload(x){
+  const due=addDays(x.h.date,30);
+  if(!due)return null;
+  return {
+   dueDate:due.getFullYear()+'-'+String(due.getMonth()+1).padStart(2,'0')+'-'+String(due.getDate()).padStart(2,'0'),
+   customer:String(x.h.customer||'Pelanggan'),
+   amount:money(x.total),
+   reference:String(x.h.id||x.key),
+   invoiceDate:String(x.h.date||'')
+  };
+ }
  function createReminder(x){
   const due=addDays(x.h.date,30);
   if(!due){showStatus('Tanggal nota tidak valid; pengingat tidak dapat dibuat.');return;}
-  const customer=String(x.h.customer||'Pelanggan');
-  const amount=money(x.total);
-  const note='Jatuh tempo pembayaran ASIDO: '+formatSlash(due)+'. Total '+amount+'. Nota '+String(x.h.id||'')+'. Mohon tagih pembayaran Tempo.';
-  if(window.AndroidAsido&&typeof window.AndroidAsido.addCalendarReminder==='function'){
+  const payload=reminderPayload(x);
+  if(window.AndroidAsido&&typeof window.AndroidAsido.scheduleTempoReminder==='function'){
    try{
-    window.AndroidAsido.addCalendarReminder(note,customer);
-    showStatus('Google Calendar dibuka dengan tanggal jatuh tempo '+formatSlash(due)+' untuk '+customer+'. Periksa kalender yang dipilih lalu tekan Simpan.');
-   }catch(e){showStatus('Tidak dapat membuka Kalender: '+(e.message||String(e)));}
+    window.AndroidAsido.scheduleTempoReminder(payload.dueDate,payload.customer,payload.amount,payload.reference);
+    showStatus('Permintaan pengingat Tempo dikirim ke kalender Android untuk '+payload.customer+' pada '+formatSlash(due)+'.');
+   }catch(e){showStatus('Tidak dapat menjadwalkan Kalender: '+(e.message||String(e)));}
+   return;
+  }
+  const note='Jatuh tempo pembayaran ASIDO: '+formatSlash(due)+'. Total '+money(x.total)+'. Nota '+String(x.h.id||'')+'. Mohon tagih pembayaran Tempo.';
+  if(window.AndroidAsido&&typeof window.AndroidAsido.addCalendarReminder==='function'){
+   window.AndroidAsido.addCalendarReminder(note,payload.customer);
+   showStatus('Kalender dibuka untuk '+payload.customer+'. Tekan Simpan pada formulir kalender.');
    return;
   }
   const start=new Date(due.getFullYear(),due.getMonth(),due.getDate(),9,0,0);
   const end=new Date(due.getFullYear(),due.getMonth(),due.getDate(),10,0,0);
   const fmt=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'T'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+'00';
-  const params=new URLSearchParams({action:'TEMPLATE',text:'Jatuh Tempo ASIDO — '+customer,dates:fmt(start)+'/'+fmt(end),details:note});
+  const params=new URLSearchParams({action:'TEMPLATE',text:'Jatuh Tempo ASIDO — '+payload.customer,dates:fmt(start)+'/'+fmt(end),details:note});
   window.open('https://calendar.google.com/calendar/render?'+params.toString(),'_blank');
-  showStatus('Halaman Google Calendar dibuka dengan rincian pengingat. Tekan Simpan agar masuk ke kalender.');
+  showStatus('Google Calendar dibuka dengan detail pengingat. Tekan Simpan di Google Calendar.');
  }
+ function createAllTempoReminders(){
+  const all=historyData.map(h=>({h,key:invoiceKey(h),status:guessStatus(h),total:totalOf(h)})).filter(x=>x.status==='Tempo');
+  const payload=all.map(reminderPayload).filter(Boolean);
+  if(!payload.length){showStatus('Belum ada transaksi Tempo dengan tanggal nota yang valid.');return;}
+  if(window.AndroidAsido&&typeof window.AndroidAsido.scheduleTempoReminders==='function'){
+   window.AndroidAsido.scheduleTempoReminders(JSON.stringify(payload));
+   showStatus('Meminta Android menjadwalkan '+payload.length+' pengingat Tempo pada tanggal nota +30 hari. Kalender Google di akun HP akan menerima pengingat yang berhasil dibuat.');
+   return;
+  }
+  showStatus('Fitur jadwalkan semua Tempo otomatis memerlukan APK ASIDO versi terbaru. Anda masih dapat membuat pengingat satu per satu melalui tombol pada tiap nota.');
+ }
+ $('remindAllTempo').addEventListener('click',createAllTempoReminders);
  $('refresh').addEventListener('click',loadData);
  $('monthFilter').addEventListener('change',render);
  $('statusFilter').addEventListener('change',render);
