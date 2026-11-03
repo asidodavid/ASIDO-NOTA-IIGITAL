@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
     private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=1.0.0";
     private WebView web;
     private TextView status;
+    private Uri lastPdfUri;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -117,15 +118,29 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void sharePng(String dataUrl, String fileName) {
             runOnUiThread(() -> nativeSharePng(dataUrl, fileName));
         }
+        @JavascriptInterface public String savePdf(String dataUrl, String fileName) {
+            return nativeSavePdf(dataUrl, fileName);
+        }
+        @JavascriptInterface public String shareSavedPdf() {
+            Uri uri = getLastPdfUri();
+            if (uri == null) return "ERROR|Buat dan simpan PDF terlebih dahulu.";
+            runOnUiThread(() -> nativeSharePdf(uri));
+            return "OK|Menu berbagi PDF dibuka.";
+        }
+        @JavascriptInterface public String openSavedPdf() {
+            Uri uri = getLastPdfUri();
+            if (uri == null) return "ERROR|Buat dan simpan PDF terlebih dahulu.";
+            runOnUiThread(() -> nativeOpenPdf(uri));
+            return "OK|PDF dibuka.";
+        }
         @JavascriptInterface public void startVoiceInput() {
             runOnUiThread(MainActivity.this::startNativeVoice);
         }
         @JavascriptInterface public void addCalendarReminder(String note, String customer) {
             runOnUiThread(() -> createCalendarEvent(note, customer));
         }
-        @JavascriptInterface public String version() { return "1.0.0"; }
+        @JavascriptInterface public String version() { return "1.1.0"; }
     }
-
     private void nativeSharePng(String dataUrl, String fileName) {
         Uri uri = null;
         try {
@@ -193,6 +208,86 @@ public class MainActivity extends Activity {
                 try { getContentResolver().delete(uri, null, null); } catch (Exception ignored) { }
             }
             toast("Berbagi gagal: " + (e.getMessage() == null ? "kesalahan Android" : e.getMessage()));
+        }
+    }
+
+    private String nativeSavePdf(String dataUrl, String fileName) {
+        Uri uri = null;
+        try {
+            if (dataUrl == null || !dataUrl.startsWith("data:application/pdf") || !dataUrl.contains(";base64,")) {
+                return "ERROR|Data PDF tidak valid.";
+            }
+            byte[] bytes = android.util.Base64.decode(dataUrl.substring(dataUrl.indexOf(',') + 1), android.util.Base64.DEFAULT);
+            if (bytes.length < 1000) return "ERROR|File PDF kosong atau terlalu kecil.";
+            String name = fileName == null ? "ASIDO-Nota.pdf" : fileName.replaceAll("[^A-Za-z0-9._-]", "-");
+            if (!name.toLowerCase(Locale.ROOT).endsWith(".pdf")) name += ".pdf";
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/ASIDO");
+            values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+            uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) return "ERROR|Tidak dapat membuat file PDF di Downloads.";
+            try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+                if (out == null) throw new IllegalStateException("Tidak dapat menulis file PDF.");
+                out.write(bytes);
+                out.flush();
+            }
+            ContentValues ready = new ContentValues();
+            ready.put(MediaStore.MediaColumns.IS_PENDING, 0);
+            getContentResolver().update(uri, ready, null, null);
+            lastPdfUri = uri;
+            getSharedPreferences("asido_native", MODE_PRIVATE).edit().putString("last_pdf_uri", uri.toString()).apply();
+            return "OK|" + uri.toString();
+        } catch (Exception e) {
+            if (uri != null) {
+                try { getContentResolver().delete(uri, null, null); } catch (Exception ignored) { }
+            }
+            return "ERROR|" + (e.getMessage() == null ? "Gagal menyimpan PDF." : e.getMessage());
+        }
+    }
+
+    private Uri getLastPdfUri() {
+        if (lastPdfUri != null) return lastPdfUri;
+        String saved = getSharedPreferences("asido_native", MODE_PRIVATE).getString("last_pdf_uri", null);
+        if (saved == null) return null;
+        try { lastPdfUri = Uri.parse(saved); return lastPdfUri; }
+        catch (Exception ignored) { return null; }
+    }
+
+    private void nativeSharePdf(Uri uri) {
+        try {
+            Intent send = new Intent(Intent.ACTION_SEND);
+            send.setType("application/pdf");
+            send.putExtra(Intent.EXTRA_STREAM, uri);
+            send.setClipData(ClipData.newUri(getContentResolver(), "Nota ASIDO PDF", uri));
+            send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            String pkg = installed("com.whatsapp") ? "com.whatsapp" :
+                    (installed("com.whatsapp.w4b") ? "com.whatsapp.w4b" : null);
+            if (pkg != null) {
+                send.setPackage(pkg);
+                try { startActivity(send); }
+                catch (ActivityNotFoundException e) {
+                    send.setPackage(null);
+                    startActivity(Intent.createChooser(send, "Bagikan PDF nota ASIDO"));
+                }
+            } else {
+                startActivity(Intent.createChooser(send, "Bagikan PDF nota ASIDO"));
+            }
+        } catch (Exception e) {
+            toast("Gagal membagikan PDF: " + (e.getMessage() == null ? "kesalahan Android" : e.getMessage()));
+        }
+    }
+
+    private void nativeOpenPdf(Uri uri) {
+        try {
+            Intent view = new Intent(Intent.ACTION_VIEW);
+            view.setDataAndType(uri, "application/pdf");
+            view.setClipData(ClipData.newUri(getContentResolver(), "Nota ASIDO PDF", uri));
+            view.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(view, "Buka PDF nota ASIDO"));
+        } catch (Exception e) {
+            toast("Tidak ada aplikasi pembaca PDF atau file tidak bisa dibuka.");
         }
     }
 
