@@ -1,10 +1,14 @@
 package id.asido.notadigital;
 
 import android.app.Activity;
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -27,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -38,11 +43,13 @@ import java.util.regex.Pattern;
 public class MainActivity extends Activity {
     private static final int VOICE_REQUEST = 7101;
     private static final int FILE_CHOOSER_REQUEST = 7102;
-    private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=1.2.0";
+    private static final int CALENDAR_PERMISSION_REQUEST = 7103;
+    private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=1.3.0";
     private WebView web;
     private TextView status;
     private Uri lastPdfUri;
     private ValueCallback<Uri[]> filePathCallback;
+    private String pendingTempoReminderJson;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -156,7 +163,24 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void addCalendarReminder(String note, String customer) {
             runOnUiThread(() -> createCalendarEvent(note, customer));
         }
-        @JavascriptInterface public String version() { return "1.1.0"; }
+        @JavascriptInterface public void scheduleTempoReminder(String dueDate, String customer, String amount, String reference) {
+            try {
+                JSONObject item = new JSONObject();
+                item.put("dueDate", dueDate);
+                item.put("customer", customer);
+                item.put("amount", amount);
+                item.put("reference", reference);
+                JSONArray items = new JSONArray();
+                items.put(item);
+                runOnUiThread(() -> requestOrScheduleTempoReminders(items.toString()));
+            } catch (Exception e) {
+                runOnUiThread(() -> toast("Data pengingat Tempo tidak valid."));
+            }
+        }
+        @JavascriptInterface public void scheduleTempoReminders(String json) {
+            runOnUiThread(() -> requestOrScheduleTempoReminders(json));
+        }
+        @JavascriptInterface public String version() { return "1.3.0"; }
     }
     private void nativeSharePng(String dataUrl, String fileName) {
         Uri uri = null;
@@ -346,6 +370,141 @@ public class MainActivity extends Activity {
             if (list != null && !list.isEmpty()) {
                 web.evaluateJavascript("window.onAsidoVoiceResult && window.onAsidoVoiceResult(" + JSONObject.quote(list.get(0)) + ")", null);
             }
+        }
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CALENDAR_PERMISSION_REQUEST) {
+            boolean granted = grantResults.length >= 2;
+            for (int result : grantResults) granted = granted && result == PackageManager.PERMISSION_GRANTED;
+            if (granted && pendingTempoReminderJson != null) {
+                String json = pendingTempoReminderJson;
+                pendingTempoReminderJson = null;
+                scheduleTempoRemindersNow(json);
+            } else {
+                pendingTempoReminderJson = null;
+                toast("Izin Kalender tidak diberikan. Pengingat Tempo belum ditambahkan.");
+            }
+        }
+    }
+
+    private void requestOrScheduleTempoReminders(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            toast("Tidak ada transaksi Tempo untuk dijadwalkan.");
+            return;
+        }
+        if (checkSelfPermission(Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            pendingTempoReminderJson = json;
+            requestPermissions(new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR}, CALENDAR_PERMISSION_REQUEST);
+            return;
+        }
+        scheduleTempoRemindersNow(json);
+    }
+
+    private long findWritableCalendarId() {
+        Cursor cursor = null;
+        long fallbackId = -1L;
+        long googleId = -1L;
+        long googlePrimaryId = -1L;
+        try {
+            String[] projection = new String[]{
+                    CalendarContract.Calendars._ID,
+                    CalendarContract.Calendars.ACCOUNT_TYPE,
+                    CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
+                    CalendarContract.Calendars.VISIBLE,
+                    CalendarContract.Calendars.IS_PRIMARY
+            };
+            cursor = getContentResolver().query(CalendarContract.Calendars.CONTENT_URI, projection, null, null, null);
+            if (cursor == null) return -1L;
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(0);
+                String accountType = cursor.getString(1);
+                int access = cursor.getInt(2);
+                int visible = cursor.getInt(3);
+                int primary = cursor.getInt(4);
+                if (visible != 1 || access < 500) continue;
+                if (fallbackId < 0) fallbackId = id;
+                if ("com.google".equalsIgnoreCase(accountType)) {
+                    if (googleId < 0) googleId = id;
+                    if (primary == 1) googlePrimaryId = id;
+                }
+            }
+        } catch (Exception e) {
+            return -1L;
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        if (googlePrimaryId >= 0) return googlePrimaryId;
+        if (googleId >= 0) return googleId;
+        return fallbackId;
+    }
+
+    private void scheduleTempoRemindersNow(String json) {
+        try {
+            JSONArray items = new JSONArray(json);
+            if (items.length() == 0) {
+                toast("Tidak ada transaksi Tempo untuk dijadwalkan.");
+                return;
+            }
+            long calendarId = findWritableCalendarId();
+            if (calendarId < 0) {
+                toast("Tidak ditemukan kalender yang dapat ditulis. Pastikan akun Google tersedia di aplikasi Kalender.");
+                return;
+            }
+            int created = 0;
+            int alreadyExists = 0;
+            int failed = 0;
+            android.content.SharedPreferences prefs = getSharedPreferences("asido_tempo_reminders", MODE_PRIVATE);
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                String dueDate = item.optString("dueDate", "");
+                String customer = item.optString("customer", "Pelanggan");
+                String amount = item.optString("amount", "");
+                String reference = item.optString("reference", customer + dueDate);
+                String[] parts = dueDate.split("-");
+                if (parts.length != 3) { failed++; continue; }
+                int year = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int day = Integer.parseInt(parts[2]);
+                Calendar start = Calendar.getInstance();
+                start.clear();
+                start.set(year, month - 1, day, 9, 0, 0);
+                if (start.get(Calendar.YEAR) != year || start.get(Calendar.MONTH) != month - 1 || start.get(Calendar.DAY_OF_MONTH) != day) {
+                    failed++;
+                    continue;
+                }
+                Calendar end = (Calendar) start.clone();
+                end.add(Calendar.HOUR_OF_DAY, 1);
+                String prefKey = "event_" + Integer.toHexString(reference.hashCode());
+                if (prefs.contains(prefKey)) {
+                    alreadyExists++;
+                    continue;
+                }
+                ContentValues values = new ContentValues();
+                values.put(CalendarContract.Events.CALENDAR_ID, calendarId);
+                values.put(CalendarContract.Events.TITLE, "Jatuh Tempo ASIDO — " + customer);
+                values.put(CalendarContract.Events.DESCRIPTION, "Pengingat pembayaran Tempo ASIDO.\nPelanggan: " + customer + "\nTotal: " + amount + "\nReferensi nota: " + reference + "\nDibuat otomatis oleh Pembukuan ASIDO.");
+                values.put(CalendarContract.Events.DTSTART, start.getTimeInMillis());
+                values.put(CalendarContract.Events.DTEND, end.getTimeInMillis());
+                values.put(CalendarContract.Events.EVENT_TIMEZONE, java.util.TimeZone.getDefault().getID());
+                values.put(CalendarContract.Events.HAS_ALARM, 1);
+                values.put(CalendarContract.Events.ALL_DAY, 0);
+                Uri eventUri = getContentResolver().insert(CalendarContract.Events.CONTENT_URI, values);
+                if (eventUri == null) { failed++; continue; }
+                long eventId = ContentUris.parseId(eventUri);
+                ContentValues reminder = new ContentValues();
+                reminder.put(CalendarContract.Reminders.EVENT_ID, eventId);
+                reminder.put(CalendarContract.Reminders.MINUTES, 0);
+                reminder.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+                getContentResolver().insert(CalendarContract.Reminders.CONTENT_URI, reminder);
+                prefs.edit().putLong(prefKey, eventId).apply();
+                created++;
+            }
+            toast(created + " pengingat Tempo dibuat di kalender. " + alreadyExists + " sudah pernah dibuat. " + failed + " gagal.");
+        } catch (Exception e) {
+            toast("Gagal membuat pengingat Google Calendar: " + (e.getMessage() == null ? "kesalahan kalender" : e.getMessage()));
         }
     }
 
