@@ -64,10 +64,19 @@ let historyData=JSON.parse(localStorage.getItem('asido_history')||'[]');
 let rows=[];
 const now=new Date();$('date').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function sortedProductEntries(){
+ return products.map((p,index)=>({product:p,index}))
+  .sort((a,b)=>String(a.product.name||'').localeCompare(String(b.product.name||''),'id',{sensitivity:'base',numeric:true}));
+}
 function renderProducts(){
- $('productSelect').innerHTML='<option value="">Pilih produk...</option>'+products.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+' — '+money(p.price)+'</option>').join('');
+ const ordered=sortedProductEntries();
+ $('productSelect').innerHTML='<option value="">Pilih produk...</option>'+ordered.map((entry,displayIndex)=>'<option value="'+entry.index+'">'+(displayIndex+1)+'. '+esc(entry.product.name)+' — '+money(entry.product.price)+'</option>').join('');
  const ms=$('manageProductSelect');
- if(ms){const prior=ms.value;ms.innerHTML='<option value="">Pilih produk untuk diedit...</option>'+products.map((p,i)=>'<option value="'+i+'">'+esc(p.name)+' — '+money(p.price)+'</option>').join('');if(prior!==''&&Number(prior)<products.length)ms.value=prior;}
+ if(ms){
+  const prior=ms.value;
+  ms.innerHTML='<option value="">Pilih produk untuk diedit...</option>'+ordered.map((entry,displayIndex)=>'<option value="'+entry.index+'">'+(displayIndex+1)+'. '+esc(entry.product.name)+' — '+money(entry.product.price)+'</option>').join('');
+  if(prior!==''&&Number(prior)<products.length)ms.value=prior;
+ }
 }
 function addRow(name='',qty=1,price=0){rows.push({name,qty,price});renderRows()}
 function renderTotal(){const sum=rows.reduce((a,r)=>a+(Number(r.qty)||0)*(Number(r.price)||0),0);$('grandTotal').textContent='TOTAL: '+money(sum);return sum}
