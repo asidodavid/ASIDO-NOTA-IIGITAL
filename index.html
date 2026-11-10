@@ -53,7 +53,7 @@
  <p id="pdfNativeStatus" class="muted" role="status"></p>
 </div>
 </section><section class="card"><h2>📒 Pembukuan ASIDO</h2><p class="muted">Gabungkan nota berdasarkan tanggal, lihat total Cash dan Tempo, serta buat pengingat jatuh tempo 30 hari di Google Calendar.</p><div class="buttons"><a href="./pembukuan/" style="display:block;width:100%;text-align:center;text-decoration:none;background:#143c73;color:#fff;border-radius:10px;padding:13px;font-weight:700">Buka Pembukuan ASIDO</a></div></section>
-<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memperbarui perangkat lain, ekspor cadangan dari perangkat sumber, pindahkan file JSON melalui Google Drive, lalu pilih salah satu cara impor di perangkat tujuan.</p><div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importMergeBtn" class="secondary">Impor &amp; Gabungkan</button><button type="button" id="importReplaceBtn" class="green">Impor &amp; Samakan Data</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importProductsOnlyBtn" class="secondary">Samakan Daftar Barang Saja</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><p class="muted">Gabungkan: pertahankan data lama dan tambahkan isi cadangan. Samakan Data: ganti daftar barang dan seluruh riwayat. Samakan Daftar Barang Saja: ganti hanya katalog barang dan harga; riwayat nota pada perangkat ini tetap dipertahankan.</p><div class="buttons" style="margin-top:8px"><button type="button" id="restorePreSyncBtn" class="secondary" hidden>Pulihkan data sebelum penyamaan</button><button type="button" id="restorePreCatalogBtn" class="secondary" hidden>Pulihkan daftar barang sebelumnya</button><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
+<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memperbarui perangkat lain, ekspor cadangan dari perangkat sumber, pindahkan file JSON melalui Google Drive, lalu pilih salah satu cara impor di perangkat tujuan.</p><div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importMergeBtn" class="secondary">Impor &amp; Gabungkan</button><button type="button" id="importReplaceBtn" class="green">Impor &amp; Samakan Data</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importProductsOnlyBtn" class="secondary">Samakan Daftar Barang Saja</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><p class="muted">Gabungkan: pertahankan data lama dan tambahkan isi cadangan. Samakan Data: ganti daftar barang dan seluruh riwayat. Samakan Daftar Barang Saja: ganti hanya katalog barang dan harga; riwayat nota pada perangkat ini tetap dipertahankan.</p><div class="buttons" style="margin-top:8px"><button type="button" id="restorePreSyncBtn" class="secondary" hidden>Pulihkan data sebelum penyamaan</button><button type="button" id="restorePreCatalogBtn" class="secondary" hidden>Pulihkan daftar barang sebelumnya</button><button type="button" id="restorePreMergeBtn" class="secondary" hidden>Pulihkan data sebelum penggabungan</button><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
@@ -289,17 +289,45 @@ $('importDataFile').addEventListener('change',e=>{
    }else{
     const ok=confirm('Gabungkan '+incoming.products.length+' produk dan '+incoming.history.length+' nota dari file cadangan dengan data yang sudah ada di perangkat ini? Data lama yang tidak ada di file akan tetap dipertahankan.');
     if(!ok){$('backupStatus').textContent='Impor gabungan dibatalkan. Data perangkat tidak berubah.';e.target.value='';return;}
+    const preMerge={format:'asido-nota-pre-merge-v1',savedAt:new Date().toISOString(),products:products,history:historyData};
+    try{localStorage.setItem('asido_pre_merge_backup',JSON.stringify(preMerge));}
+    catch(storageErr){throw new Error('Cadangan pengaman sebelum penggabungan tidak dapat disimpan karena ruang browser tidak cukup. Tidak ada data yang digabungkan. Ekspor cadangan perangkat ini terlebih dahulu.');}
     const productMap=new Map(products.map(p=>[String(p.name||'').trim().toLowerCase(),{...p}]));
-    incoming.products.forEach(p=>productMap.set(p.name.toLowerCase(),p));
-    products=Array.from(productMap.values());
-    const invoiceKey=h=>String(h.id||'')||[h.date||'',String(h.customer||'').trim().toLowerCase(),Number(h.total)||0,JSON.stringify(h.items||[])].join('|');
-    const invoiceMap=new Map(historyData.map(h=>[invoiceKey(h),h]));
-    incoming.history.forEach(h=>invoiceMap.set(invoiceKey(h),h));
-    historyData=Array.from(invoiceMap.values()).sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||''))).slice(0,500);
-    localStorage.setItem('asido_products',JSON.stringify(products));
-    localStorage.setItem('asido_history',JSON.stringify(historyData));
+    let addedProducts=0;
+    incoming.products.forEach(p=>{
+     const key=p.name.toLowerCase();
+     if(!productMap.has(key)){productMap.set(key,{...p});addedProducts++;}
+    });
+    const mergedProducts=Array.from(productMap.values());
+    const mergedHistory=historyData.map(h=>({...h}));
+    const signature=h=>JSON.stringify([h.date||'',String(h.customer||'').trim().toLowerCase(),Number(h.total)||0,h.items||[],h.paymentStatus||'',h.notes||'',h.savedAt||'',h.buyer||'',h.seller||'']);
+    let addedHistory=0,duplicateHistory=0,collisionCount=0;
+    incoming.history.forEach(h=>{
+     const sig=signature(h);
+     const sameId=h.id?mergedHistory.find(v=>v.id&&String(v.id)===String(h.id)):null;
+     if(sameId){
+      if(signature(sameId)===sig){duplicateHistory++;return;}
+      const copy={...h,originalImportedId:h.id,id:String(h.id)+'-IMP-'+Date.now()+'-'+(++collisionCount)};
+      mergedHistory.push(copy);addedHistory++;return;
+     }
+     if(mergedHistory.some(v=>signature(v)===sig)){duplicateHistory++;return;}
+     mergedHistory.push({...h});addedHistory++;
+    });
+    mergedHistory.sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
+    const oldProductsRaw=localStorage.getItem('asido_products');
+    const oldHistoryRaw=localStorage.getItem('asido_history');
+    try{
+     localStorage.setItem('asido_products',JSON.stringify(mergedProducts));
+     localStorage.setItem('asido_history',JSON.stringify(mergedHistory));
+    }catch(storageErr){
+     if(oldProductsRaw===null)localStorage.removeItem('asido_products');else localStorage.setItem('asido_products',oldProductsRaw);
+     if(oldHistoryRaw===null)localStorage.removeItem('asido_history');else localStorage.setItem('asido_history',oldHistoryRaw);
+     throw new Error('Ruang penyimpanan tidak cukup. Data sebelum penggabungan tetap dipertahankan; tidak ada hasil gabungan yang disimpan.');
+    }
+    products=mergedProducts;historyData=mergedHistory;
+    $('restorePreMergeBtn').hidden=false;
     renderProducts();renderHistory();
-    $('backupStatus').textContent='Impor gabungan berhasil. Katalog dan riwayat dari file sudah digabungkan dengan data perangkat ini.';
+    $('backupStatus').textContent='Penggabungan aman selesai. '+addedProducts+' produk baru dan '+addedHistory+' nota baru ditambahkan; '+duplicateHistory+' nota duplikat dilewati. Data produk dan riwayat yang sudah ada tetap dipertahankan.';
    }
   }catch(err){$('backupStatus').textContent='Impor gagal: '+(err.message||String(err))+'. Data perangkat tidak diganti.';}
   e.target.value='';
@@ -338,8 +366,25 @@ $('restorePreCatalogBtn').onclick=()=>{
   $('backupStatus').textContent='Daftar barang sebelumnya berhasil dipulihkan. Riwayat nota tetap utuh.';
  }catch(err){$('backupStatus').textContent='Pemulihan katalog gagal: '+(err.message||String(err));}
 };
+$('restorePreMergeBtn').onclick=()=>{
+ const raw=localStorage.getItem('asido_pre_merge_backup');
+ if(!raw){$('backupStatus').textContent='Tidak ada cadangan sebelum penggabungan pada perangkat ini.';$('restorePreMergeBtn').hidden=true;return;}
+ if(!confirm('Pulihkan daftar produk dan riwayat yang tersimpan tepat sebelum penggabungan terakhir? Data saat ini akan diganti dengan cadangan pengaman tersebut.'))return;
+ try{
+  const backup=JSON.parse(raw);
+  if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('Cadangan sebelum penggabungan tidak valid.');
+  localStorage.setItem('asido_products',JSON.stringify(backup.products));
+  localStorage.setItem('asido_history',JSON.stringify(backup.history));
+  products=backup.products;historyData=backup.history;
+  renderProducts();renderHistory();
+  localStorage.removeItem('asido_pre_merge_backup');
+  $('restorePreMergeBtn').hidden=true;
+  $('backupStatus').textContent='Data sebelum penggabungan berhasil dipulihkan.';
+ }catch(err){$('backupStatus').textContent='Pemulihan sebelum penggabungan gagal: '+(err.message||String(err));}
+};
 if(localStorage.getItem('asido_pre_catalog_sync_backup'))$('restorePreCatalogBtn').hidden=false;
 if(localStorage.getItem('asido_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
+if(localStorage.getItem('asido_pre_merge_backup'))$('restorePreMergeBtn').hidden=false;
 $('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
 function parseVoice(text){
  const low=text.toLowerCase();
