@@ -210,7 +210,7 @@ function renderHistory(){
  renderStoreSearch();
 }
 function normalizeStoreSearch(value){
- return String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLocaleLowerCase('id').replace(/[^a-z0-9]+/g,' ').trim().replace(/\\s+/g,' ');
+ return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('id').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
 }
 function storeNameOf(h){
  return String(h.customer||h.toko||h.storeName||h.shopName||'Tanpa nama toko');
