@@ -53,7 +53,16 @@
  <p id="pdfNativeStatus" class="muted" role="status"></p>
 </div>
 </section><section class="card"><h2>📒 Pembukuan ASIDO</h2><p class="muted">Gabungkan nota berdasarkan tanggal, lihat total Cash dan Tempo, serta buat pengingat jatuh tempo 30 hari di Google Calendar.</p><div class="buttons"><a href="./pembukuan/" style="display:block;width:100%;text-align:center;text-decoration:none;background:#143c73;color:#fff;border-radius:10px;padding:13px;font-weight:700">Buka Pembukuan ASIDO</a></div></section>
-<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memperbarui perangkat lain, ekspor cadangan dari perangkat sumber, pindahkan file JSON melalui Google Drive, lalu pilih salah satu cara impor di perangkat tujuan.</p><div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importMergeBtn" class="secondary">Impor &amp; Gabungkan</button><button type="button" id="importReplaceBtn" class="green">Impor &amp; Samakan Data</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importProductsOnlyBtn" class="secondary">Samakan Daftar Barang Saja</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><p class="muted">Gabungkan: pertahankan data lama dan tambahkan isi cadangan. Samakan Data: ganti daftar barang dan seluruh riwayat. Samakan Daftar Barang Saja: ganti hanya katalog barang dan harga; riwayat nota pada perangkat ini tetap dipertahankan.</p><div class="buttons" style="margin-top:8px"><button type="button" id="restorePreSyncBtn" class="secondary" hidden>Pulihkan data sebelum penyamaan</button><button type="button" id="restorePreCatalogBtn" class="secondary" hidden>Pulihkan daftar barang sebelumnya</button><button type="button" id="restorePreMergeBtn" class="secondary" hidden>Pulihkan data sebelum penggabungan</button><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
+<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memperbarui perangkat lain, ekspor cadangan dari perangkat sumber, pindahkan file JSON melalui Google Drive, lalu pilih salah satu cara impor di perangkat tujuan.</p>
+<div style="margin:12px 0;padding:12px;border:1px solid #d8e2ef;border-radius:12px;background:#f8fbff">
+ <strong style="color:#123c7a">🔎 Cari Nota berdasarkan Nama Toko</strong>
+ <p class="muted" style="margin:5px 0 9px">Ketik nama toko atau sebutkan lewat mikrofon. Hasil akan menampilkan tanggal transaksi, barang, jumlah, harga, dan total pesanan dari riwayat pada perangkat ini.</p>
+ <div class="field"><label for="storeSearchInput">Nama toko / pelanggan</label><input id="storeSearchInput" type="search" placeholder="Contoh: Toko Sinar Baru" autocomplete="off"></div>
+ <div class="buttons"><button type="button" id="searchStoreBtn" class="secondary">Cari Toko</button><button type="button" id="voiceStoreSearchBtn">🎙 Cari dengan Suara</button><button type="button" id="clearStoreSearchBtn" class="secondary">Hapus Pencarian</button></div>
+ <p id="storeSearchStatus" class="muted" role="status">Masukkan nama toko atau tekan Cari dengan Suara.</p>
+ <div id="storeSearchResults" aria-live="polite"></div>
+</div>
+<div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importMergeBtn" class="secondary">Impor &amp; Gabungkan</button><button type="button" id="importReplaceBtn" class="green">Impor &amp; Samakan Data</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importProductsOnlyBtn" class="secondary">Samakan Daftar Barang Saja</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><p class="muted">Gabungkan: pertahankan data lama dan tambahkan isi cadangan. Samakan Data: ganti daftar barang dan seluruh riwayat. Samakan Daftar Barang Saja: ganti hanya katalog barang dan harga; riwayat nota pada perangkat ini tetap dipertahankan.</p><div class="buttons" style="margin-top:8px"><button type="button" id="restorePreSyncBtn" class="secondary" hidden>Pulihkan data sebelum penyamaan</button><button type="button" id="restorePreCatalogBtn" class="secondary" hidden>Pulihkan daftar barang sebelumnya</button><button type="button" id="restorePreMergeBtn" class="secondary" hidden>Pulihkan data sebelum penggabungan</button><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
@@ -198,7 +207,81 @@ function renderHistory(){
   const status=$('backupStatus')||$('status');
   if(status)status.textContent='Nota "'+customer+'" sudah dihapus dari riwayat perangkat ini.';
  });
+ renderStoreSearch();
 }
+function normalizeStoreSearch(value){
+ return String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLocaleLowerCase('id').replace(/[^a-z0-9]+/g,' ').trim().replace(/\\s+/g,' ');
+}
+function storeNameOf(h){
+ return String(h.customer||h.toko||h.storeName||h.shopName||'Tanpa nama toko');
+}
+function calculateInvoiceTotal(h){
+ const explicit=Number(h.total);
+ if(Number.isFinite(explicit)&&explicit>0)return explicit;
+ return (Array.isArray(h.items)?h.items:[]).reduce((sum,item)=>sum+(Number(item.qty)||0)*(Number(item.price)||0),0);
+}
+function renderStoreSearch(){
+ const input=$('storeSearchInput'),results=$('storeSearchResults'),status=$('storeSearchStatus');
+ if(!input||!results||!status)return;
+ const raw=input.value.trim(),query=normalizeStoreSearch(raw);
+ if(!query){results.innerHTML='';status.textContent='Masukkan nama toko atau tekan Cari dengan Suara.';return;}
+ const matches=historyData.map((h,index)=>({h,index})).filter(({h})=>normalizeStoreSearch(storeNameOf(h)).includes(query))
+  .sort((a,b)=>String(b.h.date||'').localeCompare(String(a.h.date||''))||String(b.h.savedAt||'').localeCompare(String(a.h.savedAt||'')));
+ if(!matches.length){results.innerHTML='';status.textContent='Belum ada nota dengan nama toko “'+raw+'” di riwayat perangkat ini. Periksa ejaan atau coba sebagian nama toko.';return;}
+ status.textContent='Ditemukan '+matches.length+' nota untuk pencarian “'+raw+'”.';
+ results.innerHTML=matches.map(({h,index})=>{
+  const items=(Array.isArray(h.items)?h.items:[]).filter(item=>String(item.name||'').trim());
+  const total=calculateInvoiceTotal(h);
+  const itemHtml=items.length?items.map(item=>{
+   const price=Number(item.price)||0,subtotal=(Number(item.qty)||0)*price;
+   return '<li style="margin:4px 0">'+esc(item.name)+' — <strong>'+esc(item.qty??0)+' '+(item.unit?esc(item.unit)+' ':'')+'</strong> × '+money(price)+' = '+money(subtotal)+'</li>';
+  }).join(''):'<li>Rincian barang tidak tersedia pada nota ini.</li>';
+  return '<div class="item" style="background:#fff;margin:9px 0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>'+esc(storeNameOf(h))+'</strong><span class="muted">Tanggal: '+esc(h.date||'-')+'</span></div><div class="muted" style="margin-top:4px">Jumlah jenis barang: '+items.length+' · Pembayaran: '+esc(h.paymentStatus||'-')+'</div><ul style="margin:8px 0 10px;padding-left:20px">'+itemHtml+'</ul><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #edf0f5;padding-top:9px"><strong style="color:#123c7a">Total pesanan: '+money(total)+'</strong><button type="button" class="secondary" data-open-search-invoice="'+index+'" style="padding:8px 11px">Buka Nota</button></div></div>';
+ }).join('');
+ results.querySelectorAll('[data-open-search-invoice]').forEach(button=>button.onclick=()=>{
+  const h=historyData[Number(button.dataset.openSearchInvoice)];
+  if(!h)return;
+  loadInvoice(h);
+  $('status').textContent='Nota '+storeNameOf(h)+' tanggal '+(h.date||'-')+' dibuka dari hasil pencarian.';
+  window.scrollTo({top:0,behavior:'smooth'});
+ });
+}
+$('storeSearchInput').addEventListener('input',renderStoreSearch);
+$('searchStoreBtn').onclick=renderStoreSearch;
+$('clearStoreSearchBtn').onclick=()=>{
+ $('storeSearchInput').value='';
+ renderStoreSearch();
+ $('storeSearchInput').focus();
+};
+$('voiceStoreSearchBtn').onclick=()=>{
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){
+  $('storeSearchStatus').textContent='Pencarian suara belum didukung di browser/aplikasi ini. Silakan ketik nama toko pada kotak pencarian.';
+  return;
+ }
+ try{
+  const recognition=new SpeechRecognition();
+  recognition.lang='id-ID';recognition.continuous=false;recognition.interimResults=false;recognition.maxAlternatives=1;
+  const voiceButton=$('voiceStoreSearchBtn');
+  voiceButton.disabled=true;voiceButton.textContent='Mendengarkan…';
+  $('storeSearchStatus').textContent='Silakan sebutkan nama toko dengan jelas.';
+  recognition.onresult=event=>{
+   const transcript=event.results&&event.results[0]&&event.results[0][0]?event.results[0][0].transcript:'';
+   $('storeSearchInput').value=String(transcript||'').trim();
+   renderStoreSearch();
+  };
+  recognition.onerror=event=>{
+   $('storeSearchStatus').textContent='Pencarian suara gagal ('+(event.error||'tidak diketahui')+'). Bapak bisa mengetik nama toko sebagai alternatif.';
+  };
+  recognition.onend=()=>{
+   voiceButton.disabled=false;voiceButton.textContent='🎙 Cari dengan Suara';
+  };
+  recognition.start();
+ }catch(error){
+  $('storeSearchStatus').textContent='Mikrofon tidak dapat dimulai. Periksa izin mikrofon Chrome, lalu coba lagi atau ketik nama toko.';
+  $('voiceStoreSearchBtn').disabled=false;$('voiceStoreSearchBtn').textContent='🎙 Cari dengan Suara';
+ }
+};
 function loadInvoice(v){$('date').value=v.date||'';$('customer').value=v.customer||'';$('paymentStatus').value=v.paymentStatus||'Cash';$('notes').value=v.notes||'';rows=(v.items||[]).map(r=>({...r}));renderRows();['buyerSig','sellerSig'].forEach(id=>clearSignature(id));[['buyerSig',v.buyer],['sellerSig',v.seller]].forEach(([id,data])=>{if(data){const im=new Image();im.onload=()=>{const c=$(id),cx=c.getContext('2d'),rect=c.getBoundingClientRect();cx.drawImage(im,0,0,rect.width,rect.height);sigInk[id]=true};im.src=data}});window.scrollTo({top:0,behavior:'smooth'});$('status').textContent='Nota lama dimuat.'}
 function downloadBlobFile(blob,name){
  const url=URL.createObjectURL(blob),a=document.createElement('a');
