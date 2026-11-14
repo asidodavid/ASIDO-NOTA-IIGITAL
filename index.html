@@ -662,7 +662,7 @@ function printInvoiceForPhone(){
   #asidoPrintSheet .signatures{display:grid;grid-template-columns:1fr 1fr;gap:45px;margin-top:36px;break-inside:avoid;page-break-inside:avoid}
   #asidoPrintSheet .sigarea{text-align:center}
   #asidoPrintSheet .sigarea.asidoSig{position:relative}
-  #asidoPrintSheet .stamp{position:absolute;right:-4px;bottom:22px;width:68px;height:68px;pointer-events:none}
+  #asidoPrintSheet .stamp{display:block!important;visibility:visible!important;opacity:1!important;position:absolute;right:0;bottom:26px;width:72px;height:72px;z-index:20;overflow:visible;pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #asidoPrintSheet .sigcaption{text-align:left;margin-bottom:4px}
   #asidoPrintSheet .sigimg{height:58px;max-width:100%;width:100%;object-fit:contain;object-position:center}
   #asidoPrintSheet .signblank{height:58px}
@@ -783,9 +783,18 @@ $('makeNotaImage').onclick=()=>{
   // Native APK: pass the PNG to Android ACTION_SEND directly from this button.
   if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
    $('notaImageStatus').textContent='Menyiapkan lampiran gambar nota di WhatsApp…';
-   window.AndroidAsido.sharePng(dataUrl,fileName);
-   $('status').textContent='Nota '+v.customer+' disiapkan untuk WhatsApp.';
-   return;
+   try{
+    const nativeShareResult=window.AndroidAsido.sharePng(dataUrl,fileName);
+    if(typeof nativeShareResult==='string'&&/^ERROR\\|/i.test(nativeShareResult)){
+     throw new Error(nativeShareResult.replace(/^ERROR\\|/i,''));
+    }
+    $('status').textContent='Gambar nota dibuat. Periksa pratinjau WhatsApp sebelum mengirim; PNG juga tersedia melalui tombol Unduh Gambar PNG.';
+    $('notaImageStatus').textContent='Gambar nota diserahkan ke fitur berbagi Android. Periksa pratinjau WhatsApp. Jika lampiran kosong, gunakan Unduh Gambar PNG lalu bagikan melalui My Files.';
+    return;
+   }catch(nativeShareErr){
+    console.warn('Native share failed; trying Web Share fallback',nativeShareErr);
+    $('notaImageStatus').textContent='Fitur berbagi native gagal; mencoba menu berbagi browser…';
+   }
   }
 
   // Android Web Share: share the PNG file only (no text payload).
