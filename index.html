@@ -293,24 +293,32 @@ $('exportData').onclick=()=>{
  const status=$('backupStatus');
  try{
   const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData};
-  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
+  const json=JSON.stringify(backup,null,2);
+  const blob=new Blob([json],{type:'application/json;charset=utf-8'});
   const oldLink=$('backupDownloadLink');
-  if(oldLink){
-   const oldUrl=oldLink.dataset.blobUrl;
-   if(oldUrl){try{URL.revokeObjectURL(oldUrl);}catch(_){}}
-   oldLink.remove();
-  }
+  if(oldLink)oldLink.remove();
   const link=document.createElement('a');
-  link.id='backupDownloadLink';link.href=url;link.download='asido-backup.json';
-  link.dataset.blobUrl=url;
-  link.className='pdf-action-link green';link.textContent='Unduh file JSON sekarang';
+  link.id='backupDownloadLink';
+  link.href='#download-asido-backup';
+  link.className='pdf-action-link green';
+  link.textContent='Unduh file JSON sekarang';
   link.style.display='inline-block';link.style.marginTop='8px';
   link.setAttribute('aria-label','Unduh file cadangan ASIDO JSON');
-  status.textContent='File cadangan siap. Tekan tautan hijau ini secara langsung untuk mengunduh asido-backup.json ke folder Download. Jika Chrome meminta izin, pilih Izinkan.';
+  // Create a fresh Blob URL and invoke a temporary download anchor inside the
+  // actual user's tap gesture. A native anchor holding an old Blob URL may fail
+  // silently in Chrome Android / installed PWA.
+  link.onclick=(event)=>{
+   event.preventDefault();
+   try{
+    const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+    downloadBlobFile(blob,'ASIDO-backup-'+stamp+'.json');
+    status.firstChild.textContent='Download cadangan ASIDO dimulai. Periksa folder Download di HP.';
+   }catch(downloadErr){
+    status.firstChild.textContent='Download gagal: '+(downloadErr.message||String(downloadErr))+'. Coba buka aplikasi di Chrome, bukan shortcut.';
+   }
+  };
+  status.textContent='File cadangan siap. Tekan tautan hijau ini untuk memulai unduhan JSON. Nama file dibuat dengan waktu agar backup lama tidak tertimpa.';
   status.appendChild(document.createElement('br'));status.appendChild(link);
-  // Jangan memicu download secara otomatis: pada Chrome Android, tautan unduh
-  // harus ditekan langsung oleh pengguna agar izin download berjalan konsisten.
  }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
 };
 let importMode='merge';
