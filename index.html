@@ -313,10 +313,30 @@ $('exportData').onclick=()=>{
   link.textContent='Unduh file JSON sekarang';
   link.style.display='inline-block';link.style.marginTop='8px';
   link.setAttribute('aria-label','Unduh file cadangan ASIDO JSON');
-  // The visible anchor itself carries the Blob URL and download filename.
-  // User tap invokes the browser's native download handling directly.
-  status.textContent='File cadangan siap ('+filename+'). Ketuk tombol hijau ini secara langsung. Setelah mengetuk, periksa folder Download atau notifikasi Chrome.';
+  status.textContent='File cadangan siap ('+filename+'). Jika download tidak tersimpan, gunakan tombol Bagikan JSON untuk mengirim file ke Google Drive melalui menu Bagikan Android.';
   status.appendChild(document.createElement('br'));status.appendChild(link);
+  const shareBtn=document.createElement('button');
+  shareBtn.id='backupShareJson';
+  shareBtn.type='button';
+  shareBtn.className='pdf-action-link green';
+  shareBtn.textContent='Bagikan JSON ke Google Drive';
+  shareBtn.style.display='inline-block';shareBtn.style.marginTop='8px';
+  shareBtn.style.marginLeft='8px';
+  shareBtn.onclick=async()=>{
+   try{
+    const file=new File([json],filename,{type:'application/json'});
+    if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})){
+     status.firstChild.textContent='Fitur Bagikan file JSON tidak didukung browser ini. Coba buka ASIDO melalui Chrome penuh.';
+     return;
+    }
+    await navigator.share({files:[file],title:'Backup ASIDO Nota Digital',text:'Backup data nota ASIDO'});
+    status.firstChild.textContent='Menu Bagikan Android telah dibuka. Pilih Google Drive jika tersedia, lalu pastikan akun dan folder tujuan.';
+   }catch(shareErr){
+    if(shareErr&&shareErr.name==='AbortError')status.firstChild.textContent='Bagikan dibatalkan. File backup tetap siap.';
+    else status.firstChild.textContent='Bagikan JSON gagal: '+(shareErr.message||String(shareErr));
+   }
+  };
+  status.appendChild(document.createElement('br'));status.appendChild(shareBtn);
   setTimeout(()=>{try{URL.revokeObjectURL(blobUrl);}catch(_){}},10*60*1000);
  }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
 };
