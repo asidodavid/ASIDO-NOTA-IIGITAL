@@ -293,17 +293,24 @@ $('exportData').onclick=()=>{
  const status=$('backupStatus');
  try{
   const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData};
-  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(blob);
-  const oldLink=$('backupDownloadLink');if(oldLink)oldLink.remove();
+  const oldLink=$('backupDownloadLink');
+  if(oldLink){
+   const oldUrl=oldLink.dataset.blobUrl;
+   if(oldUrl){try{URL.revokeObjectURL(oldUrl);}catch(_){}}
+   oldLink.remove();
+  }
   const link=document.createElement('a');
   link.id='backupDownloadLink';link.href=url;link.download='asido-backup.json';
+  link.dataset.blobUrl=url;
   link.className='pdf-action-link green';link.textContent='Unduh file JSON sekarang';
   link.style.display='inline-block';link.style.marginTop='8px';
-  status.textContent='File cadangan siap. Bila unduhan otomatis tidak muncul, tekan tautan hijau di bawah ini. Setelah terunduh, cari asido-backup.json di folder Download.';
+  link.setAttribute('aria-label','Unduh file cadangan ASIDO JSON');
+  status.textContent='File cadangan siap. Tekan tautan hijau ini secara langsung untuk mengunduh asido-backup.json ke folder Download. Jika Chrome meminta izin, pilih Izinkan.';
   status.appendChild(document.createElement('br'));status.appendChild(link);
-  try{link.click();}catch(downloadErr){}
-  setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(_){}},10*60*1000);
+  // Jangan memicu download secara otomatis: pada Chrome Android, tautan unduh
+  // harus ditekan langsung oleh pengguna agar izin download berjalan konsisten.
  }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
 };
 let importMode='merge';
