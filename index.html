@@ -785,8 +785,8 @@ $('makeNotaImage').onclick=()=>{
    $('notaImageStatus').textContent='Menyiapkan lampiran gambar nota di WhatsApp…';
    try{
     const nativeShareResult=window.AndroidAsido.sharePng(dataUrl,fileName);
-    if(typeof nativeShareResult==='string'&&/^ERROR\\|/i.test(nativeShareResult)){
-     throw new Error(nativeShareResult.replace(/^ERROR\\|/i,''));
+    if(typeof nativeShareResult==='string'&&nativeShareResult.startsWith('ERROR|')){
+     throw new Error(nativeShareResult.slice(6));
     }
     $('status').textContent='Gambar nota dibuat. Periksa pratinjau WhatsApp sebelum mengirim; PNG juga tersedia melalui tombol Unduh Gambar PNG.';
     $('notaImageStatus').textContent='Gambar nota diserahkan ke fitur berbagi Android. Periksa pratinjau WhatsApp. Jika lampiran kosong, gunakan Unduh Gambar PNG lalu bagikan melalui My Files.';
