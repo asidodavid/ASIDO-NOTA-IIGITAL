@@ -296,29 +296,28 @@ $('exportData').onclick=()=>{
   const json=JSON.stringify(backup,null,2);
   const blob=new Blob([json],{type:'application/json;charset=utf-8'});
   const oldLink=$('backupDownloadLink');
-  if(oldLink)oldLink.remove();
+  if(oldLink){
+   const oldUrl=oldLink.dataset.blobUrl;
+   if(oldUrl){try{URL.revokeObjectURL(oldUrl);}catch(_){}}
+   oldLink.remove();
+  }
+  const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+  const filename='ASIDO-backup-'+stamp+'.json';
+  const blobUrl=URL.createObjectURL(blob);
   const link=document.createElement('a');
   link.id='backupDownloadLink';
-  link.href='#download-asido-backup';
+  link.href=blobUrl;
+  link.download=filename;
+  link.dataset.blobUrl=blobUrl;
   link.className='pdf-action-link green';
   link.textContent='Unduh file JSON sekarang';
   link.style.display='inline-block';link.style.marginTop='8px';
   link.setAttribute('aria-label','Unduh file cadangan ASIDO JSON');
-  // Create a fresh Blob URL and invoke a temporary download anchor inside the
-  // actual user's tap gesture. A native anchor holding an old Blob URL may fail
-  // silently in Chrome Android / installed PWA.
-  link.onclick=(event)=>{
-   event.preventDefault();
-   try{
-    const stamp=new Date().toISOString().replace(/[:.]/g,'-');
-    downloadBlobFile(blob,'ASIDO-backup-'+stamp+'.json');
-    status.firstChild.textContent='Download cadangan ASIDO dimulai. Periksa folder Download di HP.';
-   }catch(downloadErr){
-    status.firstChild.textContent='Download gagal: '+(downloadErr.message||String(downloadErr))+'. Coba buka aplikasi di Chrome, bukan shortcut.';
-   }
-  };
-  status.textContent='File cadangan siap. Tekan tautan hijau ini untuk memulai unduhan JSON. Nama file dibuat dengan waktu agar backup lama tidak tertimpa.';
+  // The visible anchor itself carries the Blob URL and download filename.
+  // User tap invokes the browser's native download handling directly.
+  status.textContent='File cadangan siap ('+filename+'). Ketuk tombol hijau ini secara langsung. Setelah mengetuk, periksa folder Download atau notifikasi Chrome.';
   status.appendChild(document.createElement('br'));status.appendChild(link);
+  setTimeout(()=>{try{URL.revokeObjectURL(blobUrl);}catch(_){}},10*60*1000);
  }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
 };
 let importMode='merge';
