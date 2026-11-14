@@ -333,7 +333,7 @@ $('exportData').onclick=()=>{
     status.firstChild.textContent='Menu Bagikan Android telah dibuka. Pilih Google Drive jika tersedia, lalu pastikan akun dan folder tujuan.';
    }catch(shareErr){
     if(shareErr&&shareErr.name==='AbortError')status.firstChild.textContent='Bagikan dibatalkan. File backup tetap siap.';
-    else status.firstChild.textContent='Bagikan JSON gagal: '+(shareErr.message||String(shareErr));
+    else{status.firstChild.textContent='Bagikan langsung ditolak browser ('+(shareErr.message||String(shareErr))+'). Backup JSON tetap tersedia. Unduh file JSON sekarang, lalu unggah manual ke Google Drive.';const driveLink=document.createElement('a');driveLink.href='https://drive.google.com/drive/u/0/my-drive';driveLink.target='_blank';driveLink.rel='noopener';driveLink.className='pdf-action-link green';driveLink.textContent='Buka Google Drive untuk unggah manual';driveLink.style.display='inline-block';driveLink.style.marginTop='8px';status.appendChild(document.createElement('br'));status.appendChild(driveLink);}
    }
   };
   status.appendChild(document.createElement('br'));status.appendChild(shareBtn);
