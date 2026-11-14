@@ -644,6 +644,7 @@ function printInvoiceForPhone(){
   #asidoPrintSheet .brand{font-size:25pt;font-weight:800;letter-spacing:-1px}
   #asidoPrintSheet .divider{font-size:24pt;font-weight:300}
   #asidoPrintSheet .title{font-size:15pt;font-weight:700}
+  #asidoPrintSheet .website{margin-left:auto;color:#b45b67;font-family:cursive;font-size:15pt;font-style:italic;white-space:nowrap}
   #asidoPrintSheet .date{float:right;text-align:right;margin-top:0}
   #asidoPrintSheet .customer{margin:6px 0 17px}
   #asidoPrintSheet .customer small{display:block;color:#555;font-size:9pt;margin-bottom:3px}
@@ -667,7 +668,7 @@ function printInvoiceForPhone(){
   #asidoPrintSheet .footer{position:fixed;bottom:0;left:0;font-size:8pt;color:#555}
  }
  `;
- sheet.innerHTML='<div class="date">Tanggal: '+esc(v.date||'-')+'</div><div class="heading"><span class="brand">ASIDO</span><span class="divider">|</span><span class="title">NOTA PENJUALAN</span></div><div class="customer"><small>Pelanggan:</small><strong>'+esc(v.customer)+'</strong></div><table><thead><tr><th>Barang</th><th class="qty">Qty</th><th class="num">Harga</th><th class="num">Subtotal</th></tr></thead><tbody>'+itemRows+'</tbody></table><div class="totals"><div class="totrow"><span>Subtotal:</span><span>'+money(v.total)+'</span></div><div class="totrow grand"><span>TOTAL:</span><span>'+money(v.total)+'</span></div></div>'+(v.notes?'<div class="notes"><strong>Catatan:</strong>'+esc(v.notes).replace(/\n/g,'<br>')+'</div>':'')+'<div class="signatures"><div class="sigarea"><div class="sigcaption">Pelanggan,</div>'+buyerSig+'<div class="line">('+esc(v.customer)+')</div></div><div class="sigarea"><div class="sigcaption">ASIDO,</div>'+sellerSig+'<div class="line">(David Asido)</div></div></div><div class="footer">Dibuat dengan ASIDO Nota Digital</div>';
+ sheet.innerHTML='<div class="date">Tanggal: '+esc(v.date||'-')+'</div><div class="heading"><span class="brand">ASIDO</span><span class="divider">|</span><span class="title">NOTA PENJUALAN</span><span class="website">www.asido.id</span></div><div class="customer"><small>Pelanggan:</small><strong>'+esc(v.customer)+'</strong></div><table><thead><tr><th>Barang</th><th class="qty">Qty</th><th class="num">Harga</th><th class="num">Subtotal</th></tr></thead><tbody>'+itemRows+'</tbody></table><div class="totals"><div class="totrow"><span>Subtotal:</span><span>'+money(v.total)+'</span></div><div class="totrow grand"><span>TOTAL:</span><span>'+money(v.total)+'</span></div></div>'+(v.notes?'<div class="notes"><strong>Catatan:</strong>'+esc(v.notes).replace(/\n/g,'<br>')+'</div>':'')+'<div class="signatures"><div class="sigarea"><div class="sigcaption">Pelanggan,</div>'+buyerSig+'<div class="line">('+esc(v.customer)+')</div></div><div class="sigarea"><div class="sigcaption">ASIDO,</div>'+sellerSig+'<div class="line">(David Asido)</div></div></div><div class="footer">Dibuat dengan ASIDO Nota Digital</div>';
  $('status').textContent='Membuka dialog cetak Android. Pilih “Simpan sebagai PDF”, lalu pilih lokasi dan tekan Simpan.';
  if(typeof window.print!=='function'){alert('Fitur cetak tidak tersedia pada browser ini. Buka halaman ini di Chrome.');return;}
  window.print();
@@ -702,6 +703,7 @@ function createCanvasNota(v,buyerImage,sellerImage){
  ctx.fillStyle=blue;ctx.font='bold 66px Arial, sans-serif';ctx.fillText('ASIDO',pad,106);
  ctx.strokeStyle=blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(320,49);ctx.lineTo(320,118);ctx.stroke();
  ctx.font='bold 44px Arial, sans-serif';ctx.fillText('NOTA PENJUALAN',355,99);
+ ctx.fillStyle='#b45b67';ctx.textAlign='right';ctx.font='italic 34px cursive';ctx.fillText('www.asido.id',W-pad,88);ctx.textAlign='left';
  ctx.fillStyle=gray;ctx.textAlign='right';ctx.font='26px Arial, sans-serif';ctx.fillText('Tanggal: '+(v.date||'-'),W-pad,154);ctx.textAlign='left';
  ctx.fillStyle=gray;ctx.font='26px Arial, sans-serif';ctx.fillText('Pelanggan:',pad,205);
  ctx.fillStyle=dark;ctx.font='bold 38px Arial, sans-serif';
