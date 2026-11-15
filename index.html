@@ -754,112 +754,44 @@ function dataUrlToPngBlob(dataUrl){
 $('makeNotaImage').onclick=async()=>{
  const btn=$('makeNotaImage');
  try{
-  // If the PNG is already prepared, this fresh tap opens Android's share sheet
-  // synchronously, preserving the browser's user-activation permission.
   if(latestNotaImageFile&&latestNotaImageBlob){
+   $('notaImageStatus').textContent='Membuka menu berbagi untuk file nota…';
    const file=latestNotaImageFile;
-   const caption='Nota penjualan ASIDO untuk '+$('customer').value.trim()+'.';
    if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
     const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name);
     if(typeof result==='string'&&result.startsWith('ERROR|'))throw new Error(result.slice(6));
-    $('notaImageStatus').textContent='Menu berbagi Android dibuka. Pilih WhatsApp dan periksa lampiran nota.';
+    $('notaImageStatus').textContent='Permintaan berbagi dikirim ke Android. Pilih WhatsApp jika menu muncul.';
     return;
    }
-   if(!navigator.share){$('notaImageStatus').textContent='Berbagi file tidak didukung browser ini. Tekan Unduh Gambar PNG dan bagikan dari My Files.';return;}
-   if(navigator.canShare&&!navigator.canShare({files:[file]})){$('notaImageStatus').textContent='Browser tidak mendukung berbagi file gambar. Tekan Unduh Gambar PNG lalu bagikan dari My Files.';return;}
-   const sharePromise=navigator.share({files:[file],title:'Nota ASIDO - '+$('customer').value.trim(),text:caption});
-   sharePromise.then(()=>{$('notaImageStatus').textContent='Menu berbagi ditutup. Jika memilih WhatsApp, periksa lampiran sebelum mengirim.';}).catch(err=>{$('notaImageStatus').textContent=err&&err.name==='AbortError'?'Berbagi dibatalkan. Nota PNG tetap tersedia.':'Berbagi gagal: '+(err&&err.message?err.message:String(err));});
+   if(!navigator.share){$('notaImageStatus').textContent='Fitur berbagi file tidak didukung browser. Tekan Unduh Gambar PNG lalu lampirkan dari My Files di WhatsApp.';return;}
+   if(navigator.canShare&&!navigator.canShare({files:[file]})){$('notaImageStatus').textContent='Browser tidak bisa berbagi PNG langsung. Tekan Unduh Gambar PNG lalu lampirkan dari My Files.';return;}
+   navigator.share({files:[file],title:'Nota ASIDO - '+$('customer').value.trim(),text:'Nota penjualan ASIDO untuk '+$('customer').value.trim()+'.'}).then(()=>{$('notaImageStatus').textContent='Menu berbagi ditutup. Periksa WhatsApp dan lampiran nota.';}).catch(err=>{$('notaImageStatus').textContent='Berbagi gagal: '+(err&&err.message?err.message:String(err));});
    return;
   }
   const v=invoice();if(!validate(v))return;
-  btn.disabled=true;
-  btn.textContent='Menyiapkan nota untuk WhatsApp…';
-  $('notaImageStatus').textContent='Membuat gambar nota putih untuk '+v.customer+'…';
-
-  // Create exactly the white invoice sheet, including both signatures.
+  btn.disabled=true;btn.textContent='Membuat gambar nota…';
+  $('notaImageStatus').textContent='Memproses gambar nota. Mohon tunggu…';
   const buyerCanvas=sigInk['buyerSig']?$('buyerSig'):null;
   const sellerCanvas=sigInk['sellerSig']?$('sellerSig'):null;
   const canvas=await createCanvasNota(v,buyerCanvas,sellerCanvas);
   const dataUrl=canvas.toDataURL('image/png');
   const blob=dataUrlToPngBlob(dataUrl);
-  if(!blob||blob.type!=='image/png'||blob.size<1000)throw new Error('Gambar nota kosong atau tidak valid.');
-
+  if(!blob||blob.type!=='image/png'||blob.size<1000)throw new Error('Gambar PNG kosong atau tidak valid.');
   const datePart=(v.date||'').replace(/-/g,'');
   const safeCustomer=(v.customer||'Pelanggan').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,32)||'Pelanggan';
   const fileName='ASIDO-Nota-'+datePart+'-'+safeCustomer+'.png';
   const file=new File([blob],fileName,{type:'image/png',lastModified:Date.now()});
-
-  latestNotaImageBlob=blob;
-  latestNotaImageFile=file;
-  latestNotaImageDataUrl=dataUrl;
+  latestNotaImageBlob=blob;latestNotaImageFile=file;latestNotaImageDataUrl=dataUrl;
   if(latestNotaImageUrl&&latestNotaImageUrl.startsWith('blob:')){try{URL.revokeObjectURL(latestNotaImageUrl)}catch(_){}}
   latestNotaImageUrl=URL.createObjectURL(blob);
-  $('notaImagePreview').src=latestNotaImageUrl;
-  $('downloadNotaImage').href=latestNotaImageUrl;
-  $('downloadNotaImage').download=fileName;
-  $('notaImageActions').hidden=false;
-  $('pdfActions').hidden=true;
-  // Native APK bridge can launch Android share after PNG generation.
-  // In a regular browser, keep the file ready and require a fresh user tap.
-  if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
-   const nativeResult=window.AndroidAsido.sharePng(dataUrl,fileName);
-   if(typeof nativeResult==='string'&&nativeResult.startsWith('ERROR|'))throw new Error(nativeResult.slice(6));
-   $('notaImageStatus').textContent='Gambar nota diserahkan ke menu berbagi Android. Pilih WhatsApp dan periksa lampiran.';
-   return;
-  }
+  $('notaImagePreview').src=latestNotaImageUrl;$('downloadNotaImage').href=latestNotaImageUrl;$('downloadNotaImage').download=fileName;
+  $('notaImageActions').hidden=false;$('pdfActions').hidden=true;
   btn.textContent='📤 Tekan lagi untuk WhatsApp';
-  $('notaImageStatus').textContent='Gambar nota sudah selesai dibuat. Tekan sekali lagi tombol hijau untuk membuka menu berbagi dan pilih WhatsApp.';
-  return;
-
-  // Native APK: pass the PNG to Android ACTION_SEND directly from this button.
-  if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
-   $('notaImageStatus').textContent='Menyiapkan lampiran gambar nota di WhatsApp…';
-   try{
-    const nativeShareResult=window.AndroidAsido.sharePng(dataUrl,fileName);
-    if(typeof nativeShareResult==='string'&&nativeShareResult.startsWith('ERROR|')){
-     throw new Error(nativeShareResult.slice(6));
-    }
-    $('status').textContent='Gambar nota dibuat. Periksa pratinjau WhatsApp sebelum mengirim; PNG juga tersedia melalui tombol Unduh Gambar PNG.';
-    $('notaImageStatus').textContent='Gambar nota diserahkan ke fitur berbagi Android. Periksa pratinjau WhatsApp. Jika lampiran kosong, gunakan Unduh Gambar PNG lalu bagikan melalui My Files.';
-    return;
-   }catch(nativeShareErr){
-    console.warn('Native share failed; trying Web Share fallback',nativeShareErr);
-    $('notaImageStatus').textContent='Fitur berbagi native gagal; mencoba menu berbagi browser…';
-   }
-  }
-
-  // Android Web Share: share the PNG file only (no text payload).
-  // Call synchronously in the original button tap to preserve user activation.
-  if(!navigator.share){
-   $('notaImageStatus').textContent='HP/browser ini tidak menyediakan berbagi file langsung. Gambar nota sudah dibuat; gunakan Unduh Gambar PNG sebagai cadangan.';
-   return;
-  }
-  if(navigator.canShare&&!navigator.canShare({files:[file]})){
-   $('notaImageStatus').textContent='HP/browser ini tidak mendukung lampiran file gambar melalui menu berbagi. Gunakan Unduh Gambar PNG sebagai cadangan.';
-   return;
-  }
-
-  $('notaImageStatus').textContent='Membuka menu Bagikan Android dengan satu lampiran gambar nota '+v.customer+'. Pilih WhatsApp.';
-  const shareCaption='Nota penjualan ASIDO untuk '+v.customer+'. Total '+money(v.total)+'.';
-  const sharePromise=navigator.share({
-   files:[file],
-   title:'Nota ASIDO - '+v.customer,
-   text:shareCaption
-  });
-  sharePromise.then(()=>{
-   $('notaImageStatus').textContent='Menu berbagi ditutup. Jika Anda memilih WhatsApp, pastikan foto nota putih terlihat di pratinjau, lalu tekan Kirim.';
-  }).catch(err=>{
-   if(err&&err.name==='AbortError'){
-    $('notaImageStatus').textContent='Berbagi dibatalkan. Gambar nota masih tersedia melalui Unduh Gambar PNG.';
-   }else{
-    $('notaImageStatus').textContent='Menu berbagi tidak dapat melampirkan gambar: '+(err&&err.message?err.message:'kesalahan perangkat')+'. Gunakan Unduh Gambar PNG sebagai cadangan.';
-   }
-  });
+  $('notaImageStatus').textContent='Gambar nota selesai dibuat. Tekan kembali tombol hijau untuk membagikan ke WhatsApp.';
  }catch(err){
-  $('notaImageStatus').textContent='Gagal menyiapkan gambar nota: '+(err&&err.message?err.message:String(err));
+  $('notaImageStatus').textContent='Kesalahan tombol WhatsApp: '+(err&&err.message?err.message:String(err));
  }finally{
   btn.disabled=false;
-  if(!latestNotaImageFile)btn.textContent='📲 Kirim Nota ke WhatsApp';
  }
 };
 $('shareNotaImageNow').onclick=()=>{
