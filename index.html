@@ -70,21 +70,52 @@
 const $=id=>document.getElementById(id);
 const money=n=>'Rp'+Math.max(0,Number(n)||0).toLocaleString('id-ID');
 const ASIDO_REMOVED_PRODUCTS=new Set(['pengki sampah','wiper lantai gagang besi']);
-const defaultProducts=[{name:'Sapu ijuk',price:15000},{name:'Sapu lidi',price:10000},{name:'Pel lobi besi',price:58000},{name:'Pel capit katun',price:35000},{name:'Pel capit kartun warna',price:26500},{name:'Pel peras otomatis',price:24000},{name:'Sikat dorong senar',price:25000},{name:'Sikat dorong ijuk',price:25000},{name:'Wiper lantai gagang besi',price:30000}].filter(p=>!ASIDO_REMOVED_PRODUCTS.has(p.name.trim().toLocaleLowerCase('id')));
+const ASIDO_CATALOG_V2=[
+{name:'Pel capit kartun warna',price:26500},
+{name:'Pel capit katun',price:24500},
+{name:'Pel lobi besi',price:55500},
+{name:'Pel peras otomatis',price:24000},
+{name:'Pengki Gagang Besi',price:11000},
+{name:'Pengki Gagang Besi Cash',price:10000},
+{name:'Pengki Gagang Kayu',price:10000},
+{name:'Pengki Gagang Kayu Cash',price:9000},
+{name:'Sapu ijuk',price:15000},
+{name:'Sapu ijuk Gagang Besi cash',price:19500},
+{name:'Sapu ijuk Gagang kayu',price:18500},
+{name:'Sapu ijuk gagang kayu cash',price:17500},
+{name:'Sapu ijuk gagang kayu 90',price:20500},
+{name:'Sapu ijuk gagang kayu 90 cash',price:19500},
+{name:'Sapu ijuk Gagang Besi',price:20500},
+{name:'Sapu lidi',price:6000},
+{name:'Sikat dorong ijuk',price:12500},
+{name:'Sikat dorong senar',price:13500},
+{name:'Wiper Gagang Besi',price:13500},
+{name:'Wiper Gagang Besi Cash',price:12500},
+{name:'Wiper Gagang Kayu',price:12500},
+{name:'Wiper Gagang Kayu Cash',price:11500}
+];
+const defaultProducts=ASIDO_CATALOG_V2.filter(p=>!ASIDO_REMOVED_PRODUCTS.has(p.name.trim().toLocaleLowerCase('id')));
 let products=JSON.parse(localStorage.getItem('asido_products')||'null')||defaultProducts;
 // One-time catalogue cleanup: remove the two products requested by ASIDO.
 // Invoice history is stored separately and is intentionally left unchanged.
 const productsBeforeCleanup=products.length;
 products=products.filter(p=>!ASIDO_REMOVED_PRODUCTS.has(String(p.name||'').trim().toLocaleLowerCase('id')));
-// Add the new product to existing phone catalogues without overwriting other custom items.
-const newCatalogProducts=[{name:'Pel capit kartun warna',price:26500},{name:'Pel peras otomatis',price:24000}];
-for(const added of newCatalogProducts){
- const existing=products.find(p=>String(p.name||'').trim().toLocaleLowerCase('id')===added.name.toLocaleLowerCase('id'));
- if(existing){existing.price=added.price;}
- else{products.push({...added});}
-}
-if(products.length!==productsBeforeCleanup||newCatalogProducts.some(p=>products.some(x=>String(x.name||'').trim().toLocaleLowerCase('id')===p.name.toLocaleLowerCase('id')))){
+// Migrate the catalogue to the ASIDO screenshot-approved list and prices.
+// Keep any additional user-created products; invoice history remains untouched.
+const asidoCatalogMigrationKey='asido_catalog_v2_migrated';
+if(localStorage.getItem(asidoCatalogMigrationKey)!=='yes'){
+ const currentByName=new Map(products.map(p=>[String(p.name||'').trim().toLocaleLowerCase('id'),p]));
+ for(const item of ASIDO_CATALOG_V2){
+  const key=item.name.trim().toLocaleLowerCase('id');
+  const existing=currentByName.get(key);
+  if(existing){existing.name=item.name;existing.price=item.price;}
+  else{products.push({...item});}
+ }
+ // Remove obsolete default items from the former short list only.
+ const obsoleteDefaultNames=new Set(['wiper lantai gagang besi']);
+ products=products.filter(p=>!obsoleteDefaultNames.has(String(p.name||'').trim().toLocaleLowerCase('id'))&&!ASIDO_REMOVED_PRODUCTS.has(String(p.name||'').trim().toLocaleLowerCase('id')));
  localStorage.setItem('asido_products',JSON.stringify(products));
+ localStorage.setItem(asidoCatalogMigrationKey,'yes');
 }
 let historyData=JSON.parse(localStorage.getItem('asido_history')||'[]');
 let rows=[];
