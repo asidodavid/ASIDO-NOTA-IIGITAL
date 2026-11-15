@@ -1,4 +1,4 @@
-const CACHE_NAME = 'asido-nota-shell-v17';
+const CACHE_NAME = 'asido-nota-shell-v18';
 const APP_SHELL = ['./', './index.html', './pembukuan/', './pembukuan/index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
