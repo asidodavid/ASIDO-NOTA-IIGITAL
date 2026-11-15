@@ -131,6 +131,30 @@ if(localStorage.getItem(asidoCatalogMigrationKey)!=='yes'){
  localStorage.setItem('asido_products',JSON.stringify(products));
  localStorage.setItem(asidoCatalogMigrationKey,'yes');
 }
+// One-time targeted cleanup for duplicate rows requested from the latest device screenshots.
+const asidoCatalogMigrationKeyV4='asido_catalog_v4_requested_duplicates_removed';
+if(localStorage.getItem(asidoCatalogMigrationKeyV4)!=='yes'){
+ const duplicateRemovalRules={
+  'sapu ijuk gagang besi cash|19500':{removeOccurrence:1}, // remove earlier #9, keep #15
+  'sapu ijuk gagang kayu|18500':{removeOccurrence:2}, // remove duplicate #16, keep #10
+  'sapu ijuk gagang kayu 90|20500':{removeOccurrence:2}, // remove duplicate #17
+  'sapu ijuk gagang kayu 90 cash|19500':{removeOccurrence:2}, // remove duplicate #18
+  'wiper gagang besi|13500':{removeOccurrence:2}, // remove duplicate #27
+  'wiper gagang besi cash|12500':{removeOccurrence:2}, // remove duplicate #28
+  'wiper gagang kayu|12500':{removeOccurrence:2}, // remove duplicate #29
+  'wiper gagang kayu cash|11500':{removeOccurrence:2} // remove duplicate #30
+ };
+ const counts={};
+ products=products.filter(p=>{
+  const key=String(p.name||'').trim().toLocaleLowerCase('id')+'|'+String(p.price??'');
+  const rule=duplicateRemovalRules[key];
+  if(!rule)return true;
+  counts[key]=(counts[key]||0)+1;
+  return counts[key]!==rule.removeOccurrence;
+ });
+ localStorage.setItem('asido_products',JSON.stringify(products));
+ localStorage.setItem(asidoCatalogMigrationKeyV4,'yes');
+}
 let historyData=JSON.parse(localStorage.getItem('asido_history')||'[]');
 let rows=[];
 const now=new Date();$('date').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
