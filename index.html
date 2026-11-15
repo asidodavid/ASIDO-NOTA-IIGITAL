@@ -79,6 +79,7 @@ const ASIDO_CATALOG_V2=[
 {name:'Pengki Gagang Besi Cash',price:10000},
 {name:'Pengki Gagang Kayu',price:10000},
 {name:'Pengki Gagang Kayu Cash',price:9000},
+{name:'Sapu ijuk',price:15000},
 {name:'Sapu ijuk Gagang Besi cash',price:19500},
 {name:'Sapu ijuk Gagang kayu',price:18500},
 {name:'Sapu ijuk gagang kayu cash',price:17500},
@@ -154,6 +155,14 @@ if(localStorage.getItem(asidoCatalogMigrationKeyV4)!=='yes'){
  });
  localStorage.setItem('asido_products',JSON.stringify(products));
  localStorage.setItem(asidoCatalogMigrationKeyV4,'yes');
+}
+// Force one-time replacement with the exact 22-item catalog from the user's three screenshots.
+// Only the product catalog is reset; invoices/history, signatures, and other app data remain intact.
+const asidoExactCatalogResetKey='asido_catalog_exact_22_from_screenshots_v1';
+if(localStorage.getItem(asidoExactCatalogResetKey)!=='yes'){
+ products=ASIDO_CATALOG_V2.map(p=>({...p}));
+ localStorage.setItem('asido_products',JSON.stringify(products));
+ localStorage.setItem(asidoExactCatalogResetKey,'yes');
 }
 let historyData=JSON.parse(localStorage.getItem('asido_history')||'[]');
 let rows=[];
