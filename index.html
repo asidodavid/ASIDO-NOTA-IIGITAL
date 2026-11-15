@@ -799,8 +799,16 @@ $('makeNotaImage').onclick=async()=>{
   $('downloadNotaImage').download=fileName;
   $('notaImageActions').hidden=false;
   $('pdfActions').hidden=true;
+  // Native APK bridge can launch Android share after PNG generation.
+  // In a regular browser, keep the file ready and require a fresh user tap.
+  if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
+   const nativeResult=window.AndroidAsido.sharePng(dataUrl,fileName);
+   if(typeof nativeResult==='string'&&nativeResult.startsWith('ERROR|'))throw new Error(nativeResult.slice(6));
+   $('notaImageStatus').textContent='Gambar nota diserahkan ke menu berbagi Android. Pilih WhatsApp dan periksa lampiran.';
+   return;
+  }
   btn.textContent='📤 Tekan lagi untuk WhatsApp';
-  $('notaImageStatus').textContent='Gambar nota sudah siap. Tekan kembali tombol hijau ini untuk membuka WhatsApp/menu berbagi.';
+  $('notaImageStatus').textContent='Gambar nota sudah selesai dibuat. Tekan sekali lagi tombol hijau untuk membuka menu berbagi dan pilih WhatsApp.';
   return;
 
   // Native APK: pass the PNG to Android ACTION_SEND directly from this button.
