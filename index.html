@@ -735,7 +735,7 @@ async function createCanvasNota(v,buyerImage,sellerImage){
  const sigW=440,sigH=125,sigLeft=pad+35,sigRight=W/2+65;
  if(buyerImage){ctx.drawImage(buyerImage,sigLeft,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigLeft,y,sigW,sigH);}
  if(sellerImage){ctx.drawImage(sellerImage,sigRight,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigRight,y,sigW,sigH);}
- drawCanvasStamp(ctx,sigRight+sigW-48,y+sigH/2,43);y+=sigH+8;ctx.strokeStyle='#454b55';ctx.lineWidth=2;
+ await drawCanvasStamp(ctx,sigRight+sigW-48,y+sigH/2,43);y+=sigH+8;ctx.strokeStyle='#454b55';ctx.lineWidth=2;
  ctx.beginPath();ctx.moveTo(sigLeft,y);ctx.lineTo(sigLeft+sigW,y);ctx.moveTo(sigRight,y);ctx.lineTo(sigRight+sigW,y);ctx.stroke();y+=38;
  ctx.fillStyle=dark;ctx.font='23px Arial, sans-serif';ctx.textAlign='center';ctx.fillText('('+v.customer+')',sigLeft+sigW/2,y);ctx.fillText('(David Asido)',sigRight+sigW/2,y);ctx.textAlign='left';
  ctx.fillStyle=gray;ctx.font='19px Arial, sans-serif';ctx.fillText('Dibuat dengan ASIDO Nota Digital',pad,H-24);
