@@ -758,7 +758,7 @@ $('makeNotaImage').onclick=async()=>{
    $('notaImageStatus').textContent='Membuka menu berbagi untuk file nota…';
    const file=latestNotaImageFile;
    if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
-    const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name);
+    const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name,$('customer').value.trim());
     if(typeof result==='string'&&result.startsWith('ERROR|'))throw new Error(result.slice(6));
     $('notaImageStatus').textContent='Permintaan berbagi dikirim ke Android. Pilih WhatsApp jika menu muncul.';
     return;
