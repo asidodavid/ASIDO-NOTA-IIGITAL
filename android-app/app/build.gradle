@@ -5,11 +5,11 @@ android {
     namespace 'id.asido.notadigital'
     compileSdk 35
     defaultConfig {
-        applicationId 'id.asido.notadigital'
+        applicationId 'id.asido.notadigital.test'
         minSdk 29
         targetSdk 34
-        versionCode 5
-        versionName '1.4.0'
+        versionCode 6
+        versionName '1.4.1-test'
     }
 }
 
