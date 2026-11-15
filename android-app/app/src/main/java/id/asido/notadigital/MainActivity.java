@@ -34,6 +34,8 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.io.OutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -183,51 +185,48 @@ public class MainActivity extends Activity {
         @JavascriptInterface public String version() { return "1.3.0"; }
     }
     private void nativeSharePng(String dataUrl, String fileName, String customer) {
-        Uri uri = null;
         try {
             if (dataUrl == null || !dataUrl.startsWith("data:image/png;base64,")) {
-                toast("Data gambar PNG tidak valid. Coba buat nota lagi.");
+                toast("Data gambar PNG tidak valid. Buat nota lagi.");
                 return;
             }
             byte[] bytes = android.util.Base64.decode(dataUrl.substring(dataUrl.indexOf(',') + 1), android.util.Base64.DEFAULT);
             if (bytes.length < 1000) {
-                toast("Gambar nota kosong. Coba buat ulang.");
+                toast("Gambar nota kosong. Buat ulang nota.");
                 return;
             }
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            if (bitmap == null) {
-                toast("Android tidak dapat membaca gambar nota.");
+            if (bitmap == null || bitmap.getWidth() < 10 || bitmap.getHeight() < 10) {
+                if (bitmap != null) bitmap.recycle();
+                toast("Gambar nota tidak dapat dibaca Android.");
                 return;
-            }
-            String name = safeName(fileName);
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
-            values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/ASIDO Nota Digital");
-            values.put(MediaStore.MediaColumns.IS_PENDING, 1);
-            uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-            if (uri == null) {
-                bitmap.recycle();
-                toast("Tidak dapat membuat file gambar di Galeri.");
-                return;
-            }
-            try (OutputStream out = getContentResolver().openOutputStream(uri)) {
-                if (out == null || !bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)) {
-                    getContentResolver().delete(uri, null, null);
-                    bitmap.recycle();
-                    toast("Gagal menulis gambar nota.");
-                    return;
-                }
             }
             bitmap.recycle();
-            ContentValues ready = new ContentValues();
-            ready.put(MediaStore.MediaColumns.IS_PENDING, 0);
-            getContentResolver().update(uri, ready, null, null);
+
+            String name = safeName(fileName);
+            File shareDir = new File(getCacheDir(), "nota-share");
+            if (!shareDir.exists() && !shareDir.mkdirs()) {
+                toast("Folder sementara gambar nota gagal dibuat.");
+                return;
+            }
+            File imageFile = new File(shareDir, name);
+            try (FileOutputStream out = new FileOutputStream(imageFile, false)) {
+                out.write(bytes);
+                out.flush();
+            }
+            if (!imageFile.exists() || imageFile.length() < 1000) {
+                toast("File lampiran gambar nota gagal disimpan.");
+                return;
+            }
+
+            Uri uri = androidx.core.content.FileProvider.getUriForFile(
+                    this, getPackageName() + ".fileprovider", imageFile);
 
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("image/png");
             send.putExtra(Intent.EXTRA_STREAM, uri);
-            String recipientCaption = (customer == null || customer.trim().isEmpty()) ? "Nota penjualan ASIDO" : "Nota penjualan ASIDO untuk " + customer.trim();
+            String recipientCaption = (customer == null || customer.trim().isEmpty())
+                    ? "Nota penjualan ASIDO" : "Nota penjualan ASIDO untuk " + customer.trim();
             send.putExtra(Intent.EXTRA_TEXT, recipientCaption);
             send.setClipData(ClipData.newUri(getContentResolver(), "Nota ASIDO", uri));
             send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -238,7 +237,7 @@ public class MainActivity extends Activity {
                 send.setPackage(pkg);
                 try {
                     startActivity(send);
-                    toast("Lampiran gambar nota sudah disiapkan. Pilih pelanggan di WhatsApp.");
+                    toast("Lampiran nota siap. Pilih pelanggan dan pastikan gambar tampil sebelum Kirim.");
                 } catch (ActivityNotFoundException e) {
                     send.setPackage(null);
                     startActivity(Intent.createChooser(send, "Kirim nota ASIDO"));
@@ -247,9 +246,6 @@ public class MainActivity extends Activity {
                 startActivity(Intent.createChooser(send, "Kirim nota ASIDO"));
             }
         } catch (Exception e) {
-            if (uri != null) {
-                try { getContentResolver().delete(uri, null, null); } catch (Exception ignored) { }
-            }
             toast("Berbagi gagal: " + (e.getMessage() == null ? "kesalahan Android" : e.getMessage()));
         }
     }
