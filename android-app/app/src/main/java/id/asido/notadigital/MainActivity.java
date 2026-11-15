@@ -139,8 +139,8 @@ public class MainActivity extends Activity {
     private int dp(float n) { return (int)(n * getResources().getDisplayMetrics().density + 0.5f); }
 
     private class AndroidBridge {
-        @JavascriptInterface public void sharePng(String dataUrl, String fileName) {
-            runOnUiThread(() -> nativeSharePng(dataUrl, fileName));
+        @JavascriptInterface public void sharePng(String dataUrl, String fileName, String customer) {
+            runOnUiThread(() -> nativeSharePng(dataUrl, fileName, customer));
         }
         @JavascriptInterface public String savePdf(String dataUrl, String fileName) {
             return nativeSavePdf(dataUrl, fileName);
@@ -182,7 +182,7 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public String version() { return "1.3.0"; }
     }
-    private void nativeSharePng(String dataUrl, String fileName) {
+    private void nativeSharePng(String dataUrl, String fileName, String customer) {
         Uri uri = null;
         try {
             if (dataUrl == null || !dataUrl.startsWith("data:image/png;base64,")) {
@@ -227,6 +227,8 @@ public class MainActivity extends Activity {
             Intent send = new Intent(Intent.ACTION_SEND);
             send.setType("image/png");
             send.putExtra(Intent.EXTRA_STREAM, uri);
+            String recipientCaption = (customer == null || customer.trim().isEmpty()) ? "Nota penjualan ASIDO" : "Nota penjualan ASIDO untuk " + customer.trim();
+            send.putExtra(Intent.EXTRA_TEXT, recipientCaption);
             send.setClipData(ClipData.newUri(getContentResolver(), "Nota ASIDO", uri));
             send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
