@@ -79,7 +79,6 @@ const ASIDO_CATALOG_V2=[
 {name:'Pengki Gagang Besi Cash',price:10000},
 {name:'Pengki Gagang Kayu',price:10000},
 {name:'Pengki Gagang Kayu Cash',price:9000},
-{name:'Sapu ijuk',price:15000},
 {name:'Sapu ijuk Gagang Besi cash',price:19500},
 {name:'Sapu ijuk Gagang kayu',price:18500},
 {name:'Sapu ijuk gagang kayu cash',price:17500},
@@ -102,18 +101,33 @@ const productsBeforeCleanup=products.length;
 products=products.filter(p=>!ASIDO_REMOVED_PRODUCTS.has(String(p.name||'').trim().toLocaleLowerCase('id')));
 // Migrate the catalogue to the ASIDO screenshot-approved list and prices.
 // Keep any additional user-created products; invoice history remains untouched.
-const asidoCatalogMigrationKey='asido_catalog_v2_migrated';
+const asidoCatalogMigrationKey='asido_catalog_v3_deduped';
 if(localStorage.getItem(asidoCatalogMigrationKey)!=='yes'){
- const currentByName=new Map(products.map(p=>[String(p.name||'').trim().toLocaleLowerCase('id'),p]));
+ const catalogByName=new Map(ASIDO_CATALOG_V2.map(p=>[String(p.name).trim().toLocaleLowerCase('id'),p]));
+ const seenNames=new Set();
+ const seenCustom=new Set();
+ const cleaned=[];
+ for(const p of products){
+  const name=String(p.name||'').trim();
+  const key=name.toLocaleLowerCase('id');
+  if(key==='sapu ijuk')continue; // user requested removal of former item no. 9
+  if(ASIDO_REMOVED_PRODUCTS.has(key))continue;
+  if(catalogByName.has(key)){
+   if(seenNames.has(key))continue; // retain first occurrence of duplicated catalog item
+   seenNames.add(key);
+   cleaned.push({...catalogByName.get(key)});
+  }else{
+   const fingerprint=key+'|'+String(p.price??'');
+   if(seenCustom.has(fingerprint))continue;
+   seenCustom.add(fingerprint);
+   cleaned.push(p);
+  }
+ }
  for(const item of ASIDO_CATALOG_V2){
   const key=item.name.trim().toLocaleLowerCase('id');
-  const existing=currentByName.get(key);
-  if(existing){existing.name=item.name;existing.price=item.price;}
-  else{products.push({...item});}
+  if(!seenNames.has(key)){cleaned.push({...item});seenNames.add(key);}
  }
- // Remove obsolete default items from the former short list only.
- const obsoleteDefaultNames=new Set(['wiper lantai gagang besi']);
- products=products.filter(p=>!obsoleteDefaultNames.has(String(p.name||'').trim().toLocaleLowerCase('id'))&&!ASIDO_REMOVED_PRODUCTS.has(String(p.name||'').trim().toLocaleLowerCase('id')));
+ products=cleaned;
  localStorage.setItem('asido_products',JSON.stringify(products));
  localStorage.setItem(asidoCatalogMigrationKey,'yes');
 }
