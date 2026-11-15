@@ -690,7 +690,7 @@ function roundedRect(ctx,x,y,w,h,r){
  const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
 }
 const ASIDO_PANDA_STAMP_DATA='data:image/png;base64,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';
-async function drawCanvasStamp(ctx,cx,cy,r){const im=new Image();await new Promise((resolve,reject)=>{let settled=false;const done=()=>{if(!settled){settled=true;resolve();}};const fail=()=>{if(!settled){settled=true;reject(new Error('Logo panda gagal dimuat.'));}};im.onload=done;im.onerror=fail;im.src=ASIDO_PANDA_STAMP_DATA;if(im.complete&&im.naturalWidth)done();});if(!im.naturalWidth)throw new Error('Logo panda tidak valid.');ctx.drawImage(im,cx-r,cy-r,r*2,r*2);}
+async function drawCanvasStamp(ctx,cx,cy,r){const im=new Image();await new Promise((resolve,reject)=>{let settled=false;const timer=setTimeout(()=>fail(new Error('Waktu tunggu logo panda habis.')),8000);const done=()=>{if(!settled){settled=true;clearTimeout(timer);resolve();}};const fail=(err)=>{if(!settled){settled=true;clearTimeout(timer);reject(err||new Error('Logo panda gagal dimuat.'));}};im.onload=done;im.onerror=()=>fail(new Error('Logo panda gagal dimuat.'));im.src=ASIDO_PANDA_STAMP_DATA;if(im.complete&&im.naturalWidth)done();});if(!im.naturalWidth)throw new Error('Logo panda tidak valid.');ctx.drawImage(im,cx-r,cy-r,r*2,r*2);}
 async function createCanvasNota(v,buyerImage,sellerImage){
  const W=1400,pad=76,rowFont=28,lineHeight=36;
  const rows=v.items.filter(r=>String(r.name||'').trim()&&Number(r.qty)>0);
@@ -770,6 +770,7 @@ $('makeNotaImage').onclick=async()=>{
   }
   const v=invoice();if(!validate(v))return;
   btn.disabled=true;btn.textContent='Membuat gambar nota…';
+  $('notaImageActions').hidden=false;
   $('notaImageStatus').textContent='Memproses gambar nota. Mohon tunggu…';
   const buyerCanvas=sigInk['buyerSig']?$('buyerSig'):null;
   const sellerCanvas=sigInk['sellerSig']?$('sellerSig'):null;
@@ -798,9 +799,12 @@ $('makeNotaImage').onclick=async()=>{
    $('notaImageStatus').textContent='Gambar nota siap. Browser tidak mendukung berbagi langsung; tekan Unduh Gambar PNG lalu lampirkan di WhatsApp.';
   }
  }catch(err){
-  $('notaImageStatus').textContent='Kesalahan tombol WhatsApp: '+(err&&err.message?err.message:String(err));
+  $('notaImageActions').hidden=false;
+  $('notaImageStatus').textContent='Gagal membuat/mengirim nota: '+(err&&err.message?err.message:String(err));
+  btn.textContent='📲 Kirim Nota ke WhatsApp';
  }finally{
   btn.disabled=false;
+  if(btn.textContent==='Membuat gambar nota…'||btn.textContent==='📤 Membuka WhatsApp…')btn.textContent='📲 Kirim Nota ke WhatsApp';
  }
 };
 $('shareNotaImageNow').onclick=()=>{
