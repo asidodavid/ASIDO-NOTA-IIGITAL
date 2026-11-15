@@ -804,7 +804,7 @@ $('shareNotaImageNow').onclick=()=>{
   const file=latestNotaImageFile;
   const caption='Nota penjualan ASIDO untuk '+$('customer').value.trim()+'.';
   if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
-   const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name);
+   const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name,$('customer').value.trim());
    if(typeof result==='string'&&result.startsWith('ERROR|'))throw new Error(result.slice(6));
    $('notaImageStatus').textContent='Lampiran gambar diserahkan ke Android. Periksa pratinjau WhatsApp sebelum mengirim.';
    return;
