@@ -39,6 +39,7 @@
  <p class="muted">Tombol utama membuat gambar nota putih dan, di aplikasi Android ASIDO, membuka WhatsApp dengan gambar sebagai lampiran. Pilih pelanggan lalu tekan Kirim.</p>
  <img id="notaImagePreview" alt="Pratinjau gambar nota ASIDO" style="display:block;width:100%;height:auto;border:1px solid #d8e2ef;border-radius:8px;background:#fff;margin:10px 0">
  <div class="buttons" style="margin-top:8px"><a id="downloadNotaImage" class="pdf-action-link secondary" href="#" download="ASIDO-Nota.png">Unduh Gambar PNG (cadangan)</a></div>
+ <div class="buttons" style="margin-top:8px"><button type="button" id="shareNotaImageNow" class="green">📤 Bagikan gambar nota</button></div>
  <p id="notaImageStatus" class="muted" role="status"></p>
 </div>
 <div style="margin-top:14px"><strong>PDF</strong></div>
@@ -741,7 +742,7 @@ async function createCanvasNota(v,buyerImage,sellerImage){
  ctx.fillStyle=gray;ctx.font='19px Arial, sans-serif';ctx.fillText('Dibuat dengan ASIDO Nota Digital',pad,H-24);
  return canvas;
 }
-let latestNotaImageBlob=null,latestNotaImageFile=null,latestNotaImageUrl='';
+let latestNotaImageBlob=null,latestNotaImageFile=null,latestNotaImageUrl='',latestNotaImageDataUrl='';
 function dataUrlToPngBlob(dataUrl){
  const comma=dataUrl.indexOf(',');
  if(comma<0)throw new Error('Format gambar PNG tidak valid.');
@@ -773,6 +774,7 @@ $('makeNotaImage').onclick=async()=>{
 
   latestNotaImageBlob=blob;
   latestNotaImageFile=file;
+  latestNotaImageDataUrl=dataUrl;
   if(latestNotaImageUrl&&latestNotaImageUrl.startsWith('blob:')){try{URL.revokeObjectURL(latestNotaImageUrl)}catch(_){}}
   latestNotaImageUrl=URL.createObjectURL(blob);
   $('notaImagePreview').src=latestNotaImageUrl;
@@ -780,6 +782,8 @@ $('makeNotaImage').onclick=async()=>{
   $('downloadNotaImage').download=fileName;
   $('notaImageActions').hidden=false;
   $('pdfActions').hidden=true;
+  $('notaImageStatus').textContent='Gambar nota sudah dibuat. Untuk membuka WhatsApp, tekan tombol Bagikan gambar nota di bawah pratinjau.';
+  return;
 
   // Native APK: pass the PNG to Android ACTION_SEND directly from this button.
   if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
@@ -831,6 +835,23 @@ $('makeNotaImage').onclick=async()=>{
   btn.disabled=false;
   btn.textContent='📲 Kirim Nota ke WhatsApp';
  }
+};
+$('shareNotaImageNow').onclick=()=>{
+ try{
+  if(!latestNotaImageFile||!latestNotaImageBlob){$('notaImageStatus').textContent='Gambar nota belum dibuat. Tekan Kirim Nota ke WhatsApp terlebih dahulu.';return;}
+  const file=latestNotaImageFile;
+  const caption='Nota penjualan ASIDO untuk '+$('customer').value.trim()+'.';
+  if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
+   const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name);
+   if(typeof result==='string'&&result.startsWith('ERROR|'))throw new Error(result.slice(6));
+   $('notaImageStatus').textContent='Lampiran gambar diserahkan ke Android. Periksa pratinjau WhatsApp sebelum mengirim.';
+   return;
+  }
+  if(!navigator.share){$('notaImageStatus').textContent='Browser ini tidak menyediakan berbagi langsung. Unduh PNG lalu bagikan melalui My Files.';return;}
+  if(navigator.canShare&&!navigator.canShare({files:[file]})){$('notaImageStatus').textContent='Browser tidak mendukung berbagi file gambar. Unduh PNG lalu bagikan melalui My Files.';return;}
+  const sharePromise=navigator.share({files:[file],title:'Nota ASIDO - '+$('customer').value.trim(),text:caption});
+  sharePromise.then(()=>{$('notaImageStatus').textContent='Menu berbagi ditutup. Jika memilih WhatsApp, periksa lampiran lalu tekan Kirim.';}).catch(err=>{$('notaImageStatus').textContent=err&&err.name==='AbortError'?'Berbagi dibatalkan. PNG tetap tersedia melalui tombol unduh.':'Berbagi gagal: '+(err&&err.message?err.message:String(err))+'. Unduh PNG lalu bagikan manual.';});
+ }catch(err){$('notaImageStatus').textContent='Berbagi gagal: '+(err&&err.message?err.message:String(err));}
 };
 $('shareSavedPdf').onclick=()=>{
  if(!window.AndroidAsido||typeof window.AndroidAsido.shareSavedPdf!=='function'){
