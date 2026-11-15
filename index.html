@@ -787,17 +787,8 @@ $('makeNotaImage').onclick=async()=>{
   latestNotaImageUrl=URL.createObjectURL(blob);
   $('notaImagePreview').src=latestNotaImageUrl;$('downloadNotaImage').href=latestNotaImageUrl;$('downloadNotaImage').download=fileName;
   $('notaImageActions').hidden=false;$('pdfActions').hidden=true;
-  btn.textContent='📤 Membuka WhatsApp…';
-  $('notaImageStatus').textContent='Gambar nota selesai dibuat. Membuka menu berbagi…';
-  if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
-   const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name);
-   if(typeof result==='string'&&result.startsWith('ERROR|'))throw new Error(result.slice(6));
-   $('notaImageStatus').textContent='Permintaan berbagi dikirim ke Android. Pilih WhatsApp jika menu muncul.';
-  }else if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-   navigator.share({files:[file],title:'Nota ASIDO - '+$('customer').value.trim(),text:'Nota penjualan ASIDO untuk '+$('customer').value.trim()+'.'}).then(()=>{$('notaImageStatus').textContent='Menu berbagi ditutup. Periksa WhatsApp dan lampiran nota.';}).catch(err=>{$('notaImageStatus').textContent='Berbagi gagal: '+(err&&err.message?err.message:String(err));});
-  }else{
-   $('notaImageStatus').textContent='Gambar nota siap. Browser tidak mendukung berbagi langsung; tekan Unduh Gambar PNG lalu lampirkan di WhatsApp.';
-  }
+  btn.textContent='📤 Bagikan gambar nota';
+  $('notaImageStatus').textContent='Gambar nota selesai dibuat. Untuk mengirim, tekan tombol “Bagikan gambar nota” di bawah pratinjau.';
  }catch(err){
   $('notaImageActions').hidden=false;
   $('notaImageStatus').textContent='Gagal membuat/mengirim nota: '+(err&&err.message?err.message:String(err));
