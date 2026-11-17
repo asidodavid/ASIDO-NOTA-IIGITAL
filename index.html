@@ -371,53 +371,85 @@ function downloadBlobFile(blob,name){
 $('exportData').onclick=()=>{
  const status=$('backupStatus');
  try{
+  const historyCount=Array.isArray(historyData)?historyData.length:0;
+  const productCount=Array.isArray(products)?products.length:0;
+  if(historyCount===0){
+   status.textContent='EKSPOR DIBATALKAN: aplikasi membaca 0 riwayat nota. Tidak ada file kosong yang dibuat. Pastikan riwayat nota terlihat pada perangkat ini, lalu coba lagi.';
+   return;
+  }
   const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData};
   const json=JSON.stringify(backup,null,2);
-  const blob=new Blob([json],{type:'application/json;charset=utf-8'});
-  const oldLink=$('backupDownloadLink');
-  if(oldLink){
-   const oldUrl=oldLink.dataset.blobUrl;
-   if(oldUrl){try{URL.revokeObjectURL(oldUrl);}catch(_){}}
-   oldLink.remove();
-  }
   const stamp=new Date().toISOString().replace(/[:.]/g,'-');
   const filename='ASIDO-backup-'+stamp+'.json';
+
+  // Native Android APK: write the exact JSON to Downloads/ASIDO using MediaStore.
+  // This avoids WebView blob-download and navigator.share limitations.
+  if(window.AndroidAsido&&typeof window.AndroidAsido.version==='function'){
+   if(typeof window.AndroidAsido.saveJson!=='function'){
+    status.textContent='Aplikasi Android yang terpasang belum memiliki fitur ekspor JSON asli. Perbarui APK ASIDO ke versi 1.5.0 terlebih dahulu. Riwayat saat ini tidak diubah.';
+    return;
+   }
+   const result=String(window.AndroidAsido.saveJson(json,filename));
+   if(!result.startsWith('OK|')){
+    status.textContent='Ekspor JSON gagal: '+result.replace(/^ERROR\|/,'');
+    return;
+   }
+   const savedParts=result.split('|');
+   const bytes=Number(savedParts[3])||new Blob([json]).size;
+   status.textContent='CADANGAN BERHASIL DIBUAT. '+historyCount+' nota dan '+productCount+' produk disimpan sebagai '+filename+' di folder Download/ASIDO. Ukuran file '+bytes.toLocaleString('id-ID')+' byte.';
+   const oldShare=$('backupShareJson');if(oldShare)oldShare.remove();
+   const shareBtn=document.createElement('button');
+   shareBtn.id='backupShareJson';shareBtn.type='button';shareBtn.className='pdf-action-link green';
+   shareBtn.textContent='Bagikan JSON ke Google Drive';
+   shareBtn.style.display='inline-block';shareBtn.style.marginTop='8px';
+   shareBtn.onclick=()=>{
+    try{
+     const shareResult=String(window.AndroidAsido.shareSavedJson());
+     if(shareResult.startsWith('OK|')){
+      status.textContent='File JSON sudah tersimpan di Download/ASIDO. Menu berbagi Android dibuka; pilih Google Drive untuk mengunggah cadangan.';
+     }else{
+      status.textContent='File JSON tetap tersimpan di Download/ASIDO. '+shareResult.replace(/^ERROR\|/,'')+' Unggah manual melalui Google Drive.';
+     }
+    }catch(shareError){
+     status.textContent='File JSON tetap tersimpan di Download/ASIDO. Menu berbagi gagal dibuka. Unggah manual melalui Google Drive.';
+    }
+   };
+   status.appendChild(document.createElement('br'));status.appendChild(shareBtn);
+   return;
+  }
+
+  // Full Chrome/PWA fallback.
+  const blob=new Blob([json],{type:'application/json;charset=utf-8'});
   const blobUrl=URL.createObjectURL(blob);
+  const oldLink=$('backupDownloadLink');if(oldLink){try{URL.revokeObjectURL(oldLink.dataset.blobUrl||'')}catch(_){}oldLink.remove();}
   const link=document.createElement('a');
-  link.id='backupDownloadLink';
-  link.href=blobUrl;
-  link.download=filename;
-  link.dataset.blobUrl=blobUrl;
-  link.className='pdf-action-link green';
-  link.textContent='Unduh file JSON sekarang';
+  link.id='backupDownloadLink';link.href=blobUrl;link.download=filename;link.dataset.blobUrl=blobUrl;
+  link.className='pdf-action-link green';link.textContent='Unduh file JSON sekarang';
   link.style.display='inline-block';link.style.marginTop='8px';
-  link.setAttribute('aria-label','Unduh file cadangan ASIDO JSON');
-  status.textContent='File cadangan siap ('+filename+'). Jika download tidak tersimpan, gunakan tombol Bagikan JSON untuk mengirim file ke Google Drive melalui menu Bagikan Android.';
+  status.textContent='File cadangan siap: '+historyCount+' nota dan '+productCount+' produk. Tekan Unduh file JSON sekarang, lalu unggah manual ke Google Drive.';
   status.appendChild(document.createElement('br'));status.appendChild(link);
-  const shareBtn=document.createElement('button');
-  shareBtn.id='backupShareJson';
-  shareBtn.type='button';
-  shareBtn.className='pdf-action-link green';
-  shareBtn.textContent='Bagikan JSON ke Google Drive';
-  shareBtn.style.display='inline-block';shareBtn.style.marginTop='8px';
-  shareBtn.style.marginLeft='8px';
+  const oldShare=$('backupShareJson');if(oldShare)oldShare.remove();
+  const shareBtn=document.createElement('button');shareBtn.id='backupShareJson';shareBtn.type='button';
+  shareBtn.className='pdf-action-link green';shareBtn.textContent='Bagikan JSON ke Google Drive';
+  shareBtn.style.display='inline-block';shareBtn.style.marginTop='8px';shareBtn.style.marginLeft='8px';
   shareBtn.onclick=async()=>{
    try{
     const file=new File([json],filename,{type:'application/json'});
     if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})){
-     status.firstChild.textContent='Fitur Bagikan file JSON tidak didukung browser ini. Coba buka ASIDO melalui Chrome penuh.';
+     status.textContent='Berbagi langsung tidak didukung browser ini. File tetap dapat diunduh melalui tombol hijau Unduh file JSON sekarang.';
      return;
     }
     await navigator.share({files:[file],title:'Backup ASIDO Nota Digital',text:'Backup data nota ASIDO'});
-    status.firstChild.textContent='Menu Bagikan Android telah dibuka. Pilih Google Drive jika tersedia, lalu pastikan akun dan folder tujuan.';
+    status.textContent='Menu berbagi dibuka. Pilih Google Drive untuk mengunggah cadangan.';
    }catch(shareErr){
-    if(shareErr&&shareErr.name==='AbortError')status.firstChild.textContent='Bagikan dibatalkan. File backup tetap siap.';
-    else{status.firstChild.textContent='Bagikan langsung ditolak browser ('+(shareErr.message||String(shareErr))+'). Backup JSON tetap tersedia. Unduh file JSON sekarang, lalu unggah manual ke Google Drive.';const driveLink=document.createElement('a');driveLink.href='https://drive.google.com/drive/u/0/my-drive';driveLink.target='_blank';driveLink.rel='noopener';driveLink.className='pdf-action-link green';driveLink.textContent='Buka Google Drive untuk unggah manual';driveLink.style.display='inline-block';driveLink.style.marginTop='8px';status.appendChild(document.createElement('br'));status.appendChild(driveLink);}
+    status.textContent=shareErr&&shareErr.name==='AbortError'?'Berbagi dibatalkan. File JSON tetap dapat diunduh.':'Berbagi langsung gagal. Gunakan tombol Unduh file JSON sekarang, lalu unggah manual ke Google Drive.';
    }
   };
   status.appendChild(document.createElement('br'));status.appendChild(shareBtn);
   setTimeout(()=>{try{URL.revokeObjectURL(blobUrl);}catch(_){}},10*60*1000);
- }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
+ }catch(err){
+  status.textContent='Gagal membuat cadangan: '+(err.message||String(err));
+ }
 };
 let importMode='merge';
 $('importMergeBtn').onclick=()=>{importMode='merge';$('importDataFile').value='';$('importDataFile').click();};
