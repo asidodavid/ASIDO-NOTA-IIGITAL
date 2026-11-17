@@ -46,10 +46,11 @@ public class MainActivity extends Activity {
     private static final int VOICE_REQUEST = 7101;
     private static final int FILE_CHOOSER_REQUEST = 7102;
     private static final int CALENDAR_PERMISSION_REQUEST = 7103;
-    private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=1.4.0";
+    private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=1.5.0";
     private WebView web;
     private TextView status;
     private Uri lastPdfUri;
+    private Uri lastJsonUri;
     private ValueCallback<Uri[]> filePathCallback;
     private String pendingTempoReminderJson;
 
@@ -159,6 +160,15 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> nativeOpenPdf(uri));
             return "OK|PDF dibuka.";
         }
+        @JavascriptInterface public String saveJson(String json, String fileName) {
+            return nativeSaveJson(json, fileName);
+        }
+        @JavascriptInterface public String shareSavedJson() {
+            Uri uri = getLastJsonUri();
+            if (uri == null) return "ERROR|Buat dan simpan cadangan JSON terlebih dahulu.";
+            runOnUiThread(() -> nativeShareJson(uri));
+            return "OK|Menu berbagi cadangan JSON dibuka.";
+        }
         @JavascriptInterface public void startVoiceInput() {
             runOnUiThread(MainActivity.this::startNativeVoice);
         }
@@ -182,7 +192,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void scheduleTempoReminders(String json) {
             runOnUiThread(() -> requestOrScheduleTempoReminders(json));
         }
-        @JavascriptInterface public String version() { return "1.4.0"; }
+        @JavascriptInterface public String version() { return "1.5.0"; }
     }
     private void nativeSharePng(String dataUrl, String fileName, String customer) {
         try {
@@ -292,6 +302,66 @@ public class MainActivity extends Activity {
         if (saved == null) return null;
         try { lastPdfUri = Uri.parse(saved); return lastPdfUri; }
         catch (Exception ignored) { return null; }
+    }
+
+    private String nativeSaveJson(String json, String fileName) {
+        Uri uri = null;
+        try {
+            if (json == null || json.trim().isEmpty()) return "ERROR|Data cadangan JSON kosong.";
+            JSONObject backup = new JSONObject(json);
+            JSONArray products = backup.optJSONArray("products");
+            JSONArray history = backup.optJSONArray("history");
+            if (products == null || history == null) return "ERROR|Struktur cadangan ASIDO tidak lengkap.";
+            if (history.length() == 0) return "ERROR|Riwayat nota terbaca 0. File tidak dibuat agar cadangan kosong tidak menimpa data.";
+            byte[] bytes = json.getBytes("UTF-8");
+            if (bytes.length < 100) return "ERROR|File cadangan terlalu kecil dan tidak valid.";
+            String name = fileName == null ? "ASIDO-backup.json" : fileName.replaceAll("[^A-Za-z0-9._-]", "-");
+            if (!name.toLowerCase(Locale.ROOT).endsWith(".json")) name += ".json";
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/json");
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/ASIDO");
+            values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+            uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) return "ERROR|Tidak dapat membuat file JSON di Download/ASIDO.";
+            try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+                if (out == null) throw new IllegalStateException("Tidak dapat menulis file JSON.");
+                out.write(bytes);
+                out.flush();
+            }
+            ContentValues ready = new ContentValues();
+            ready.put(MediaStore.MediaColumns.IS_PENDING, 0);
+            getContentResolver().update(uri, ready, null, null);
+            lastJsonUri = uri;
+            getSharedPreferences("asido_native", MODE_PRIVATE).edit().putString("last_json_uri", uri.toString()).apply();
+            return "OK|" + uri.toString() + "|" + history.length() + "|" + bytes.length;
+        } catch (Exception e) {
+            if (uri != null) {
+                try { getContentResolver().delete(uri, null, null); } catch (Exception ignored) { }
+            }
+            return "ERROR|" + (e.getMessage() == null ? "Gagal menyimpan cadangan JSON." : e.getMessage());
+        }
+    }
+
+    private Uri getLastJsonUri() {
+        if (lastJsonUri != null) return lastJsonUri;
+        String saved = getSharedPreferences("asido_native", MODE_PRIVATE).getString("last_json_uri", null);
+        if (saved == null) return null;
+        try { lastJsonUri = Uri.parse(saved); return lastJsonUri; }
+        catch (Exception ignored) { return null; }
+    }
+
+    private void nativeShareJson(Uri uri) {
+        try {
+            Intent send = new Intent(Intent.ACTION_SEND);
+            send.setType("application/json");
+            send.putExtra(Intent.EXTRA_STREAM, uri);
+            send.setClipData(ClipData.newUri(getContentResolver(), "Cadangan ASIDO JSON", uri));
+            send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(send, "Simpan cadangan ASIDO ke Google Drive"));
+        } catch (Exception e) {
+            toast("File JSON sudah disimpan di Download/ASIDO, tetapi menu berbagi gagal dibuka. Unggah file tersebut melalui Google Drive.");
+        }
     }
 
     private void nativeSharePdf(Uri uri) {
