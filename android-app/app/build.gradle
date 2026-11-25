@@ -5,14 +5,14 @@ android {
     namespace 'id.asido.notadigital'
     compileSdk 35
     defaultConfig {
-        applicationId 'id.asido.notadigital.test'
+        // Separate package so this new app cannot overwrite the older ASIDO app.
+        applicationId 'id.asido.notadigital.v2'
         minSdk 29
         targetSdk 34
-        versionCode 7
-        versionName '1.5.0'
+        versionCode 8
+        versionName '2.0.0'
     }
 }
-
 dependencies {
     implementation 'androidx.core:core:1.13.1'
 }
