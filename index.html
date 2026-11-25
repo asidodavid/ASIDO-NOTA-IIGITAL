@@ -121,6 +121,12 @@ if(savedCatalogVersion!==CATALOG_VERSION){
  products=Array.isArray(storedProducts)?storedProducts:defaultProducts.map(p=>({...p}));
  if(!Array.isArray(storedProducts))localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
 }
+// Load this app's own invoice history before any save, render, export, or import operation.
+let historyData=[];
+try{
+ const savedHistory=JSON.parse(localStorage.getItem('asido_newapp_v1_history')||'[]');
+ historyData=Array.isArray(savedHistory)?savedHistory:[];
+}catch(e){historyData=[];}
 function sortedProductEntries(){
  return products.map((p,index)=>({product:p,index}))
   .sort((a,b)=>String(a.product.name||'').localeCompare(String(b.product.name||''),'id',{sensitivity:'base',numeric:true}));
