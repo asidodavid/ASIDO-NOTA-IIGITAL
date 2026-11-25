@@ -62,6 +62,19 @@
  <p id="storeSearchStatus" class="muted" role="status">Masukkan nama toko atau tekan Cari dengan Suara.</p>
  <div id="storeSearchResults" aria-live="polite"></div>
 </div>
+<div style="margin:12px 0;padding:12px;border:1px solid #d8e2ef;border-radius:12px;background:#f8fbff">
+ <strong style="color:#123c7a">💾 Cadangan dan Pemulihan Data</strong>
+ <p class="muted" style="margin:5px 0 9px">Simpan nota, daftar barang, dan data Pembukuan ASIDO (Cash, Tempo, Lunas, cicilan, serta tanggal pelunasan) ke file JSON. File ini dapat dipindahkan ke perangkat lain.</p>
+ <div class="buttons"><button type="button" id="exportData" class="green">Ekspor Cadangan JSON</button></div>
+ <div class="buttons" style="margin-top:8px">
+  <button type="button" id="visibleImportMergeBtn" class="secondary">Impor &amp; Gabungkan</button>
+  <button type="button" id="visibleImportReplaceBtn" class="secondary">Impor &amp; Samakan Data</button>
+ </div>
+ <div class="buttons" style="margin-top:8px">
+  <button type="button" id="visibleImportProductsBtn" class="secondary">Samakan Daftar Barang Saja</button>
+ </div>
+ <p class="muted" style="margin-top:8px">Gabungkan mempertahankan data lama dan menambahkan data cadangan. Samakan Data mengganti daftar barang dan seluruh riwayat pada perangkat ini. Samakan Daftar Barang Saja hanya mengganti katalog dan harga, tanpa mengubah riwayat nota.</p>
+</div>
 <div hidden><button id="importMergeBtn"></button><button id="importReplaceBtn"></button><button id="importProductsOnlyBtn"></button><input type="file" id="importDataFile"><button id="restorePreSyncBtn"></button><button id="restorePreCatalogBtn"></button><button id="restorePreMergeBtn"></button></div><div class="buttons" style="margin-top:8px"><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -334,7 +347,7 @@ $('exportData').onclick=()=>{
   if(window.AndroidAsido&&typeof window.AndroidAsido.saveJson==='function'){
    const stamp=new Date().toISOString().replace(/[:.]/g,'-');
    const nativeResult=String(window.AndroidAsido.saveJson(backupJson,'ASIDO-Backup-'+stamp+'.json'));
-   if(!nativeResult.startsWith('OK|'))throw new Error(nativeResult.replace(/^ERROR\\|/,'')||'Android gagal menyimpan cadangan JSON.');
+   if(!nativeResult.startsWith('OK|'))throw new Error(nativeResult.replace(/^ERROR\|/,'')||'Android gagal menyimpan cadangan JSON.');
    status.textContent='Cadangan JSON Nota + Pembukuan berhasil disimpan di HP, folder Downloads/ASIDO. Simpan juga salinannya ke Google Drive.';
    return;
   }
@@ -355,6 +368,9 @@ let importMode='merge';
 $('importMergeBtn').onclick=()=>{importMode='merge';$('importDataFile').value='';$('importDataFile').click();};
 $('importReplaceBtn').onclick=()=>{importMode='replace';$('importDataFile').value='';$('importDataFile').click();};
 $('importProductsOnlyBtn').onclick=()=>{importMode='products-only';$('importDataFile').value='';$('importDataFile').click();};
+$('visibleImportMergeBtn').onclick=()=>$('importMergeBtn').click();
+$('visibleImportReplaceBtn').onclick=()=>$('importReplaceBtn').click();
+$('visibleImportProductsBtn').onclick=()=>$('importProductsOnlyBtn').click();
 function validateBackupData(backup){
  if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('File bukan cadangan ASIDO yang valid.');
  const cleanProducts=backup.products.map((p,i)=>{
