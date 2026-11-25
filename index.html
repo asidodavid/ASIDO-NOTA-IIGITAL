@@ -445,50 +445,73 @@ $('importDataFile').addEventListener('change',e=>{
     const preMerge={format:'asido-nota-pre-merge-v1',savedAt:new Date().toISOString(),products:products,history:historyData};
     try{localStorage.setItem('asido_newapp_v1_pre_merge_backup',JSON.stringify(preMerge));}
     catch(storageErr){throw new Error('Cadangan pengaman sebelum penggabungan tidak dapat disimpan karena ruang browser tidak cukup. Tidak ada data yang digabungkan. Ekspor cadangan perangkat ini terlebih dahulu.');}
-    const productMap=new Map(products.map(p=>[String(p.name||'').trim().toLowerCase(),{...p}]));
+    $('backupStatus').textContent='Sedang memeriksa dan menggabungkan cadangan. Mohon tunggu…';
+    const productMap=new Map(products.map(p=>[String(p.name||'').trim(),{...p}]));
     let addedProducts=0;
     incoming.products.forEach(p=>{
-     const key=p.name.toLowerCase();
+     const key=String(p.name||'').trim();
      if(!productMap.has(key)){productMap.set(key,{...p});addedProducts++;}
     });
     const mergedProducts=Array.from(productMap.values());
     const mergedHistory=historyData.map(h=>({...h}));
     const signature=h=>JSON.stringify([h.date||'',String(h.customer||'').trim().toLowerCase(),Number(h.total)||0,h.items||[],h.paymentStatus||'',h.notes||'',h.savedAt||'',h.buyer||'',h.seller||'']);
+    const historyById=new Map();
+    const signatureSet=new Set();
+    for(const existing of mergedHistory){
+     if(existing.id)historyById.set(String(existing.id),existing);
+     signatureSet.add(signature(existing));
+    }
     let addedHistory=0,duplicateHistory=0,collisionCount=0;
-    incoming.history.forEach(h=>{
+    for(const h of incoming.history){
      const sig=signature(h);
-     const sameId=h.id?mergedHistory.find(v=>v.id&&String(v.id)===String(h.id)):null;
+     const sameId=h.id?historyById.get(String(h.id)):null;
      if(sameId){
-      if(signature(sameId)===sig){duplicateHistory++;return;}
+      if(signature(sameId)===sig){duplicateHistory++;continue;}
       const copy={...h,originalImportedId:h.id,id:String(h.id)+'-IMP-'+Date.now()+'-'+(++collisionCount)};
-      mergedHistory.push(copy);addedHistory++;return;
+      mergedHistory.push(copy);addedHistory++;
+      historyById.set(String(copy.id),copy);signatureSet.add(signature(copy));
+      continue;
      }
-     if(mergedHistory.some(v=>signature(v)===sig)){duplicateHistory++;return;}
-     mergedHistory.push({...h});addedHistory++;
-    });
+     if(signatureSet.has(sig)){duplicateHistory++;continue;}
+     const copy={...h};mergedHistory.push(copy);addedHistory++;
+     if(copy.id)historyById.set(String(copy.id),copy);
+     signatureSet.add(sig);
+    }
     mergedHistory.sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
-    const oldProductsRaw=localStorage.getItem('asido_newapp_v1_products');
-    const oldHistoryRaw=localStorage.getItem('asido_newapp_v1_history');
+    const storageKeys=['asido_newapp_v1_products','asido_newapp_v1_history','asido_newapp_v1_bookkeeping_status','asido_newapp_v1_bookkeeping_payments','asido_newapp_v1_bookkeeping_paid_dates'];
+    const oldValues=new Map(storageKeys.map(key=>[key,localStorage.getItem(key)]));
     try{
      localStorage.setItem('asido_newapp_v1_products',JSON.stringify(mergedProducts));
      localStorage.setItem('asido_newapp_v1_history',JSON.stringify(mergedHistory));
-      const mergedBookStatus={...incoming.bookkeepingStatus,...JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}')};
-      const localBookPayments=JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}');
-      const mergedBookPayments={...incoming.bookkeepingPayments,...localBookPayments};
-      for(const key of Object.keys(incoming.bookkeepingPayments||{})){if(localBookPayments[key]){const all=[...(incoming.bookkeepingPayments[key]||[]),...(localBookPayments[key]||[])];const seen=new Set();mergedBookPayments[key]=all.filter(p=>{const sig=String(p.createdAt||'')+'|'+String(p.date||'')+'|'+Number(p.amount||0);if(seen.has(sig))return false;seen.add(sig);return true;});}}
-      const mergedPaidDates={...incoming.bookkeepingPaidDates,...JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
-      localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(mergedBookStatus));
-      localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(mergedBookPayments));
-      localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(mergedPaidDates));
+     const localBookStatus=JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}');
+     const mergedBookStatus={...incoming.bookkeepingStatus,...localBookStatus};
+     const localBookPayments=JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}');
+     const mergedBookPayments={...incoming.bookkeepingPayments,...localBookPayments};
+     for(const key of Object.keys(incoming.bookkeepingPayments||{})){
+      if(localBookPayments[key]){
+       const all=[...(incoming.bookkeepingPayments[key]||[]),...(localBookPayments[key]||[])];
+       const seen=new Set();
+       mergedBookPayments[key]=all.filter(p=>{
+        const sig=String(p.createdAt||'')+'|'+String(p.date||'')+'|'+Number(p.amount||0);
+        if(seen.has(sig))return false;seen.add(sig);return true;
+       });
+      }
+     }
+     const mergedPaidDates={...incoming.bookkeepingPaidDates,...JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+     localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(mergedBookStatus));
+     localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(mergedBookPayments));
+     localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(mergedPaidDates));
+     const verifyProducts=JSON.parse(localStorage.getItem('asido_newapp_v1_products')||'null');
+     const verifyHistory=JSON.parse(localStorage.getItem('asido_newapp_v1_history')||'null');
+     if(!Array.isArray(verifyProducts)||verifyProducts.length!==mergedProducts.length||!Array.isArray(verifyHistory)||verifyHistory.length!==mergedHistory.length)throw new Error('Pemeriksaan setelah penyimpanan tidak cocok. Data sebelumnya dipulihkan.');
     }catch(storageErr){
-     if(oldProductsRaw===null)localStorage.removeItem('asido_newapp_v1_products');else localStorage.setItem('asido_newapp_v1_products',oldProductsRaw);
-     if(oldHistoryRaw===null)localStorage.removeItem('asido_newapp_v1_history');else localStorage.setItem('asido_newapp_v1_history',oldHistoryRaw);
-     throw new Error('Ruang penyimpanan tidak cukup. Data sebelum penggabungan tetap dipertahankan; tidak ada hasil gabungan yang disimpan.');
+     for(const [key,value] of oldValues){if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}
+     throw new Error('Penyimpanan atau pemeriksaan gagal ('+(storageErr.message||String(storageErr))+'). Data sebelum penggabungan dipulihkan; tidak ada hasil gabungan yang dipakai.');
     }
     products=mergedProducts;historyData=mergedHistory;
     $('restorePreMergeBtn').hidden=false;
     renderProducts();renderHistory();
-    $('backupStatus').textContent='Penggabungan aman selesai. '+addedProducts+' produk baru dan '+addedHistory+' nota baru ditambahkan; '+duplicateHistory+' nota duplikat dilewati. Data produk dan riwayat yang sudah ada tetap dipertahankan.';
+    $('backupStatus').textContent='PENGGABUNGAN BERHASIL. '+products.length+' produk dan '+historyData.length+' nota sekarang tersimpan di perangkat ini. '+addedProducts+' produk baru dan '+addedHistory+' nota baru ditambahkan; '+duplicateHistory+' nota duplikat dilewati. Semua nama produk dari file dipertahankan.';
    }
   }catch(err){$('backupStatus').textContent='Impor gagal: '+(err.message||String(err))+'. Data perangkat tidak diganti.';}
   e.target.value='';
