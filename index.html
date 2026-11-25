@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123c7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="ASIDO Nota"><link rel="manifest" href="./manifest.json"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./icon-192.png"><title>ASIDO Nota Digital</title>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123c7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="ASIDO Nota"><title>ASIDO Nota Digital</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#172435;background:#f2f6fb}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#123c7a,#1769aa);color:#fff;padding:20px 14px}header h1{font-size:24px;margin:0}header p{margin:5px 0 0;font-size:14px}.wrap{max-width:850px;margin:auto;padding:12px}.card{background:#fff;border-radius:16px;margin:0 0 13px;padding:15px;box-shadow:0 4px 18px #152f5010}h2{font-size:18px;margin:0 0 12px;color:#123c7a}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}label{font-size:13px;font-weight:650;color:#47566b}input,select,textarea{font:inherit;width:100%;min-width:0;border:1px solid #d2dce8;border-radius:10px;padding:11px;background:#fff;color:#172435}button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:12px 14px;cursor:pointer;background:#123c7a;color:#fff}.secondary{background:#e8eef8;color:#123c7a}.green{background:#13814b}.red{background:#a52b36}.buttons{display:flex;gap:8px;flex-wrap:wrap}.buttons button{flex:1}.pdf-action-link{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;font:inherit;font-weight:700;border-radius:10px;padding:12px 14px;flex:1;min-width:0}.pdf-action-link.secondary{background:#e8eef8;color:#123c7a}.pdf-action-link.green{background:#13814b;color:#fff}.item{border:1px solid #e0e7f0;border-radius:12px;padding:11px;margin:9px 0}.itemgrid{display:grid;grid-template-columns:1.5fr .65fr .95fr;gap:8px}.itemgrid label{display:block;margin-bottom:5px}.itemgrid .namefield{min-width:0}.muted{color:#68778b;font-size:12px;line-height:1.5}.total{text-align:right;color:#123c7a;font-size:23px;font-weight:800;margin:12px 0}.siggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sigbox{border:1px solid #e0e7f0;border-radius:12px;padding:10px}.sig{display:block;width:100%;height:150px;min-height:150px;border:1px dashed #7f94ad;border-radius:9px;touch-action:none;-ms-touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;background:#fff;cursor:crosshair;}.historyrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #edf0f5}.historyrow:last-child{border:0}.historyrow>div{min-width:0;overflow-wrap:anywhere}.historyactions{display:flex;gap:6px;flex-shrink:0}.historyactions button{padding:9px 11px;font-size:13px}.historyactions .red{background:#a52b36;color:#fff}.small{font-size:12px}@media(max-width:520px){.grid,.siggrid{grid-template-columns:1fr}.itemgrid{grid-template-columns:1fr 1fr}.itemgrid .namefield{grid-column:1/-1}.wrap{padding:9px}.card{padding:12px}header h1{font-size:22px}}
 </style></head><body>
-<header><div class="wrap"><h1>ASIDO Nota Digital</h1><p>Nota penjualan · input suara · dua tanda tangan · PDF dan gambar nota</p><p style="font-size:12px;font-weight:700;opacity:.95">APK Android native 1.2 · WhatsApp + PDF + impor cadangan</p><div style="margin-top:13px"><button type="button" id="installAppBtn" style="background:#fff;color:#123c7a;border-radius:11px;padding:10px 14px">＋ Pasang aplikasi di HP</button></div><p id="installHelp" style="font-size:12px;opacity:.9;margin-top:8px">Pasang sekali, lalu buka ASIDO dari ikon di layar utama.</p></div></header>
+<header><div class="wrap"><h1>ASIDO Nota Digital</h1><p>Nota penjualan · input suara · dua tanda tangan · PDF dan gambar nota</p><p style="font-size:12px;font-weight:700;opacity:.95">Aplikasi mandiri · Nota + Pembukuan + Riwayat Cicilan</p><div style="margin-top:13px"><button type="button" id="installAppBtn" style="background:#fff;color:#123c7a;border-radius:11px;padding:10px 14px">＋ Pasang aplikasi di HP</button></div><p id="installHelp" style="font-size:12px;opacity:.9;margin-top:8px">Pasang sekali, lalu buka ASIDO dari ikon di layar utama.</p></div></header>
 <main class="wrap">
 <section class="card"><h2>1. Informasi Nota</h2><div class="grid">
 <div class="field"><label>Tanggal nota</label><input id="date" type="date"></div>
@@ -39,7 +39,6 @@
  <p class="muted">Tombol utama membuat gambar nota putih dan, di aplikasi Android ASIDO, membuka WhatsApp dengan gambar sebagai lampiran. Pilih pelanggan lalu tekan Kirim.</p>
  <img id="notaImagePreview" alt="Pratinjau gambar nota ASIDO" style="display:block;width:100%;height:auto;border:1px solid #d8e2ef;border-radius:8px;background:#fff;margin:10px 0">
  <div class="buttons" style="margin-top:8px"><a id="downloadNotaImage" class="pdf-action-link secondary" href="#" download="ASIDO-Nota.png">Unduh Gambar PNG (cadangan)</a></div>
- <div class="buttons" style="margin-top:8px"><button type="button" id="shareNotaImageNow" class="green">📤 Bagikan gambar nota</button></div>
  <p id="notaImageStatus" class="muted" role="status"></p>
 </div>
 <div style="margin-top:14px"><strong>PDF</strong></div>
@@ -53,8 +52,8 @@
  <div class="buttons" style="margin-top:8px"><a id="pdfDownloadLink" class="pdf-action-link secondary" href="#" download>Unduh PDF (cadangan)</a></div>
  <p id="pdfNativeStatus" class="muted" role="status"></p>
 </div>
-</section><section class="card"><h2>📒 Pembukuan ASIDO</h2><p class="muted">Gabungkan nota berdasarkan tanggal, lihat total Cash dan Tempo, serta buat pengingat jatuh tempo 30 hari di Google Calendar.</p><div class="buttons"><a href="./pembukuan/" style="display:block;width:100%;text-align:center;text-decoration:none;background:#143c73;color:#fff;border-radius:10px;padding:13px;font-weight:700">Buka Pembukuan ASIDO</a></div></section>
-<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk tersimpan di browser perangkat ini. Untuk memperbarui perangkat lain, ekspor cadangan dari perangkat sumber, pindahkan file JSON melalui Google Drive, lalu pilih salah satu cara impor di perangkat tujuan.</p>
+</section><section class="card"><h2>📒 Pembukuan ASIDO</h2><p class="muted">Gabungkan nota berdasarkan tanggal, lihat total Cash dan Tempo, serta buat pengingat jatuh tempo 30 hari di Google Calendar.</p><div class="buttons"><button type="button" id="openUnifiedBookkeeping" style="display:block;width:100%;text-align:center;background:#143c73;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:700;font-size:inherit;cursor:pointer">Buka Pembukuan ASIDO</button></div></section>
+<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk aplikasi baru ini tersimpan secara terpisah pada perangkat ini. Aplikasi lama tidak dibaca atau diubah.</p>
 <div style="margin:12px 0;padding:12px;border:1px solid #d8e2ef;border-radius:12px;background:#f8fbff">
  <strong style="color:#123c7a">🔎 Cari Nota berdasarkan Nama Toko</strong>
  <p class="muted" style="margin:5px 0 9px">Ketik nama toko atau sebutkan lewat mikrofon. Hasil akan menampilkan tanggal transaksi, barang, jumlah, harga, dan total pesanan dari riwayat pada perangkat ini.</p>
@@ -63,111 +62,52 @@
  <p id="storeSearchStatus" class="muted" role="status">Masukkan nama toko atau tekan Cari dengan Suara.</p>
  <div id="storeSearchResults" aria-live="polite"></div>
 </div>
-<div class="buttons"><button type="button" id="exportData" class="secondary">Ekspor cadangan</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importMergeBtn" class="secondary">Impor &amp; Gabungkan</button><button type="button" id="importReplaceBtn" class="green">Impor &amp; Samakan Data</button></div><div class="buttons" style="margin-top:8px"><button type="button" id="importProductsOnlyBtn" class="secondary">Samakan Daftar Barang Saja</button></div><input type="file" id="importDataFile" accept=".json,application/json" hidden><p class="muted">Gabungkan: pertahankan data lama dan tambahkan isi cadangan. Samakan Data: ganti daftar barang dan seluruh riwayat. Samakan Daftar Barang Saja: ganti hanya katalog barang dan harga; riwayat nota pada perangkat ini tetap dipertahankan.</p><div class="buttons" style="margin-top:8px"><button type="button" id="restorePreSyncBtn" class="secondary" hidden>Pulihkan data sebelum penyamaan</button><button type="button" id="restorePreCatalogBtn" class="secondary" hidden>Pulihkan daftar barang sebelumnya</button><button type="button" id="restorePreMergeBtn" class="secondary" hidden>Pulihkan data sebelum penggabungan</button><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
+<div hidden><button id="importMergeBtn"></button><button id="importReplaceBtn"></button><button id="importProductsOnlyBtn"></button><input type="file" id="importDataFile"><button id="restorePreSyncBtn"></button><button id="restorePreCatalogBtn"></button><button id="restorePreMergeBtn"></button></div><div class="buttons" style="margin-top:8px"><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>'Rp'+Math.max(0,Number(n)||0).toLocaleString('id-ID');
-const ASIDO_REMOVED_PRODUCTS=new Set(['pengki sampah','wiper lantai gagang besi']);
-const ASIDO_CATALOG_V2=[
-{name:'Pel capit kartun warna',price:26500},
-{name:'Pel capit katun',price:24500},
-{name:'Pel lobi besi',price:55500},
-{name:'Pel peras otomatis',price:24000},
-{name:'Pengki Gagang Besi',price:11000},
-{name:'Pengki Gagang Besi Cash',price:10000},
-{name:'Pengki Gagang Kayu',price:10000},
-{name:'Pengki Gagang Kayu Cash',price:9000},
-{name:'Sapu ijuk',price:15000},
-{name:'Sapu ijuk Gagang Besi cash',price:19500},
-{name:'Sapu ijuk Gagang kayu',price:18500},
-{name:'Sapu ijuk gagang kayu cash',price:17500},
-{name:'Sapu ijuk gagang kayu 90',price:20500},
-{name:'Sapu ijuk gagang kayu 90 cash',price:19500},
-{name:'Sapu ijuk Gagang Besi',price:20500},
-{name:'Sapu lidi',price:6000},
-{name:'Sikat dorong ijuk',price:12500},
-{name:'Sikat dorong senar',price:13500},
-{name:'Wiper Gagang Besi',price:13500},
-{name:'Wiper Gagang Besi Cash',price:12500},
-{name:'Wiper Gagang Kayu',price:12500},
-{name:'Wiper Gagang Kayu Cash',price:11500}
+const defaultProducts=[
+ {name:'Pel capit kartun warna',price:26500},
+ {name:'Pel capit katun',price:24500},
+ {name:'Pel lobi besi',price:55500},
+ {name:'Pel peras otomatis',price:24000},
+ {name:'Pengki Gagang Besi',price:11000},
+ {name:'Pengki Gagang Besi Cash',price:10000},
+ {name:'Pengki Gagang Kayu',price:10000},
+ {name:'Pengki Gagang Kayu Cash',price:9000},
+ {name:'Sapu ijuk',price:15000},
+ {name:'Sapu ijuk Gagang Besi',price:20500},
+ {name:'Sapu ijuk Gagang Besi cash',price:19500},
+ {name:'Sapu ijuk Gagang kayu',price:18500},
+ {name:'Sapu ijuk gagang kayu 90',price:20500},
+ {name:'Sapu ijuk gagang kayu 90 cash',price:19500},
+ {name:'Sapu ijuk gagang kayu cash',price:17500},
+ {name:'Sapu lidi',price:6000},
+ {name:'Sikat dorong ijuk',price:12500},
+ {name:'Sikat dorong senar',price:13500},
+ {name:'Wiper Gagang Besi',price:13500},
+ {name:'Wiper Gagang Besi Cash',price:12500},
+ {name:'Wiper Gagang Kayu',price:12500},
+ {name:'Wiper Gagang Kayu Cash',price:11500}
 ];
-const defaultProducts=ASIDO_CATALOG_V2.filter(p=>!ASIDO_REMOVED_PRODUCTS.has(p.name.trim().toLocaleLowerCase('id')));
-let products=JSON.parse(localStorage.getItem('asido_products')||'null')||defaultProducts;
-// One-time catalogue cleanup: remove the two products requested by ASIDO.
-// Invoice history is stored separately and is intentionally left unchanged.
-const productsBeforeCleanup=products.length;
-products=products.filter(p=>!ASIDO_REMOVED_PRODUCTS.has(String(p.name||'').trim().toLocaleLowerCase('id')));
-// Migrate the catalogue to the ASIDO screenshot-approved list and prices.
-// Keep any additional user-created products; invoice history remains untouched.
-const asidoCatalogMigrationKey='asido_catalog_v3_deduped';
-if(localStorage.getItem(asidoCatalogMigrationKey)!=='yes'){
- const catalogByName=new Map(ASIDO_CATALOG_V2.map(p=>[String(p.name).trim().toLocaleLowerCase('id'),p]));
- const seenNames=new Set();
- const seenCustom=new Set();
- const cleaned=[];
- for(const p of products){
-  const name=String(p.name||'').trim();
-  const key=name.toLocaleLowerCase('id');
-  if(key==='sapu ijuk')continue; // user requested removal of former item no. 9
-  if(ASIDO_REMOVED_PRODUCTS.has(key))continue;
-  if(catalogByName.has(key)){
-   if(seenNames.has(key))continue; // retain first occurrence of duplicated catalog item
-   seenNames.add(key);
-   cleaned.push({...catalogByName.get(key)});
-  }else{
-   const fingerprint=key+'|'+String(p.price??'');
-   if(seenCustom.has(fingerprint))continue;
-   seenCustom.add(fingerprint);
-   cleaned.push(p);
-  }
- }
- for(const item of ASIDO_CATALOG_V2){
-  const key=item.name.trim().toLocaleLowerCase('id');
-  if(!seenNames.has(key)){cleaned.push({...item});seenNames.add(key);}
- }
- products=cleaned;
- localStorage.setItem('asido_products',JSON.stringify(products));
- localStorage.setItem(asidoCatalogMigrationKey,'yes');
+const CATALOG_VERSION='2026-11-25-v2';
+const CATALOG_KEY='asido_newapp_v1_products';
+let storedProducts;
+try{storedProducts=JSON.parse(localStorage.getItem(CATALOG_KEY)||'null');}catch(e){storedProducts=null;}
+const savedCatalogVersion=localStorage.getItem('asido_newapp_catalog_version');
+/* The new application starts with its own catalogue. Upgrade only this app's catalogue once;
+   invoice history and bookkeeping records are deliberately left untouched. */
+let products;
+if(savedCatalogVersion!==CATALOG_VERSION){
+ products=defaultProducts.map(p=>({...p}));
+ localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
+ localStorage.setItem('asido_newapp_catalog_version',CATALOG_VERSION);
+}else{
+ products=Array.isArray(storedProducts)?storedProducts:defaultProducts.map(p=>({...p}));
+ if(!Array.isArray(storedProducts))localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
 }
-// One-time targeted cleanup for duplicate rows requested from the latest device screenshots.
-const asidoCatalogMigrationKeyV4='asido_catalog_v4_requested_duplicates_removed';
-if(localStorage.getItem(asidoCatalogMigrationKeyV4)!=='yes'){
- const duplicateRemovalRules={
-  'sapu ijuk gagang besi cash|19500':{removeOccurrence:1}, // remove earlier #9, keep #15
-  'sapu ijuk gagang kayu|18500':{removeOccurrence:2}, // remove duplicate #16, keep #10
-  'sapu ijuk gagang kayu 90|20500':{removeOccurrence:2}, // remove duplicate #17
-  'sapu ijuk gagang kayu 90 cash|19500':{removeOccurrence:2}, // remove duplicate #18
-  'wiper gagang besi|13500':{removeOccurrence:2}, // remove duplicate #27
-  'wiper gagang besi cash|12500':{removeOccurrence:2}, // remove duplicate #28
-  'wiper gagang kayu|12500':{removeOccurrence:2}, // remove duplicate #29
-  'wiper gagang kayu cash|11500':{removeOccurrence:2} // remove duplicate #30
- };
- const counts={};
- products=products.filter(p=>{
-  const key=String(p.name||'').trim().toLocaleLowerCase('id')+'|'+String(p.price??'');
-  const rule=duplicateRemovalRules[key];
-  if(!rule)return true;
-  counts[key]=(counts[key]||0)+1;
-  return counts[key]!==rule.removeOccurrence;
- });
- localStorage.setItem('asido_products',JSON.stringify(products));
- localStorage.setItem(asidoCatalogMigrationKeyV4,'yes');
-}
-// Force one-time replacement with the exact 22-item catalog from the user's three screenshots.
-// Only the product catalog is reset; invoices/history, signatures, and other app data remain intact.
-const asidoExactCatalogResetKey='asido_catalog_exact_22_from_screenshots_v1';
-if(localStorage.getItem(asidoExactCatalogResetKey)!=='yes'){
- products=ASIDO_CATALOG_V2.map(p=>({...p}));
- localStorage.setItem('asido_products',JSON.stringify(products));
- localStorage.setItem(asidoExactCatalogResetKey,'yes');
-}
-let historyData=JSON.parse(localStorage.getItem('asido_history')||'[]');
-let rows=[];
-const now=new Date();$('date').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function sortedProductEntries(){
  return products.map((p,index)=>({product:p,index}))
   .sort((a,b)=>String(a.product.name||'').localeCompare(String(b.product.name||''),'id',{sensitivity:'base',numeric:true}));
@@ -200,7 +140,7 @@ $('addCatalogProduct').onclick=()=>{
  if($('manageProductPrice').value===''||!Number.isFinite(price)||price<0){alert('Masukkan harga yang valid.');return;}
  if(products.some(p=>p.name.trim().toLowerCase()===name.toLowerCase())){alert('Nama produk ini sudah ada. Pilih produk tersebut untuk mengubahnya, atau gunakan nama yang berbeda.');return;}
  products.push({name,price});
- localStorage.setItem('asido_products',JSON.stringify(products));
+ localStorage.setItem('asido_newapp_v1_products',JSON.stringify(products));
  renderProducts();
  $('manageProductSelect').value=String(products.length-1);
  $('status').textContent='Produk baru ditambahkan ke daftar katalog pada perangkat ini.';
@@ -214,7 +154,7 @@ $('updateCatalogProduct').onclick=()=>{
  if($('manageProductPrice').value===''||!Number.isFinite(price)||price<0){alert('Masukkan harga yang valid.');return;}
  if(products.some((p,j)=>j!==i&&p.name.trim().toLowerCase()===name.toLowerCase())){alert('Nama produk tersebut sudah digunakan oleh produk lain.');return;}
  products[i]={name,price};
- localStorage.setItem('asido_products',JSON.stringify(products));
+ localStorage.setItem('asido_newapp_v1_products',JSON.stringify(products));
  renderProducts();
  $('manageProductSelect').value=String(i);
  $('manageProductName').value=name;
@@ -229,11 +169,25 @@ $('deleteCatalogProduct').onclick=()=>{
  if(!confirm('Hapus produk "'+products[i].name+'" dari daftar produk? Nota yang sudah dibuat tidak dihapus.'))return;
  const deleted=products[i].name;
  products.splice(i,1);
- localStorage.setItem('asido_products',JSON.stringify(products));
+ localStorage.setItem('asido_newapp_v1_products',JSON.stringify(products));
  renderProducts();clearCatalogForm();
  $('status').textContent='Produk "'+deleted+'" dihapus dari katalog pada perangkat ini.';
 };
-$('addProduct').onclick=()=>{const i=$('productSelect').value;if(i===''){alert('Pilih produk dahulu.');return}const p=products[+i];addRow(p.name,1,p.price);$('productSelect').value=''};
+function addSelectedProduct(){
+ const select=$('productSelect');
+ const raw=select.value;
+ if(raw===''){alert('Pilih produk dahulu.');return;}
+ const index=Number(raw);
+ const product=products[index];
+ if(!Number.isInteger(index)||!product){alert('Produk tidak ditemukan. Muat ulang daftar produk lalu pilih kembali.');return;}
+ addRow(product.name,1,product.price);
+ select.value='';
+ const status=$('status');
+ if(status)status.textContent='Berhasil menambahkan '+product.name+' — '+money(product.price)+'. Silakan isi jumlah barang pada baris nota.';
+ const items=$('items');
+ if(items){items.scrollIntoView({behavior:'smooth',block:'center'});}
+}
+$('addProduct').onclick=addSelectedProduct;
 $('addBlank').onclick=()=>addRow();
 function parseDateFromCalendarNote(text){
  const iso=text.match(/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/);
@@ -271,7 +225,7 @@ $('addCalendarReminder').onclick=()=>{
 };
 function invoice(){return {date:$('date').value,customer:$('customer').value.trim(),items:rows.map(r=>({...r})),total:renderTotal(),paymentStatus:$('paymentStatus').value||'Cash',notes:$('notes').value.trim(),buyer:signatureData('buyerSig'),seller:signatureData('sellerSig'),savedAt:new Date().toISOString()}}
 function validate(v){if(!v.customer){alert('Isi nama pelanggan terlebih dahulu.');return false}if(!v.items.some(r=>r.name.trim()&&r.qty>0)){alert('Tambahkan setidaknya satu barang dengan jumlah lebih dari nol.');return false}return true}
-function saveHistory(){const v=invoice();if(!validate(v))return;v.id=v.id||('ASD-'+Date.now());historyData.unshift(v);historyData=historyData.slice(0,100);localStorage.setItem('asido_history',JSON.stringify(historyData));renderHistory();$('status').textContent='Nota tersimpan di riwayat browser perangkat ini.'}
+function saveHistory(){const v=invoice();if(!validate(v))return;v.id=v.id||('ASD-'+Date.now());historyData.unshift(v);historyData=historyData.slice(0,100);localStorage.setItem('asido_newapp_v1_history',JSON.stringify(historyData));renderHistory();$('status').textContent='Nota tersimpan di riwayat browser perangkat ini.'}
 $('saveHistory').onclick=saveHistory;
 function renderHistory(){
  $('history').innerHTML=historyData.slice(0,20).map((h,i)=>'<div class="historyrow"><div><strong>'+esc(h.customer)+'</strong><br><span class="muted">'+esc(h.date||'')+' · '+money(h.total)+'</span></div><div class="historyactions"><button type="button" class="secondary" data-load="'+i+'">Buka</button><button type="button" class="red" data-delete="'+i+'">Hapus</button></div></div>').join('')||'<p class="muted">Belum ada riwayat nota.</p>';
@@ -281,7 +235,7 @@ function renderHistory(){
   const customer=String(h.customer||'nota ini');
   if(!confirm('Hapus nota "'+customer+'" tanggal '+(h.date||'-')+' dari Riwayat Nota pada perangkat ini? File PDF atau gambar yang sudah diunduh tidak ikut terhapus.'))return;
   historyData.splice(i,1);
-  localStorage.setItem('asido_history',JSON.stringify(historyData));
+  localStorage.setItem('asido_newapp_v1_history',JSON.stringify(historyData));
   renderHistory();
   const status=$('backupStatus')||$('status');
   if(status)status.textContent='Nota "'+customer+'" sudah dihapus dari riwayat perangkat ini.';
@@ -371,85 +325,31 @@ function downloadBlobFile(blob,name){
 $('exportData').onclick=()=>{
  const status=$('backupStatus');
  try{
-  const historyCount=Array.isArray(historyData)?historyData.length:0;
-  const productCount=Array.isArray(products)?products.length:0;
-  if(historyCount===0){
-   status.textContent='EKSPOR DIBATALKAN: aplikasi membaca 0 riwayat nota. Tidak ada file kosong yang dibuat. Pastikan riwayat nota terlihat pada perangkat ini, lalu coba lagi.';
+  const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData,
+   bookkeepingStatus:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}'),
+   bookkeepingPayments:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}'),
+   bookkeepingPaidDates:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+  const backupJson=JSON.stringify(backup,null,2);
+  // Native Android APK: save the complete nota + bookkeeping backup directly to Downloads/ASIDO.
+  if(window.AndroidAsido&&typeof window.AndroidAsido.saveJson==='function'){
+   const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+   const nativeResult=String(window.AndroidAsido.saveJson(backupJson,'ASIDO-Backup-'+stamp+'.json'));
+   if(!nativeResult.startsWith('OK|'))throw new Error(nativeResult.replace(/^ERROR\\|/,'')||'Android gagal menyimpan cadangan JSON.');
+   status.textContent='Cadangan JSON Nota + Pembukuan berhasil disimpan di HP, folder Downloads/ASIDO. Simpan juga salinannya ke Google Drive.';
    return;
   }
-  const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData};
-  const json=JSON.stringify(backup,null,2);
-  const stamp=new Date().toISOString().replace(/[:.]/g,'-');
-  const filename='ASIDO-backup-'+stamp+'.json';
-
-  // Native Android APK: write the exact JSON to Downloads/ASIDO using MediaStore.
-  // This avoids WebView blob-download and navigator.share limitations.
-  if(window.AndroidAsido&&typeof window.AndroidAsido.version==='function'){
-   if(typeof window.AndroidAsido.saveJson!=='function'){
-    status.textContent='Aplikasi Android yang terpasang belum memiliki fitur ekspor JSON asli. Perbarui APK ASIDO ke versi 1.5.0 terlebih dahulu. Riwayat saat ini tidak diubah.';
-    return;
-   }
-   const result=String(window.AndroidAsido.saveJson(json,filename));
-   if(!result.startsWith('OK|')){
-    status.textContent='Ekspor JSON gagal: '+result.replace(/^ERROR\|/,'');
-    return;
-   }
-   const savedParts=result.split('|');
-   const bytes=Number(savedParts[3])||new Blob([json]).size;
-   status.textContent='CADANGAN BERHASIL DIBUAT. '+historyCount+' nota dan '+productCount+' produk disimpan sebagai '+filename+' di folder Download/ASIDO. Ukuran file '+bytes.toLocaleString('id-ID')+' byte.';
-   const oldShare=$('backupShareJson');if(oldShare)oldShare.remove();
-   const shareBtn=document.createElement('button');
-   shareBtn.id='backupShareJson';shareBtn.type='button';shareBtn.className='pdf-action-link green';
-   shareBtn.textContent='Bagikan JSON ke Google Drive';
-   shareBtn.style.display='inline-block';shareBtn.style.marginTop='8px';
-   shareBtn.onclick=()=>{
-    try{
-     const shareResult=String(window.AndroidAsido.shareSavedJson());
-     if(shareResult.startsWith('OK|')){
-      status.textContent='File JSON sudah tersimpan di Download/ASIDO. Menu berbagi Android dibuka; pilih Google Drive untuk mengunggah cadangan.';
-     }else{
-      status.textContent='File JSON tetap tersimpan di Download/ASIDO. '+shareResult.replace(/^ERROR\|/,'')+' Unggah manual melalui Google Drive.';
-     }
-    }catch(shareError){
-     status.textContent='File JSON tetap tersimpan di Download/ASIDO. Menu berbagi gagal dibuka. Unggah manual melalui Google Drive.';
-    }
-   };
-   status.appendChild(document.createElement('br'));status.appendChild(shareBtn);
-   return;
-  }
-
-  // Full Chrome/PWA fallback.
-  const blob=new Blob([json],{type:'application/json;charset=utf-8'});
-  const blobUrl=URL.createObjectURL(blob);
-  const oldLink=$('backupDownloadLink');if(oldLink){try{URL.revokeObjectURL(oldLink.dataset.blobUrl||'')}catch(_){}oldLink.remove();}
+  const blob=new Blob([backupJson],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const oldLink=$('backupDownloadLink');if(oldLink)oldLink.remove();
   const link=document.createElement('a');
-  link.id='backupDownloadLink';link.href=blobUrl;link.download=filename;link.dataset.blobUrl=blobUrl;
+  link.id='backupDownloadLink';link.href=url;link.download='asido-backup.json';
   link.className='pdf-action-link green';link.textContent='Unduh file JSON sekarang';
   link.style.display='inline-block';link.style.marginTop='8px';
-  status.textContent='File cadangan siap: '+historyCount+' nota dan '+productCount+' produk. Tekan Unduh file JSON sekarang, lalu unggah manual ke Google Drive.';
+  status.textContent='File cadangan siap. Bila unduhan otomatis tidak muncul, tekan tautan hijau di bawah ini. Setelah terunduh, cari asido-backup.json di folder Download.';
   status.appendChild(document.createElement('br'));status.appendChild(link);
-  const oldShare=$('backupShareJson');if(oldShare)oldShare.remove();
-  const shareBtn=document.createElement('button');shareBtn.id='backupShareJson';shareBtn.type='button';
-  shareBtn.className='pdf-action-link green';shareBtn.textContent='Bagikan JSON ke Google Drive';
-  shareBtn.style.display='inline-block';shareBtn.style.marginTop='8px';shareBtn.style.marginLeft='8px';
-  shareBtn.onclick=async()=>{
-   try{
-    const file=new File([json],filename,{type:'application/json'});
-    if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})){
-     status.textContent='Berbagi langsung tidak didukung browser ini. File tetap dapat diunduh melalui tombol hijau Unduh file JSON sekarang.';
-     return;
-    }
-    await navigator.share({files:[file],title:'Backup ASIDO Nota Digital',text:'Backup data nota ASIDO'});
-    status.textContent='Menu berbagi dibuka. Pilih Google Drive untuk mengunggah cadangan.';
-   }catch(shareErr){
-    status.textContent=shareErr&&shareErr.name==='AbortError'?'Berbagi dibatalkan. File JSON tetap dapat diunduh.':'Berbagi langsung gagal. Gunakan tombol Unduh file JSON sekarang, lalu unggah manual ke Google Drive.';
-   }
-  };
-  status.appendChild(document.createElement('br'));status.appendChild(shareBtn);
-  setTimeout(()=>{try{URL.revokeObjectURL(blobUrl);}catch(_){}},10*60*1000);
- }catch(err){
-  status.textContent='Gagal membuat cadangan: '+(err.message||String(err));
- }
+  try{link.click();}catch(downloadErr){}
+  setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(_){}},10*60*1000);
+ }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
 };
 let importMode='merge';
 $('importMergeBtn').onclick=()=>{importMode='merge';$('importDataFile').value='';$('importDataFile').click();};
@@ -471,7 +371,7 @@ function validateBackupData(backup){
   if(!h||typeof h!=='object'||!Array.isArray(h.items))throw new Error('Data nota nomor '+(i+1)+' tidak valid. Tidak ada data yang diubah.');
   return h;
  });
- return {products:cleanProducts,history:cleanHistory};
+ return {products:cleanProducts,history:cleanHistory,bookkeepingStatus:backup.bookkeepingStatus&&typeof backup.bookkeepingStatus==='object'?backup.bookkeepingStatus:{},bookkeepingPayments:backup.bookkeepingPayments&&typeof backup.bookkeepingPayments==='object'?backup.bookkeepingPayments:{},bookkeepingPaidDates:backup.bookkeepingPaidDates&&typeof backup.bookkeepingPaidDates==='object'?backup.bookkeepingPaidDates:{}};
 }
 $('importDataFile').addEventListener('change',e=>{
  const file=e.target.files&&e.target.files[0];if(!file)return;
@@ -484,11 +384,11 @@ $('importDataFile').addEventListener('change',e=>{
     const ok=confirm('SAMAKAN DAFTAR BARANG SAJA?\n\nKatalog barang dan harga pada perangkat ini akan DIGANTI dengan '+incoming.products.length+' produk dari file cadangan. Riwayat nota pada perangkat ini TIDAK DIUBAH.\n\nAplikasi akan menyimpan cadangan daftar barang sebelumnya agar bisa dipulihkan. Lanjutkan?');
     if(!ok){$('backupStatus').textContent='Penyamaan daftar barang dibatalkan. Data tidak berubah.';e.target.value='';return;}
     const previousCatalog={format:'asido-catalog-restore-v1',savedAt:new Date().toISOString(),products:products};
-    try{localStorage.setItem('asido_pre_catalog_sync_backup',JSON.stringify(previousCatalog));}
+    try{localStorage.setItem('asido_newapp_v1_pre_catalog_sync_backup',JSON.stringify(previousCatalog));}
     catch(storageErr){throw new Error('Tidak cukup ruang untuk menyimpan cadangan katalog lama. Ekspor cadangan perangkat ini terlebih dahulu, lalu coba lagi.');}
-    const oldProducts=localStorage.getItem('asido_products');
-    try{localStorage.setItem('asido_products',JSON.stringify(incoming.products));}
-    catch(storageErr){if(oldProducts===null)localStorage.removeItem('asido_products');else localStorage.setItem('asido_products',oldProducts);throw new Error('Penyimpanan katalog gagal. Daftar barang lama dipertahankan.');}
+    const oldProducts=localStorage.getItem('asido_newapp_v1_products');
+    try{localStorage.setItem('asido_newapp_v1_products',JSON.stringify(incoming.products));}
+    catch(storageErr){if(oldProducts===null)localStorage.removeItem('asido_newapp_v1_products');else localStorage.setItem('asido_newapp_v1_products',oldProducts);throw new Error('Penyimpanan katalog gagal. Daftar barang lama dipertahankan.');}
     products=incoming.products;
     $('restorePreCatalogBtn').hidden=false;
     renderProducts();
@@ -496,17 +396,20 @@ $('importDataFile').addEventListener('change',e=>{
    }else if(importMode==='replace'){
     const ok=confirm('SAMAKAN DATA PERANGKAT INI?\n\nDaftar produk ('+incoming.products.length+') dan riwayat nota ('+incoming.history.length+') pada perangkat ini akan DIGANTI dengan isi file cadangan. Data lokal yang tidak ada di file akan hilang dari perangkat ini.\n\nSebelum mengganti, aplikasi akan membuat cadangan pemulihan lokal. Lanjutkan?');
     if(!ok){$('backupStatus').textContent='Penyamaan dibatalkan. Data perangkat tidak berubah.';e.target.value='';return;}
-    const previous={format:'asido-nota-restore-v1',savedAt:new Date().toISOString(),products:products,history:historyData};
-    try{localStorage.setItem('asido_pre_sync_backup',JSON.stringify(previous));}
+    const previous={format:'asido-nota-restore-v1',savedAt:new Date().toISOString(),products:products,history:historyData,bookkeepingStatus:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}'),bookkeepingPayments:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}'),bookkeepingPaidDates:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+    try{localStorage.setItem('asido_newapp_v1_pre_sync_backup',JSON.stringify(previous));}
     catch(storageErr){throw new Error('Tidak cukup ruang untuk membuat cadangan pemulihan. Ekspor cadangan perangkat ini terlebih dahulu, lalu coba lagi.');}
-    const oldProducts=localStorage.getItem('asido_products');
-    const oldHistory=localStorage.getItem('asido_history');
+    const oldProducts=localStorage.getItem('asido_newapp_v1_products');
+    const oldHistory=localStorage.getItem('asido_newapp_v1_history');
     try{
-     localStorage.setItem('asido_products',JSON.stringify(incoming.products));
-     localStorage.setItem('asido_history',JSON.stringify(incoming.history));
+     localStorage.setItem('asido_newapp_v1_products',JSON.stringify(incoming.products));
+     localStorage.setItem('asido_newapp_v1_history',JSON.stringify(incoming.history));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(incoming.bookkeepingStatus||{}));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(incoming.bookkeepingPayments||{}));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(incoming.bookkeepingPaidDates||{}));
     }catch(storageErr){
-     if(oldProducts===null)localStorage.removeItem('asido_products');else localStorage.setItem('asido_products',oldProducts);
-     if(oldHistory===null)localStorage.removeItem('asido_history');else localStorage.setItem('asido_history',oldHistory);
+     if(oldProducts===null)localStorage.removeItem('asido_newapp_v1_products');else localStorage.setItem('asido_newapp_v1_products',oldProducts);
+     if(oldHistory===null)localStorage.removeItem('asido_newapp_v1_history');else localStorage.setItem('asido_newapp_v1_history',oldHistory);
      throw new Error('Penyimpanan perangkat tidak cukup. Data lama dipertahankan; kosongkan ruang browser atau kurangi ukuran riwayat lalu coba lagi.');
     }
     products=incoming.products;
@@ -518,7 +421,7 @@ $('importDataFile').addEventListener('change',e=>{
     const ok=confirm('Gabungkan '+incoming.products.length+' produk dan '+incoming.history.length+' nota dari file cadangan dengan data yang sudah ada di perangkat ini? Data lama yang tidak ada di file akan tetap dipertahankan.');
     if(!ok){$('backupStatus').textContent='Impor gabungan dibatalkan. Data perangkat tidak berubah.';e.target.value='';return;}
     const preMerge={format:'asido-nota-pre-merge-v1',savedAt:new Date().toISOString(),products:products,history:historyData};
-    try{localStorage.setItem('asido_pre_merge_backup',JSON.stringify(preMerge));}
+    try{localStorage.setItem('asido_newapp_v1_pre_merge_backup',JSON.stringify(preMerge));}
     catch(storageErr){throw new Error('Cadangan pengaman sebelum penggabungan tidak dapat disimpan karena ruang browser tidak cukup. Tidak ada data yang digabungkan. Ekspor cadangan perangkat ini terlebih dahulu.');}
     const productMap=new Map(products.map(p=>[String(p.name||'').trim().toLowerCase(),{...p}]));
     let addedProducts=0;
@@ -542,14 +445,22 @@ $('importDataFile').addEventListener('change',e=>{
      mergedHistory.push({...h});addedHistory++;
     });
     mergedHistory.sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
-    const oldProductsRaw=localStorage.getItem('asido_products');
-    const oldHistoryRaw=localStorage.getItem('asido_history');
+    const oldProductsRaw=localStorage.getItem('asido_newapp_v1_products');
+    const oldHistoryRaw=localStorage.getItem('asido_newapp_v1_history');
     try{
-     localStorage.setItem('asido_products',JSON.stringify(mergedProducts));
-     localStorage.setItem('asido_history',JSON.stringify(mergedHistory));
+     localStorage.setItem('asido_newapp_v1_products',JSON.stringify(mergedProducts));
+     localStorage.setItem('asido_newapp_v1_history',JSON.stringify(mergedHistory));
+      const mergedBookStatus={...incoming.bookkeepingStatus,...JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}')};
+      const localBookPayments=JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}');
+      const mergedBookPayments={...incoming.bookkeepingPayments,...localBookPayments};
+      for(const key of Object.keys(incoming.bookkeepingPayments||{})){if(localBookPayments[key]){const all=[...(incoming.bookkeepingPayments[key]||[]),...(localBookPayments[key]||[])];const seen=new Set();mergedBookPayments[key]=all.filter(p=>{const sig=String(p.createdAt||'')+'|'+String(p.date||'')+'|'+Number(p.amount||0);if(seen.has(sig))return false;seen.add(sig);return true;});}}
+      const mergedPaidDates={...incoming.bookkeepingPaidDates,...JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+      localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(mergedBookStatus));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(mergedBookPayments));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(mergedPaidDates));
     }catch(storageErr){
-     if(oldProductsRaw===null)localStorage.removeItem('asido_products');else localStorage.setItem('asido_products',oldProductsRaw);
-     if(oldHistoryRaw===null)localStorage.removeItem('asido_history');else localStorage.setItem('asido_history',oldHistoryRaw);
+     if(oldProductsRaw===null)localStorage.removeItem('asido_newapp_v1_products');else localStorage.setItem('asido_newapp_v1_products',oldProductsRaw);
+     if(oldHistoryRaw===null)localStorage.removeItem('asido_newapp_v1_history');else localStorage.setItem('asido_newapp_v1_history',oldHistoryRaw);
      throw new Error('Ruang penyimpanan tidak cukup. Data sebelum penggabungan tetap dipertahankan; tidak ada hasil gabungan yang disimpan.');
     }
     products=mergedProducts;historyData=mergedHistory;
@@ -564,55 +475,61 @@ $('importDataFile').addEventListener('change',e=>{
  reader.readAsText(file);
 });
 $('restorePreSyncBtn').onclick=()=>{
- const raw=localStorage.getItem('asido_pre_sync_backup');
+ const raw=localStorage.getItem('asido_newapp_v1_pre_sync_backup');
  if(!raw){$('backupStatus').textContent='Tidak ada cadangan pemulihan pada perangkat ini.';$('restorePreSyncBtn').hidden=true;return;}
  if(!confirm('Pulihkan daftar produk dan riwayat yang tersimpan tepat sebelum penyamaan terakhir? Data saat ini akan diganti dengan cadangan pemulihan tersebut.'))return;
  try{
   const backup=JSON.parse(raw);
   if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('Cadangan pemulihan tidak valid.');
-  localStorage.setItem('asido_products',JSON.stringify(backup.products));
-  localStorage.setItem('asido_history',JSON.stringify(backup.history));
+  localStorage.setItem('asido_newapp_v1_products',JSON.stringify(backup.products));
+  localStorage.setItem('asido_newapp_v1_history',JSON.stringify(backup.history));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(backup.bookkeepingStatus||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(backup.bookkeepingPayments||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(backup.bookkeepingPaidDates||{}));
   products=backup.products;historyData=backup.history;
   renderProducts();renderHistory();
-  localStorage.removeItem('asido_pre_sync_backup');
+  localStorage.removeItem('asido_newapp_v1_pre_sync_backup');
   $('restorePreSyncBtn').hidden=true;
   $('backupStatus').textContent='Cadangan sebelum penyamaan berhasil dipulihkan.';
  }catch(err){$('backupStatus').textContent='Pemulihan gagal: '+(err.message||String(err));}
 };
 $('restorePreCatalogBtn').onclick=()=>{
- const raw=localStorage.getItem('asido_pre_catalog_sync_backup');
+ const raw=localStorage.getItem('asido_newapp_v1_pre_catalog_sync_backup');
  if(!raw){$('backupStatus').textContent='Tidak ada cadangan daftar barang sebelumnya pada perangkat ini.';$('restorePreCatalogBtn').hidden=true;return;}
  if(!confirm('Pulihkan daftar barang yang tersimpan tepat sebelum penyamaan katalog terakhir? Riwayat nota tidak diubah.'))return;
  try{
   const backup=JSON.parse(raw);
   if(!backup||!Array.isArray(backup.products))throw new Error('Cadangan katalog tidak valid.');
-  localStorage.setItem('asido_products',JSON.stringify(backup.products));
+  localStorage.setItem('asido_newapp_v1_products',JSON.stringify(backup.products));
   products=backup.products;
   renderProducts();
-  localStorage.removeItem('asido_pre_catalog_sync_backup');
+  localStorage.removeItem('asido_newapp_v1_pre_catalog_sync_backup');
   $('restorePreCatalogBtn').hidden=true;
   $('backupStatus').textContent='Daftar barang sebelumnya berhasil dipulihkan. Riwayat nota tetap utuh.';
  }catch(err){$('backupStatus').textContent='Pemulihan katalog gagal: '+(err.message||String(err));}
 };
 $('restorePreMergeBtn').onclick=()=>{
- const raw=localStorage.getItem('asido_pre_merge_backup');
+ const raw=localStorage.getItem('asido_newapp_v1_pre_merge_backup');
  if(!raw){$('backupStatus').textContent='Tidak ada cadangan sebelum penggabungan pada perangkat ini.';$('restorePreMergeBtn').hidden=true;return;}
  if(!confirm('Pulihkan daftar produk dan riwayat yang tersimpan tepat sebelum penggabungan terakhir? Data saat ini akan diganti dengan cadangan pengaman tersebut.'))return;
  try{
   const backup=JSON.parse(raw);
   if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('Cadangan sebelum penggabungan tidak valid.');
-  localStorage.setItem('asido_products',JSON.stringify(backup.products));
-  localStorage.setItem('asido_history',JSON.stringify(backup.history));
+  localStorage.setItem('asido_newapp_v1_products',JSON.stringify(backup.products));
+  localStorage.setItem('asido_newapp_v1_history',JSON.stringify(backup.history));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(backup.bookkeepingStatus||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(backup.bookkeepingPayments||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(backup.bookkeepingPaidDates||{}));
   products=backup.products;historyData=backup.history;
   renderProducts();renderHistory();
-  localStorage.removeItem('asido_pre_merge_backup');
+  localStorage.removeItem('asido_newapp_v1_pre_merge_backup');
   $('restorePreMergeBtn').hidden=true;
   $('backupStatus').textContent='Data sebelum penggabungan berhasil dipulihkan.';
  }catch(err){$('backupStatus').textContent='Pemulihan sebelum penggabungan gagal: '+(err.message||String(err));}
 };
-if(localStorage.getItem('asido_pre_catalog_sync_backup'))$('restorePreCatalogBtn').hidden=false;
-if(localStorage.getItem('asido_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
-if(localStorage.getItem('asido_pre_merge_backup'))$('restorePreMergeBtn').hidden=false;
+if(localStorage.getItem('asido_newapp_v1_pre_catalog_sync_backup'))$('restorePreCatalogBtn').hidden=false;
+if(localStorage.getItem('asido_newapp_v1_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
+if(localStorage.getItem('asido_newapp_v1_pre_merge_backup'))$('restorePreMergeBtn').hidden=false;
 $('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
 function parseVoice(text){
  const low=text.toLowerCase();
@@ -755,7 +672,6 @@ function printInvoiceForPhone(){
   #asidoPrintSheet .brand{font-size:25pt;font-weight:800;letter-spacing:-1px}
   #asidoPrintSheet .divider{font-size:24pt;font-weight:300}
   #asidoPrintSheet .title{font-size:15pt;font-weight:700}
-  #asidoPrintSheet .website{margin-left:auto;color:#123c7a;font-family:inherit;font-size:15pt;font-style:normal;font-weight:700;white-space:nowrap}
   #asidoPrintSheet .date{float:right;text-align:right;margin-top:0}
   #asidoPrintSheet .customer{margin:6px 0 17px}
   #asidoPrintSheet .customer small{display:block;color:#555;font-size:9pt;margin-bottom:3px}
@@ -772,8 +688,6 @@ function printInvoiceForPhone(){
   #asidoPrintSheet .notes strong{display:block;color:#123c7a;margin-bottom:5px}
   #asidoPrintSheet .signatures{display:grid;grid-template-columns:1fr 1fr;gap:45px;margin-top:36px;break-inside:avoid;page-break-inside:avoid}
   #asidoPrintSheet .sigarea{text-align:center}
-  #asidoPrintSheet .sigarea.asidoSig{position:relative}
-  #asidoPrintSheet .stamp{display:block!important;visibility:visible!important;opacity:1!important;position:absolute;right:0;bottom:26px;width:72px;height:72px;z-index:20;overflow:visible;pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #asidoPrintSheet .sigcaption{text-align:left;margin-bottom:4px}
   #asidoPrintSheet .sigimg{height:58px;max-width:100%;width:100%;object-fit:contain;object-position:center}
   #asidoPrintSheet .signblank{height:58px}
@@ -781,7 +695,7 @@ function printInvoiceForPhone(){
   #asidoPrintSheet .footer{position:fixed;bottom:0;left:0;font-size:8pt;color:#555}
  }
  `;
- sheet.innerHTML='<div class="date">Tanggal: '+esc(v.date||'-')+'</div><div class="heading"><span class="brand">ASIDO</span><span class="divider">|</span><span class="title">NOTA PENJUALAN</span><span class="website">www.asido.id</span></div><div class="customer"><small>Pelanggan:</small><strong>'+esc(v.customer)+'</strong></div><table><thead><tr><th>Barang</th><th class="qty">Qty</th><th class="num">Harga</th><th class="num">Subtotal</th></tr></thead><tbody>'+itemRows+'</tbody></table><div class="totals"><div class="totrow"><span>Subtotal:</span><span>'+money(v.total)+'</span></div><div class="totrow grand"><span>TOTAL:</span><span>'+money(v.total)+'</span></div></div>'+(v.notes?'<div class="notes"><strong>Catatan:</strong>'+esc(v.notes).replace(/\n/g,'<br>')+'</div>':'')+'<div class="signatures"><div class="sigarea"><div class="sigcaption">Pelanggan,</div>'+buyerSig+'<div class="line">('+esc(v.customer)+')</div></div><div class="sigarea asidoSig"><div class="sigcaption">ASIDO,</div>'+sellerSig+'<img class="stamp" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEPklEQVR42t2abWibVRTHf/fJ25J26VteWtzWFQW/lAoOFRRlzm1OEWSb02r3wYkoQkURp0NldqA4FL+4KZZZmFhNsWV2TtxEpwwcFvRTcXbqdPVt61w60tSmaWLy+KEkpNmT5y03a+aFQHLvPef8/+eec+55nhYu8yFkK/wtsFI12tMaHRdVQ8AM4EoSEosJXAYRUQ3AyyGiVBt4q3aUagNv1Z6wq6g1Ol68z06omNKhF1LCKvhioxoyloGb0VGKhFKOx+zskaGjcDhlx7yq6oupgBDCVk5onYKQETpGoHWTUIeMmVBSyvV8OeDtyBfjc14qw2Z02QktxY73ZYK3o7cQp5WLrKLgi0mYvVcUK97XAi+EWPAxm7h6MmaclMOrlOMtLeNGJOzISOmFVpw/rWtUVVXDZCycL9yvJVNsT0o3qgfeqKIUg9f6buckhJn4N+N9rfVS4Ert11r7Pdgm/wT0TsSMF63ut9ULyWwJZOyXegJmylzxHjsyFSNgZKwwkQtrvRmZS0aglFFVVTUvqNxcKZmKhpBeJcjV8+K6bkTcjIxRBZJWhRZzmCZgxhulbtlSczLsKVZfJFkpiUZhUm4pbY2OC0shZOUUyhlW7CgylOcqj9VT0zoZq05SZHmoVPks9SwgA/xFbyXsvErRanv1SMgCnsvbsgks1sgRUPTeuVQ7+P/nRWZ0CrVb72P5Xz/hCAbyc+6OdkKD7xEajhAa6sdxRQsAy34Zze9Z/scY4YMDhIYjhD8doqbznvxazf1baD56iPDhAzQfPURN52ZT3rf1POC9fS3T+/azZO2tzEQGAWh841XOP/AQmTMT+O66g4ZdzxN9uHth8qbSnLu7cz7JfT6C/ftQEwmy0/9Qu/Ve/t7URXYqjlLnJ/hBH5mzEySPHZdbRoXXi/B5mekfwLt+TX7eEWhCeDwAzH72OdPvvKvfaiQSxHbtZumj2/B3P0Ks5xWyU3EAslNxYj278T/+mPwnMu+aW0h+eYz0qV9xrliGcLtQU2liL71G+JNBZr/4isTgMMmvvzHUlf5hDGfbSshkSI2eWLCWGv0e19VXyb/IvBvW4duykeYjH+FoDuO58QYAZgaGOHvTOuZGvqPh5Z3UPfOksTKHE9L/lrrtwGTjZ56Aw4HzyjYmVt/JxIaNTHY/jXf9bShNjXiuW0U2NsVMZJBzm7qofbDLUJ372mtIjZ0k/eMp3B3tC9c62kmf/FkuAc/1q0ifGMv/nhv5liWrbwZVJdC3N195HI0NZP48o2+0vo6GnTuY3tNL/M1e6nt2oPiXzq/V+al/8Vnie3vt54BWKVU/Pv06MHJh+wsfAqizs2SjkzgCTVx46jmCfW+RTSYhk2Hyie0XR4XbRfjgwHzP5HIS3/M2yeMj8yBaWggNR1DnUgi3C3dH+7bwgff3W+6FrIzL9i/1lSCyKP8rUQ4hmT3XfzZOCNOd8XDxAAAAAElFTkSuQmCC" alt="Logo panda ASIDO">'+'<div class="line">(David Asido)</div></div></div><div class="footer">Dibuat dengan ASIDO Nota Digital</div>';
+ sheet.innerHTML='<div class="date">Tanggal: '+esc(v.date||'-')+'</div><div class="heading"><span class="brand">ASIDO</span><span class="divider">|</span><span class="title">NOTA PENJUALAN</span></div><div class="customer"><small>Pelanggan:</small><strong>'+esc(v.customer)+'</strong></div><table><thead><tr><th>Barang</th><th class="qty">Qty</th><th class="num">Harga</th><th class="num">Subtotal</th></tr></thead><tbody>'+itemRows+'</tbody></table><div class="totals"><div class="totrow"><span>Subtotal:</span><span>'+money(v.total)+'</span></div><div class="totrow grand"><span>TOTAL:</span><span>'+money(v.total)+'</span></div></div>'+(v.notes?'<div class="notes"><strong>Catatan:</strong>'+esc(v.notes).replace(/\n/g,'<br>')+'</div>':'')+'<div class="signatures"><div class="sigarea"><div class="sigcaption">Pelanggan,</div>'+buyerSig+'<div class="line">('+esc(v.customer)+')</div></div><div class="sigarea"><div class="sigcaption">ASIDO,</div>'+sellerSig+'<div class="line">(David Asido)</div></div></div><div class="footer">Dibuat dengan ASIDO Nota Digital</div>';
  $('status').textContent='Membuka dialog cetak Android. Pilih “Simpan sebagai PDF”, lalu pilih lokasi dan tekan Simpan.';
  if(typeof window.print!=='function'){alert('Fitur cetak tidak tersedia pada browser ini. Buka halaman ini di Chrome.');return;}
  window.print();
@@ -799,9 +713,7 @@ function wrapCanvasText(ctx,text,maxWidth){
 function roundedRect(ctx,x,y,w,h,r){
  const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
 }
-const ASIDO_PANDA_STAMP_DATA='data:image/jpeg;base64,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';;
-async function drawCanvasStamp(ctx,cx,cy,r){const im=new Image();await new Promise((resolve,reject)=>{let settled=false;const timer=setTimeout(()=>fail(new Error('Waktu tunggu logo panda habis.')),8000);const done=()=>{if(!settled){settled=true;clearTimeout(timer);resolve();}};const fail=(err)=>{if(!settled){settled=true;clearTimeout(timer);reject(err||new Error('Logo panda gagal dimuat.'));}};im.onload=done;im.onerror=()=>fail(new Error('Logo panda gagal dimuat.'));im.src=ASIDO_PANDA_STAMP_DATA;if(im.complete&&im.naturalWidth)done();});if(!im.naturalWidth)throw new Error('Logo panda tidak valid.');ctx.drawImage(im,cx-r,cy-r,r*2,r*2);}
-async function createCanvasNota(v,buyerImage,sellerImage){
+function createCanvasNota(v,buyerImage,sellerImage){
  const W=1400,pad=76,rowFont=28,lineHeight=36;
  const rows=v.items.filter(r=>String(r.name||'').trim()&&Number(r.qty)>0);
  const measure=document.createElement('canvas').getContext('2d');measure.font='28px Arial, sans-serif';
@@ -818,7 +730,6 @@ async function createCanvasNota(v,buyerImage,sellerImage){
  ctx.fillStyle=blue;ctx.font='bold 66px Arial, sans-serif';ctx.fillText('ASIDO',pad,106);
  ctx.strokeStyle=blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(320,49);ctx.lineTo(320,118);ctx.stroke();
  ctx.font='bold 44px Arial, sans-serif';ctx.fillText('NOTA PENJUALAN',355,99);
- ctx.fillStyle=blue;ctx.textAlign='right';ctx.font='bold 44px Arial, sans-serif';ctx.fillText('www.asido.id',W-pad,99);ctx.textAlign='left';
  ctx.fillStyle=gray;ctx.textAlign='right';ctx.font='26px Arial, sans-serif';ctx.fillText('Tanggal: '+(v.date||'-'),W-pad,154);ctx.textAlign='left';
  ctx.fillStyle=gray;ctx.font='26px Arial, sans-serif';ctx.fillText('Pelanggan:',pad,205);
  ctx.fillStyle=dark;ctx.font='bold 38px Arial, sans-serif';
@@ -846,13 +757,13 @@ async function createCanvasNota(v,buyerImage,sellerImage){
  const sigW=440,sigH=125,sigLeft=pad+35,sigRight=W/2+65;
  if(buyerImage){ctx.drawImage(buyerImage,sigLeft,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigLeft,y,sigW,sigH);}
  if(sellerImage){ctx.drawImage(sellerImage,sigRight,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigRight,y,sigW,sigH);}
- await drawCanvasStamp(ctx,sigRight+sigW-48,y+sigH/2,43);y+=sigH+8;ctx.strokeStyle='#454b55';ctx.lineWidth=2;
+ y+=sigH+8;ctx.strokeStyle='#454b55';ctx.lineWidth=2;
  ctx.beginPath();ctx.moveTo(sigLeft,y);ctx.lineTo(sigLeft+sigW,y);ctx.moveTo(sigRight,y);ctx.lineTo(sigRight+sigW,y);ctx.stroke();y+=38;
  ctx.fillStyle=dark;ctx.font='23px Arial, sans-serif';ctx.textAlign='center';ctx.fillText('('+v.customer+')',sigLeft+sigW/2,y);ctx.fillText('(David Asido)',sigRight+sigW/2,y);ctx.textAlign='left';
  ctx.fillStyle=gray;ctx.font='19px Arial, sans-serif';ctx.fillText('Dibuat dengan ASIDO Nota Digital',pad,H-24);
  return canvas;
 }
-let latestNotaImageBlob=null,latestNotaImageFile=null,latestNotaImageUrl='',latestNotaImageDataUrl='';
+let latestNotaImageBlob=null,latestNotaImageFile=null,latestNotaImageUrl='';
 function dataUrlToPngBlob(dataUrl){
  const comma=dataUrl.indexOf(',');
  if(comma<0)throw new Error('Format gambar PNG tidak valid.');
@@ -861,69 +772,78 @@ function dataUrlToPngBlob(dataUrl){
  for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
  return new Blob([bytes],{type:'image/png'});
 }
-$('makeNotaImage').onclick=async()=>{
+$('makeNotaImage').onclick=()=>{
  const btn=$('makeNotaImage');
  try{
-  if(latestNotaImageFile&&latestNotaImageBlob){
-   $('notaImageStatus').textContent='Membuka menu berbagi untuk file nota…';
-   const file=latestNotaImageFile;
-   if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
-    const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name,$('customer').value.trim());
-    if(typeof result==='string'&&result.startsWith('ERROR|'))throw new Error(result.slice(6));
-    $('notaImageStatus').textContent='Permintaan berbagi dikirim ke Android. Pilih WhatsApp jika menu muncul.';
-    return;
-   }
-   if(!navigator.share){$('notaImageStatus').textContent='Fitur berbagi file tidak didukung browser. Tekan Unduh Gambar PNG lalu lampirkan dari My Files di WhatsApp.';return;}
-   if(navigator.canShare&&!navigator.canShare({files:[file]})){$('notaImageStatus').textContent='Browser tidak bisa berbagi PNG langsung. Tekan Unduh Gambar PNG lalu lampirkan dari My Files.';return;}
-   navigator.share({files:[file],title:'Nota ASIDO - '+$('customer').value.trim(),text:'Nota penjualan ASIDO untuk '+$('customer').value.trim()+'.'}).then(()=>{$('notaImageStatus').textContent='Menu berbagi ditutup. Periksa WhatsApp dan lampiran nota.';}).catch(err=>{$('notaImageStatus').textContent='Berbagi gagal: '+(err&&err.message?err.message:String(err));});
-   return;
-  }
   const v=invoice();if(!validate(v))return;
-  btn.disabled=true;btn.textContent='Membuat gambar nota…';
-  $('notaImageActions').hidden=false;
-  $('notaImageStatus').textContent='Memproses gambar nota. Mohon tunggu…';
+  btn.disabled=true;
+  btn.textContent='Menyiapkan nota untuk WhatsApp…';
+  $('notaImageStatus').textContent='Membuat gambar nota putih untuk '+v.customer+'…';
+
+  // Create exactly the white invoice sheet, including both signatures.
   const buyerCanvas=sigInk['buyerSig']?$('buyerSig'):null;
   const sellerCanvas=sigInk['sellerSig']?$('sellerSig'):null;
-  const canvas=await createCanvasNota(v,buyerCanvas,sellerCanvas);
+  const canvas=createCanvasNota(v,buyerCanvas,sellerCanvas);
   const dataUrl=canvas.toDataURL('image/png');
   const blob=dataUrlToPngBlob(dataUrl);
-  if(!blob||blob.type!=='image/png'||blob.size<1000)throw new Error('Gambar PNG kosong atau tidak valid.');
+  if(!blob||blob.type!=='image/png'||blob.size<1000)throw new Error('Gambar nota kosong atau tidak valid.');
+
   const datePart=(v.date||'').replace(/-/g,'');
   const safeCustomer=(v.customer||'Pelanggan').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,32)||'Pelanggan';
   const fileName='ASIDO-Nota-'+datePart+'-'+safeCustomer+'.png';
   const file=new File([blob],fileName,{type:'image/png',lastModified:Date.now()});
-  latestNotaImageBlob=blob;latestNotaImageFile=file;latestNotaImageDataUrl=dataUrl;
+
+  latestNotaImageBlob=blob;
+  latestNotaImageFile=file;
   if(latestNotaImageUrl&&latestNotaImageUrl.startsWith('blob:')){try{URL.revokeObjectURL(latestNotaImageUrl)}catch(_){}}
   latestNotaImageUrl=URL.createObjectURL(blob);
-  $('notaImagePreview').src=latestNotaImageUrl;$('downloadNotaImage').href=latestNotaImageUrl;$('downloadNotaImage').download=fileName;
-  $('notaImageActions').hidden=false;$('pdfActions').hidden=true;
-  btn.textContent='📤 Bagikan gambar nota';
-  $('notaImageStatus').textContent='Gambar nota selesai dibuat. Untuk mengirim, tekan tombol “Bagikan gambar nota” di bawah pratinjau.';
- }catch(err){
+  $('notaImagePreview').src=latestNotaImageUrl;
+  $('downloadNotaImage').href=latestNotaImageUrl;
+  $('downloadNotaImage').download=fileName;
   $('notaImageActions').hidden=false;
-  $('notaImageStatus').textContent='Gagal membuat/mengirim nota: '+(err&&err.message?err.message:String(err));
-  btn.textContent='📲 Kirim Nota ke WhatsApp';
- }finally{
-  btn.disabled=false;
-  if(btn.textContent==='Membuat gambar nota…'||btn.textContent==='📤 Membuka WhatsApp…')btn.textContent='📲 Kirim Nota ke WhatsApp';
- }
-};
-$('shareNotaImageNow').onclick=()=>{
- try{
-  if(!latestNotaImageFile||!latestNotaImageBlob){$('notaImageStatus').textContent='Gambar nota belum dibuat. Tekan Kirim Nota ke WhatsApp terlebih dahulu.';return;}
-  const file=latestNotaImageFile;
-  const caption='Nota penjualan ASIDO untuk '+$('customer').value.trim()+'.';
+  $('pdfActions').hidden=true;
+
+  // Native APK: pass the PNG to Android ACTION_SEND directly from this button.
   if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
-   const result=window.AndroidAsido.sharePng(latestNotaImageDataUrl,file.name,$('customer').value.trim());
-   if(typeof result==='string'&&result.startsWith('ERROR|'))throw new Error(result.slice(6));
-   $('notaImageStatus').textContent='Lampiran gambar diserahkan ke Android. Periksa pratinjau WhatsApp sebelum mengirim.';
+   $('notaImageStatus').textContent='Menyiapkan lampiran gambar nota di WhatsApp…';
+   window.AndroidAsido.sharePng(dataUrl,fileName,v.customer);
+   $('status').textContent='Nota '+v.customer+' disiapkan untuk WhatsApp.';
    return;
   }
-  if(!navigator.share){$('notaImageStatus').textContent='Browser ini tidak menyediakan berbagi langsung. Unduh PNG lalu bagikan melalui My Files.';return;}
-  if(navigator.canShare&&!navigator.canShare({files:[file]})){$('notaImageStatus').textContent='Browser tidak mendukung berbagi file gambar. Unduh PNG lalu bagikan melalui My Files.';return;}
-  const sharePromise=navigator.share({files:[file],title:'Nota ASIDO - '+$('customer').value.trim(),text:caption});
-  sharePromise.then(()=>{$('notaImageStatus').textContent='Menu berbagi ditutup. Jika memilih WhatsApp, periksa lampiran lalu tekan Kirim.';}).catch(err=>{$('notaImageStatus').textContent=err&&err.name==='AbortError'?'Berbagi dibatalkan. PNG tetap tersedia melalui tombol unduh.':'Berbagi gagal: '+(err&&err.message?err.message:String(err))+'. Unduh PNG lalu bagikan manual.';});
- }catch(err){$('notaImageStatus').textContent='Berbagi gagal: '+(err&&err.message?err.message:String(err));}
+
+  // Android Web Share: share the PNG file only (no text payload).
+  // Call synchronously in the original button tap to preserve user activation.
+  if(!navigator.share){
+   $('notaImageStatus').textContent='HP/browser ini tidak menyediakan berbagi file langsung. Gambar nota sudah dibuat; gunakan Unduh Gambar PNG sebagai cadangan.';
+   return;
+  }
+  if(navigator.canShare&&!navigator.canShare({files:[file]})){
+   $('notaImageStatus').textContent='HP/browser ini tidak mendukung lampiran file gambar melalui menu berbagi. Gunakan Unduh Gambar PNG sebagai cadangan.';
+   return;
+  }
+
+  $('notaImageStatus').textContent='Membuka menu Bagikan Android dengan satu lampiran gambar nota '+v.customer+'. Pilih WhatsApp.';
+  const shareCaption='Nota penjualan ASIDO untuk '+v.customer+'. Total '+money(v.total)+'.';
+  const sharePromise=navigator.share({
+   files:[file],
+   title:'Nota ASIDO - '+v.customer,
+   text:shareCaption
+  });
+  sharePromise.then(()=>{
+   $('notaImageStatus').textContent='Menu berbagi ditutup. Jika Anda memilih WhatsApp, pastikan foto nota putih terlihat di pratinjau, lalu tekan Kirim.';
+  }).catch(err=>{
+   if(err&&err.name==='AbortError'){
+    $('notaImageStatus').textContent='Berbagi dibatalkan. Gambar nota masih tersedia melalui Unduh Gambar PNG.';
+   }else{
+    $('notaImageStatus').textContent='Menu berbagi tidak dapat melampirkan gambar: '+(err&&err.message?err.message:'kesalahan perangkat')+'. Gunakan Unduh Gambar PNG sebagai cadangan.';
+   }
+  });
+ }catch(err){
+  $('notaImageStatus').textContent='Gagal menyiapkan gambar nota: '+(err&&err.message?err.message:String(err));
+ }finally{
+  btn.disabled=false;
+  btn.textContent='📲 Kirim Nota ke WhatsApp';
+ }
 };
 $('shareSavedPdf').onclick=()=>{
  if(!window.AndroidAsido||typeof window.AndroidAsido.shareSavedPdf!=='function'){
@@ -941,10 +861,9 @@ $('openSavedPdf').onclick=()=>{
  const result=String(window.AndroidAsido.openSavedPdf());
  $('pdfNativeStatus').textContent=result.startsWith('OK|')?'Membuka file PDF dari Downloads/ASIDO.':result.replace(/^ERROR\|/,'Buka PDF gagal: ');
 };
- function drawPdfStamp(d,cx,cy,r){d.addImage(ASIDO_PANDA_STAMP_DATA,'JPEG',cx-r,cy-r,r*2,r*2);}
 $('savePdf').onclick=()=>{try{const v=invoice();if(!validate(v))return;if(!window.jspdf){$('status').textContent='Pustaka PDF belum termuat. Periksa koneksi internet, muat ulang halaman, lalu coba lagi.';alert('Pustaka PDF belum termuat. Periksa koneksi internet lalu coba lagi.');return}const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4'});const blue=[18,60,122],pale=[230,238,248];d.setTextColor(...blue);d.setFont('helvetica','bold');d.setFontSize(22);d.text('ASIDO',14,19);d.setDrawColor(...blue);d.setLineWidth(.5);d.line(47,9,47,21);d.setFontSize(15);d.text('NOTA PENJUALAN',51,18);d.setTextColor(30);d.setFont('helvetica','normal');d.setFontSize(10);d.text('Tanggal: '+(v.date||'-'),196,29,{align:'right'});d.setTextColor(90);d.text('Pelanggan:',14,35);d.setTextColor(25);d.setFont('helvetica','bold');d.setFontSize(12);d.text(v.customer,14,42);let y=51;d.setFillColor(...pale);d.rect(14,y-5,182,8,'F');d.setFont('helvetica','bold');d.setFontSize(10);d.text('Barang',17,y);d.text('Qty',112,y,{align:'right'});d.text('Harga',147,y,{align:'right'});d.text('Subtotal',193,y,{align:'right'});d.setFont('helvetica','normal');y+=8;v.items.filter(r=>r.name.trim()&&r.qty>0).forEach(r=>{const lines=d.splitTextToSize(r.name,85);if(y+Math.max(7,lines.length*5)>245){d.addPage();y=20}d.text(lines,17,y);d.text(String(r.qty),112,y,{align:'right'});d.text(money(r.price),147,y,{align:'right'});d.text(money(r.qty*r.price),193,y,{align:'right'});y+=Math.max(8,lines.length*5)});y+=2;d.setDrawColor(30);d.line(120,y,196,y);y+=7;d.setFontSize(10);d.text('Subtotal:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=8;d.setFont('helvetica','bold');d.setFontSize(13);d.text('TOTAL:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=11;
 if(v.notes){d.setFont('helvetica','bold');d.setTextColor(...blue);d.setFontSize(11);d.text('Catatan:',14,y);y+=6;d.setDrawColor(175,190,210);d.setLineWidth(.3);const noteLines=d.splitTextToSize(v.notes,172);const h=Math.min(28,Math.max(13,noteLines.length*5+5));d.roundedRect(14,y-4,182,h,2,2,'S');d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(9);d.text(noteLines.slice(0,5),17,y+2);y+=h+8}else y+=3;
-let sigY=Math.max(y+8,218);if(sigY>258){d.addPage();sigY=35}d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(10);d.text('Pelanggan,',20,sigY);d.text('ASIDO,',145,sigY);if(v.buyer)d.addImage(v.buyer,'PNG',17,sigY+2,63,20);if(v.seller)d.addImage(v.seller,'PNG',132,sigY+2,63,20);d.setDrawColor(50);d.line(16,sigY+24,82,sigY+24);d.line(130,sigY+24,196,sigY+24);d.setFontSize(9);d.text('('+v.customer+')',49,sigY+30,{align:'center'});d.text('(David Asido)',163,sigY+30,{align:'center'});drawPdfStamp(d,180,sigY+12,13);d.setTextColor(80);d.setFontSize(8);d.text('Dibuat dengan ASIDO Nota Digital',14,287);const file='ASIDO-Nota-'+(v.date||'').replaceAll('-','')+'-'+v.customer.replace(/[^a-z0-9]/gi,'-').slice(0,20)+'.pdf';const blob=d.output('blob');preparePdfActions(blob,file,d);if(window.AndroidAsido&&typeof window.AndroidAsido.savePdf==='function'){const nativeResult=String(window.AndroidAsido.savePdf(d.output('datauristring'),file));if(!nativeResult.startsWith('OK|'))throw new Error(nativeResult.replace(/^ERROR\\|/,'')||'Android gagal menyimpan PDF.');$('pdfNativeStatus').textContent='PDF berhasil disimpan ke Downloads/ASIDO. Gunakan tombol Buka PDF atau Bagikan PDF.';$('status').textContent='PDF berhasil disimpan ke HP.';$('pdfActions').hidden=false;return;}$('status').textContent='PDF siap. Gunakan tautan Unduh PDF di bawah.';}catch(err){console.error(err);$('status').textContent='PDF belum berhasil dibuat: '+(err&&err.message?err.message:'kesalahan tidak dikenal')+'. Muat ulang halaman dan coba lagi.';alert('PDF belum berhasil dibuat. Periksa pesan di bawah tombol PDF; bila perlu muat ulang halaman.');}};
+let sigY=Math.max(y+8,218);if(sigY>258){d.addPage();sigY=35}d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(10);d.text('Pelanggan,',20,sigY);d.text('ASIDO,',145,sigY);if(v.buyer)d.addImage(v.buyer,'PNG',17,sigY+2,63,20);if(v.seller)d.addImage(v.seller,'PNG',132,sigY+2,63,20);d.setDrawColor(50);d.line(16,sigY+24,82,sigY+24);d.line(130,sigY+24,196,sigY+24);d.setFontSize(9);d.text('('+v.customer+')',49,sigY+30,{align:'center'});d.text('(David Asido)',163,sigY+30,{align:'center'});d.setTextColor(80);d.setFontSize(8);d.text('Dibuat dengan ASIDO Nota Digital',14,287);const file='ASIDO-Nota-'+(v.date||'').replaceAll('-','')+'-'+v.customer.replace(/[^a-z0-9]/gi,'-').slice(0,20)+'.pdf';const blob=d.output('blob');preparePdfActions(blob,file,d);if(window.AndroidAsido&&typeof window.AndroidAsido.savePdf==='function'){const nativeResult=String(window.AndroidAsido.savePdf(d.output('datauristring'),file));if(!nativeResult.startsWith('OK|'))throw new Error(nativeResult.replace(/^ERROR\\|/,'')||'Android gagal menyimpan PDF.');$('pdfNativeStatus').textContent='PDF berhasil disimpan ke Downloads/ASIDO. Gunakan tombol Buka PDF atau Bagikan PDF.';$('status').textContent='PDF berhasil disimpan ke HP.';$('pdfActions').hidden=false;return;}$('status').textContent='PDF siap. Gunakan tautan Unduh PDF di bawah.';}catch(err){console.error(err);$('status').textContent='PDF belum berhasil dibuat: '+(err&&err.message?err.message:'kesalahan tidak dikenal')+'. Muat ulang halaman dan coba lagi.';alert('PDF belum berhasil dibuat. Periksa pesan di bawah tombol PDF; bila perlu muat ulang halaman.');}};
 
 let asidoInstallPrompt=null;
 const asidoInstallBtn=$('installAppBtn');
@@ -990,4 +909,82 @@ if('serviceWorker' in navigator){
 }
 
 renderProducts();renderRows();renderHistory();
-</script></body></html>
+</script>
+<script>
+/* ASIDO catalog recovery: independent from the main application script. */
+(function(){
+  const key='asido_newapp_v1_products';
+  const defaults=[
+    {name:'Sapu ijuk',price:15000},
+    {name:'Sapu lidi',price:10000},
+    {name:'Pel lobi besi',price:58000},
+    {name:'Pel capit katun',price:35000},
+    {name:'Pel capit kartun warna',price:26500},
+    {name:'Pel peras otomatis',price:24000},
+    {name:'Sikat dorong senar',price:25000},
+    {name:'Sikat dorong ijuk',price:25000}
+  ];
+  function loadCatalog(){
+    const select=document.getElementById('productSelect');
+    if(!select) return;
+    let list=[];
+    try { list=JSON.parse(localStorage.getItem(key)||'[]'); } catch(e) { list=[]; }
+    if(!Array.isArray(list)||list.length===0){ list=defaults.map(p=>({...p})); }
+    list=list.filter(p=>p&&typeof p.name==='string'&&p.name.trim()&&Number.isFinite(Number(p.price))&&Number(p.price)>=0);
+    if(!list.length) list=defaults.map(p=>({...p}));
+    try { localStorage.setItem(key,JSON.stringify(list)); } catch(e) {}
+    const current=select.value;
+    select.innerHTML='<option value="">Pilih produk...</option>'+
+      list.map((p,i)=>'<option value="'+i+'">'+(i+1)+'. '+p.name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+' — Rp'+Number(p.price).toLocaleString('id-ID')+'</option>').join('');
+    if(current!==''&&Number(current)<list.length) select.value=current;
+    const manage=document.getElementById('manageProductSelect');
+    if(manage){
+      manage.innerHTML='<option value="">Pilih produk untuk diedit...</option>'+list.map((p,i)=>'<option value="'+i+'">'+(i+1)+'. '+p.name+' — Rp'+Number(p.price).toLocaleString('id-ID')+'</option>').join('');
+    }
+  }
+  loadCatalog();
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)loadCatalog();});
+})();
+</script>
+<style>
+#asidoUnifiedBookkeepingShell{display:none;position:fixed;inset:0;z-index:99999;background:#edf2f8;}
+#asidoUnifiedBookkeepingShell .unified-toolbar{height:54px;display:flex;align-items:center;gap:10px;padding:7px 12px;background:#123c7a;color:#fff;font:600 15px system-ui,sans-serif;}
+#asidoUnifiedBookkeepingShell .unified-toolbar button{border:0;border-radius:8px;padding:9px 13px;background:#e3ebf5;color:#173f75;font-weight:700;}
+#asidoUnifiedBookkeepingFrame{display:block;width:100%;height:calc(100% - 54px);border:0;background:#edf2f8;}
+</style>
+<div id="asidoUnifiedBookkeepingShell" aria-hidden="true">
+  <div class="unified-toolbar">
+    <button type="button" id="asidoUnifiedBack">← Nota Digital</button>
+    <span>Pembukuan ASIDO</span>
+  </div>
+  <iframe id="asidoUnifiedBookkeepingFrame" title="Pembukuan ASIDO"></iframe>
+</div>
+<script>
+(function(){
+  const shell=document.getElementById('asidoUnifiedBookkeepingShell');
+  const frame=document.getElementById('asidoUnifiedBookkeepingFrame');
+  const openBtn=document.getElementById('openUnifiedBookkeeping');
+  const backBtn=document.getElementById('asidoUnifiedBack');
+  const bookHtml=decodeURIComponent(escape(atob('PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImlkIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEsdmlld3BvcnQtZml0PWNvdmVyIj4KPG1ldGEgbmFtZT0idGhlbWUtY29sb3IiIGNvbnRlbnQ9IiMxNDNjNzMiPgo8dGl0bGU+UGVtYnVrdWFuIEFTSURPPC90aXRsZT4KPHN0eWxlPgo6cm9vdHstLWJsdWU6IzE0M2M3MzstLWJsdWUyOiMxZDRmOTE7LS1iZzojZWRmMmY4Oy0tY2FyZDojZmZmOy0taW5rOiMxZDI5Mzk7LS1tdXRlZDojNjg3NTg3Oy0tbGluZTojZGNlM2VjOy0tY2FzaDojMTc2OWMyOy0tdGVtcG86I2M2MjgyODstLWx1bmFzOiMxNzY5YzJ9Cip7Ym94LXNpemluZzpib3JkZXItYm94fWJvZHl7bWFyZ2luOjA7YmFja2dyb3VuZDp2YXIoLS1iZyk7Y29sb3I6dmFyKC0taW5rKTtmb250LWZhbWlseTpBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZjtmb250LXNpemU6MTVweH0udG9we2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEyMGRlZyx2YXIoLS1ibHVlKSwjMjE2NmE3KTtjb2xvcjp3aGl0ZTtwYWRkaW5nOjIycHggMThweCAxOHB4fS50b3AgaDF7bWFyZ2luOjA7Zm9udC1zaXplOjI1cHh9LnRvcCBwe21hcmdpbjo3cHggMCAwO29wYWNpdHk6Ljl9LndyYXB7bWF4LXdpZHRoOjkwMHB4O21hcmdpbjphdXRvO3BhZGRpbmc6MTRweH0uYWN0aW9uc3tkaXNwbGF5OmZsZXg7Z2FwOjlweDtmbGV4LXdyYXA6d3JhcDttYXJnaW46MTJweCAwfS5idG57Ym9yZGVyOjA7Ym9yZGVyLXJhZGl1czoxMHB4O2JhY2tncm91bmQ6I2UzZWJmNTtjb2xvcjojMTczZjc1O2ZvbnQtd2VpZ2h0OjcwMDtmb250LXNpemU6MTVweDtwYWRkaW5nOjEycHggMTRweDttaW4taGVpZ2h0OjQ2cHg7Y3Vyc29yOnBvaW50ZXJ9LmJ0bi5wcmltYXJ5e2JhY2tncm91bmQ6IzE3NjljMjtjb2xvcjojZmZmfS5idG4uZGFya3tiYWNrZ3JvdW5kOiMxNDNjNzM7Y29sb3I6I2ZmZn0uYnRuOmRpc2FibGVke29wYWNpdHk6LjU1fS5jYXJke2JhY2tncm91bmQ6dmFyKC0tY2FyZCk7Ym9yZGVyLXJhZGl1czoxNnB4O3BhZGRpbmc6MTZweDttYXJnaW46MTNweCAwO2JveC1zaGFkb3c6MCAycHggMTJweCAjMGQyMzQwMGF9LmNhcmQgaDJ7Zm9udC1zaXplOjE5cHg7Y29sb3I6dmFyKC0tYmx1ZSk7bWFyZ2luOjAgMCAxM3B4fS5tdXRlZHtjb2xvcjp2YXIoLS1tdXRlZCk7bGluZS1oZWlnaHQ6MS41NX0uc3VtbWFyeXtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCg0LG1pbm1heCgwLDFmcikpO2dhcDo5cHh9Lm1ldHJpY3tib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHg7bWluLXdpZHRoOjB9Lm1ldHJpYyBsYWJlbHtkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLW11dGVkKTttYXJnaW4tYm90dG9tOjZweH0ubWV0cmljIHN0cm9uZ3tkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToxN3B4O292ZXJmbG93LXdyYXA6YW55d2hlcmV9Lm1ldHJpYy5jYXNoIHN0cm9uZ3tjb2xvcjp2YXIoLS1jYXNoKX0ubWV0cmljLnRlbXBvIHN0cm9uZ3tjb2xvcjp2YXIoLS10ZW1wbyl9Lm1ldHJpYy5sdW5hcyBzdHJvbmd7Y29sb3I6dmFyKC0tbHVuYXMpfS5maWx0ZXJze2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcjtnYXA6MTBweH0uZmllbGQgbGFiZWx7ZGlzcGxheTpibG9jaztmb250LXNpemU6MTNweDtmb250LXdlaWdodDo3MDA7Y29sb3I6IzRhNTk2YjttYXJnaW4tYm90dG9tOjZweH0uZmllbGQgc2VsZWN0LC5maWVsZCBpbnB1dHt3aWR0aDoxMDAlO3BhZGRpbmc6MTFweDtib3JkZXI6MXB4IHNvbGlkICNjZmQ4ZTM7Ym9yZGVyLXJhZGl1czo5cHg7YmFja2dyb3VuZDojZmZmO2NvbG9yOiMxZDI5Mzk7Zm9udC1zaXplOjE1cHh9LmRheXttYXJnaW46MTRweCAwIDE4cHh9LmRheWhlYWR7YmFja2dyb3VuZDojZTZlZGY3O2JvcmRlci1yYWRpdXM6MTBweDtwYWRkaW5nOjExcHggMTJweDtmb250LXdlaWdodDo3MDA7Y29sb3I6IzE3M2Y3NTtkaXNwbGF5OmZsZXg7ZmxleC13cmFwOndyYXA7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47Z2FwOjZweH0uZGF5bWV0YXtmb250LXdlaWdodDo0MDA7Y29sb3I6IzUzNjU3ZDtmb250LXNpemU6MTJweH0udGFibGV3cmFwe292ZXJmbG93LXg6YXV0b310YWJsZXt3aWR0aDoxMDAlO2JvcmRlci1jb2xsYXBzZTpjb2xsYXBzZTttaW4td2lkdGg6NTQwcHh9dGgsdGR7cGFkZGluZzoxMHB4IDhweDt0ZXh0LWFsaWduOmxlZnQ7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgdmFyKC0tbGluZSk7dmVydGljYWwtYWxpZ246bWlkZGxlfXRoe2ZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLW11dGVkKTtmb250LXdlaWdodDo3MDB9dGQuYW1vdW50e3RleHQtYWxpZ246cmlnaHQ7Zm9udC13ZWlnaHQ6NzAwO3doaXRlLXNwYWNlOm5vd3JhcH10ZC5kYXRle3doaXRlLXNwYWNlOm5vd3JhcDtjb2xvcjojNTI2MTc2O2ZvbnQtc2l6ZToxM3B4fS5zdGF0dXNzZWxlY3R7Ym9yZGVyOjFweCBzb2xpZCAjY2JkNWUxO2JhY2tncm91bmQ6d2hpdGU7Ym9yZGVyLXJhZGl1czo4cHg7cGFkZGluZzo4cHg7bWluLXdpZHRoOjEwMHB4O2ZvbnQtd2VpZ2h0OjcwMH0uc3RhdHVzc2VsZWN0LmNhc2h7Y29sb3I6dmFyKC0tY2FzaCl9LnN0YXR1c3NlbGVjdC50ZW1wb3tjb2xvcjp2YXIoLS10ZW1wbyl9LnN0YXR1c3NlbGVjdC5sdW5hc3tjb2xvcjp2YXIoLS1sdW5hcyk7Ym9yZGVyLWNvbG9yOnZhcigtLWx1bmFzKX0ucGF5cGx1c3tkaXNwbGF5OmJsb2NrO3dpZHRoOjEwMCU7Ym9yZGVyOjA7YmFja2dyb3VuZDojMTc2OWMyO2NvbG9yOiNmZmY7Ym9yZGVyLXJhZGl1czo4cHg7cGFkZGluZzoxMXB4IDEycHg7Zm9udC13ZWlnaHQ6NzAwO2ZvbnQtc2l6ZToxNHB4O21hcmdpbjo4cHggMCAwO2N1cnNvcjpwb2ludGVyfS5wYXltZW50bG9ne2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM1MzY1N2Q7bWFyZ2luLXRvcDo3cHg7bGluZS1oZWlnaHQ6MS41NX0ucGF5bW9kYWx7cG9zaXRpb246Zml4ZWQ7aW5zZXQ6MDtiYWNrZ3JvdW5kOiMxMDI0M2RjYztkaXNwbGF5Om5vbmU7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7cGFkZGluZzoxOHB4O3otaW5kZXg6OTk5OX0ucGF5bW9kYWwub3BlbntkaXNwbGF5OmZsZXh9LnBheWJveHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNnB4O3BhZGRpbmc6MThweDt3aWR0aDptaW4oMTAwJSw0MjBweCk7Ym94LXNoYWRvdzowIDEycHggNDBweCAjMDAwNH0ucGF5Ym94IGgze21hcmdpbjowIDAgMTRweDtjb2xvcjojMTQzYzczO2ZvbnQtc2l6ZToyMHB4fS5wYXlib3ggbGFiZWx7ZGlzcGxheTpibG9jaztmb250LXdlaWdodDo3MDA7Y29sb3I6IzQzNTI2NzttYXJnaW46MTJweCAwIDZweH0ucGF5Ym94IGlucHV0e3dpZHRoOjEwMCU7cGFkZGluZzoxMnB4O2JvcmRlcjoxcHggc29saWQgI2NmZDhlMztib3JkZXItcmFkaXVzOjlweDtmb250LXNpemU6MTZweH0ucGF5Ym94IC5hY3Rpb25ze21hcmdpbi10b3A6MTZweH0ucGF5Ym94IC5zYXZlcGF5e2JhY2tncm91bmQ6IzE3NjljMjtjb2xvcjojZmZmfS5wYXlib3ggLmNhbmNlbHBheXtiYWNrZ3JvdW5kOiNlOGVkZjQ7Y29sb3I6IzE3M2Y3NX0ucGF5bWVudGxvZ3tmb250LXNpemU6MTFweDtjb2xvcjojNTM2NTdkO21hcmdpbi10b3A6NXB4O2xpbmUtaGVpZ2h0OjEuNDV9LmR1ZXtmb250LXNpemU6MTJweDtjb2xvcjp2YXIoLS10ZW1wbyk7bWFyZ2luLXRvcDo1cHh9LnJlbWluZHtmb250LXNpemU6MTJweDtwYWRkaW5nOjhweCA5cHg7bWFyZ2luLXRvcDo1cHg7Ym9yZGVyLXJhZGl1czo4cHg7Ym9yZGVyOjA7YmFja2dyb3VuZDojZmZmMGRjO2NvbG9yOiM4NzUwMGY7Zm9udC13ZWlnaHQ6NzAwfS5lbXB0eXt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nOjI1cHggMTBweDtjb2xvcjp2YXIoLS1tdXRlZCl9LmZvb3R7Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tbXV0ZWQpO2xpbmUtaGVpZ2h0OjEuNTttYXJnaW46MThweCA0cHh9LnN0YXR1c3tiYWNrZ3JvdW5kOiNlZWY3ZjE7Ym9yZGVyOjFweCBzb2xpZCAjY2NlOGQ1O2NvbG9yOiMxNzY0M2Q7cGFkZGluZzoxMHB4O2JvcmRlci1yYWRpdXM6OXB4O21hcmdpbjoxMHB4IDA7ZGlzcGxheTpub25lfS5ncm91cC1zdW17Zm9udC1zaXplOjEycHg7Y29sb3I6IzUzNjU3ZDttYXJnaW46N3B4IDJweCAycHh9LnBpbGx7ZGlzcGxheTppbmxpbmUtYmxvY2s7Ym9yZGVyLXJhZGl1czoxMDBweDtwYWRkaW5nOjNweCA4cHg7Zm9udC1zaXplOjExcHg7YmFja2dyb3VuZDojZWRmMmY4O2NvbG9yOiM1MzY1N2R9CkBtZWRpYShtYXgtd2lkdGg6NTIwcHgpey5zdW1tYXJ5e2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyfS5tZXRyaWMudG90YWx7Z3JpZC1jb2x1bW46MS8tMX0uZmlsdGVyc3tncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyfS53cmFwe3BhZGRpbmc6MTBweH0uY2FyZHtwYWRkaW5nOjEzcHh9LnRvcHtwYWRkaW5nOjE5cHggMTRweH19CkBtZWRpYSBwcmludHtib2R5e2JhY2tncm91bmQ6d2hpdGV9LnRvcHtiYWNrZ3JvdW5kOndoaXRlO2NvbG9yOiMxNDNjNzM7cGFkZGluZzowIDAgMTJweH0ud3JhcHttYXgtd2lkdGg6bm9uZTtwYWRkaW5nOjB9LmFjdGlvbnMsLmZpbHRlcnMsLnJlbWluZCwuYnRuLC5mb290e2Rpc3BsYXk6bm9uZSFpbXBvcnRhbnR9LmNhcmR7Ym94LXNoYWRvdzpub25lO2JvcmRlcjowO3BhZGRpbmc6MH0uZGF5aGVhZHtiYWNrZ3JvdW5kOiNlZWU7cHJpbnQtY29sb3ItYWRqdXN0OmV4YWN0fS5zdGF0dXNzZWxlY3R7Ym9yZGVyOjA7cGFkZGluZzowO2FwcGVhcmFuY2U6bm9uZX10YWJsZXttaW4td2lkdGg6MH10aCx0ZHtmb250LXNpemU6MTFweDtwYWRkaW5nOjZweCA0cHh9fQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8aGVhZGVyIGNsYXNzPSJ0b3AiPjxoMT5QZW1idWt1YW4gQVNJRE88L2gxPjxwPkxhcG9yYW4gcGVuanVhbGFuIGhhcmlhbiDCtyBDYXNoIMK3IFRlbXBvIMK3IEx1bmFzIMK3IFBlbWJheWFyYW4gYmVydGFoYXA8L3A+PC9oZWFkZXI+CjxtYWluIGNsYXNzPSJ3cmFwIj4KIDxkaXYgY2xhc3M9ImFjdGlvbnMiPgogIDxhIGNsYXNzPSJidG4gZGFyayIgaHJlZj0iI25vdGEiIGlkPSJ1bmlmaWVkQmFja1RvTm90YSIgc3R5bGU9InRleHQtZGVjb3JhdGlvbjpub25lO2Rpc3BsYXk6aW5saW5lLWZsZXg7YWxpZ24taXRlbXM6Y2VudGVyIj7ihpAgS2VtYmFsaSBrZSBOb3RhIERpZ2l0YWw8L2E+CiAgPGJ1dHRvbiBjbGFzcz0iYnRuIiBpZD0icmVmcmVzaCI+TXVhdCB1bGFuZyBkYXRhIG5vdGE8L2J1dHRvbj4KICA8YnV0dG9uIGNsYXNzPSJidG4iIGlkPSJwcmludCI+Q2V0YWsgbGFwb3JhbjwvYnV0dG9uPgogPC9kaXY+CiA8c2VjdGlvbiBjbGFzcz0iY2FyZCI+CiAgPGgyPlJpbmdrYXNhbiBQZW1idWt1YW48L2gyPgogIDxkaXYgY2xhc3M9InN1bW1hcnkiPgogICA8ZGl2IGNsYXNzPSJtZXRyaWMgdG90YWwiPjxsYWJlbD5Ub3RhbCBwZW5qdWFsYW48L2xhYmVsPjxzdHJvbmcgaWQ9ImFsbFRvdGFsIj5ScDA8L3N0cm9uZz48L2Rpdj4KICAgPGRpdiBjbGFzcz0ibWV0cmljIGNhc2giPjxsYWJlbD5DYXNoPC9sYWJlbD48c3Ryb25nIGlkPSJjYXNoVG90YWwiPlJwMDwvc3Ryb25nPjwvZGl2PgogICA8ZGl2IGNsYXNzPSJtZXRyaWMgdGVtcG8iPjxsYWJlbD5TaXNhIFRlbXBvPC9sYWJlbD48c3Ryb25nIGlkPSJ0ZW1wb1RvdGFsIj5ScDA8L3N0cm9uZz48L2Rpdj4KICAgPGRpdiBjbGFzcz0ibWV0cmljIGx1bmFzIj48bGFiZWw+THVuYXM8L2xhYmVsPjxzdHJvbmcgaWQ9Imx1bmFzVG90YWwiPlJwMDwvc3Ryb25nPjwvZGl2PgogIDwvZGl2PgogIDxwIGNsYXNzPSJtdXRlZCIgaWQ9InJlcG9ydE1ldGEiIHN0eWxlPSJtYXJnaW46MTJweCAwIDAiPkRhdGEgZGliYWNhIGxhbmdzdW5nIGRhcmkgUml3YXlhdCBOb3RhIHBhZGEgcGVyYW5na2F0IGluaS48L3A+CiA8L3NlY3Rpb24+CiA8c2VjdGlvbiBjbGFzcz0iY2FyZCI+CiAgPGgyPkRhZnRhciBUcmFuc2Frc2k8L2gyPgogIDxkaXYgY2xhc3M9ImZpbHRlcnMiPgogICA8ZGl2IGNsYXNzPSJmaWVsZCI+PGxhYmVsIGZvcj0ibW9udGhGaWx0ZXIiPlBpbGloIGJ1bGFuPC9sYWJlbD48aW5wdXQgaWQ9Im1vbnRoRmlsdGVyIiB0eXBlPSJtb250aCI+PC9kaXY+CiAgIDxkaXYgY2xhc3M9ImZpZWxkIj48bGFiZWwgZm9yPSJzdGF0dXNGaWx0ZXIiPktldGVyYW5nYW4gcGVtYmF5YXJhbjwvbGFiZWw+PHNlbGVjdCBpZD0ic3RhdHVzRmlsdGVyIj48b3B0aW9uIHZhbHVlPSJhbGwiPlNlbXVhOiBDYXNoICsgVGVtcG8gKyBMdW5hczwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IkNhc2giPkNhc2g8L29wdGlvbj48b3B0aW9uIHZhbHVlPSJUZW1wbyI+VGVtcG88L29wdGlvbj48b3B0aW9uIHZhbHVlPSJMdW5hcyI+THVuYXM8L29wdGlvbj48L3NlbGVjdD48L2Rpdj4KICA8L2Rpdj4KICA8ZGl2IGNsYXNzPSJhY3Rpb25zIj48YnV0dG9uIGNsYXNzPSJidG4iIGlkPSJjbGVhckZpbHRlcnMiPlRhbXBpbGthbiBzZW11YTwvYnV0dG9uPjxidXR0b24gY2xhc3M9ImJ0biBwcmltYXJ5IiBpZD0icmVtaW5kQWxsVGVtcG8iPvCfk4UgSmFkd2Fsa2FuIHNlbXVhIFRlbXBvICszMCBoYXJpPC9idXR0b24+PC9kaXY+CiAgPGRpdiBpZD0ic3RhdHVzIiBjbGFzcz0ic3RhdHVzIiByb2xlPSJzdGF0dXMiPjwvZGl2PgogIDxkaXYgaWQ9InRyYW5zYWN0aW9ucyI+PC9kaXY+CiA8L3NlY3Rpb24+CiA8ZGl2IGNsYXNzPSJwYXltb2RhbCIgaWQ9InBheU1vZGFsIiByb2xlPSJkaWFsb2ciIGFyaWEtbW9kYWw9InRydWUiIGFyaWEtbGFiZWxsZWRieT0icGF5VGl0bGUiPjxkaXYgY2xhc3M9InBheWJveCI+PGgzIGlkPSJwYXlUaXRsZSI+77yLIENhdGF0IFBlbWJheWFyYW48L2gzPjxwIGlkPSJwYXlJbnZvaWNlSW5mbyIgY2xhc3M9Im11dGVkIj48L3A+PGxhYmVsIGZvcj0icGF5QW1vdW50Ij5Ob21pbmFsIGNpY2lsYW4gKFJwKTwvbGFiZWw+PGlucHV0IGlkPSJwYXlBbW91bnQiIHR5cGU9Im51bWJlciIgbWluPSIxIiBzdGVwPSIxIiBpbnB1dG1vZGU9Im51bWVyaWMiIHBsYWNlaG9sZGVyPSJDb250b2g6IDEwMDAwMCI+PGxhYmVsIGZvcj0icGF5RGF0ZSI+VGFuZ2dhbCBwZW1iYXlhcmFuPC9sYWJlbD48aW5wdXQgaWQ9InBheURhdGUiIHR5cGU9ImRhdGUiPjxkaXYgY2xhc3M9ImFjdGlvbnMiPjxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0iYnRuIGNhbmNlbHBheSIgaWQ9ImNhbmNlbFBheSI+QmF0YWw8L2J1dHRvbj48YnV0dG9uIHR5cGU9ImJ1dHRvbiIgY2xhc3M9ImJ0biBzYXZlcGF5IiBpZD0ic2F2ZVBheSI+U2ltcGFuIHBlbWJheWFyYW48L2J1dHRvbj48L2Rpdj48L2Rpdj48L2Rpdj4KIDxwIGNsYXNzPSJmb290Ij5DYXRhdGFuOiB0cmFuc2Frc2kgZGVuZ2FuIGtldGVyYW5nYW4g4oCcdGVtcG/igJ0sIOKAnGJvbuKAnSwg4oCccGl1dGFuZ+KAnSwg4oCcdHJhbnNmZXLigJ0sIGF0YXUg4oCcYmVsdW0gYmF5YXLigJ0gcGFkYSBjYXRhdGFuIG5vdGEgYWthbiBkaWtlbmFsaSBzZWJhZ2FpIFRlbXBvLiBUcmFuc2Frc2kgbGFpbm55YSBtdWxhaSBzZWJhZ2FpIENhc2guIENhc2ggZGljYXRhdCBzZWJhZ2FpIHBlbWJheWFyYW4gcGVudWggcGFkYSB0YW5nZ2FsIG5vdGEuIFRlbXBvIGRhcGF0IG1lbmVyaW1hIHBlbWJheWFyYW4gYmVya2FsaS1rYWxpIG1lbGFsdWkgdG9tYm9sIO+8iyBQZW1iYXlhcmFuLiBTZXRpYXAgcGVtYmF5YXJhbiBtZW55aW1wYW4gbm9taW5hbCwgdGFuZ2dhbCBsZW5na2FwLCBkYW4gd2FrdHUgcGVuY2F0YXRhbi4gU3RhdHVzIEx1bmFzIGRpdGV0YXBrYW4gb3RvbWF0aXMgaGFueWEga2V0aWthIHRvdGFsIHBlbWJheWFyYW4gc2FtYSBkZW5nYW4gdG90YWwgbm90YTsgdGFuZ2dhbCBwZWx1bmFzYW4gdGVyYWtoaXIgZGlzaW1wYW4gdGVycGlzYWggZGFyaSB0YW5nZ2FsIG5vdGEuIFBlbWJheWFyYW4geWFuZyBtZWxlYmloaSBzaXNhIHRhZ2loYW4gZGl0b2xhay4gUGVydWJhaGFuIGtldGVyYW5nYW4gZGlzaW1wYW4gZGkgcGVyYW5na2F0IGluaSBkYW4gdGlkYWsgbWVuZ3ViYWggbm90YSBhc2xpbnlhLiBOb3RhIGRlbmdhbiB0YW5nZ2FsIHNhbWEgZGlrZWxvbXBva2thbiBiZXJzYW1hOyB0b3RhbCBoYXJpYW4gZGFuIHRvdGFsIENhc2gvVGVtcG8gZGloaXR1bmcgb3RvbWF0aXMuPC9wPgo8L21haW4+CjxzY3JpcHQ+CihmdW5jdGlvbigpewogY29uc3QgJD1pZD0+ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaWQpOwogY29uc3QgbW9uZXk9bj0+J1JwJytNYXRoLnJvdW5kKE51bWJlcihuKXx8MCkudG9Mb2NhbGVTdHJpbmcoJ2lkLUlEJyk7CiBjb25zdCBlc2NhcGVIdG1sPXM9PlN0cmluZyhzPz8nJykucmVwbGFjZSgvWyY8PiInXS9nLGNoPT4oeycmJzonJmFtcDsnLCc8JzonJmx0OycsJz4nOicmZ3Q7JywnIic6JyZxdW90OycsIiciOicmIzM5Oyd9W2NoXSkpOwogY29uc3Qgc3RhdHVzU3RvcmVLZXk9J2FzaWRvX25ld2FwcF92MV9ib29ra2VlcGluZ19zdGF0dXMnOwogY29uc3QgcGF5bWVudFN0b3JlS2V5PSdhc2lkb19uZXdhcHBfdjFfYm9va2tlZXBpbmdfcGF5bWVudHMnOwogY29uc3QgcGFpZERhdGVTdG9yZUtleT0nYXNpZG9fbmV3YXBwX3YxX2Jvb2trZWVwaW5nX3BhaWRfZGF0ZXMnOwogbGV0IHBhaWREYXRlTWFwPXt9OwogdHJ5e3BhaWREYXRlTWFwPUpTT04ucGFyc2UobG9jYWxTdG9yYWdlLmdldEl0ZW0ocGFpZERhdGVTdG9yZUtleSl8fCd7fScpfHx7fTt9Y2F0Y2goXyl7cGFpZERhdGVNYXA9e307fQogbGV0IHBheW1lbnRNYXA9e307CiB0cnl7cGF5bWVudE1hcD1KU09OLnBhcnNlKGxvY2FsU3RvcmFnZS5nZXRJdGVtKHBheW1lbnRTdG9yZUtleSl8fCd7fScpfHx7fTt9Y2F0Y2goXyl7cGF5bWVudE1hcD17fTt9CiBsZXQgaGlzdG9yeURhdGE9W107CiBsZXQgc3RhdHVzTWFwPXt9OwogdHJ5e3N0YXR1c01hcD1KU09OLnBhcnNlKGxvY2FsU3RvcmFnZS5nZXRJdGVtKHN0YXR1c1N0b3JlS2V5KXx8J3t9Jyl8fHt9O31jYXRjaChfKXtzdGF0dXNNYXA9e307fQogY29uc3Qgc2hvd1N0YXR1cz1tc2c9Pntjb25zdCBlbD0kKCdzdGF0dXMnKTtlbC50ZXh0Q29udGVudD1tc2c7ZWwuc3R5bGUuZGlzcGxheT0nYmxvY2snO307CiBjb25zdCBoaWRlU3RhdHVzPSgpPT57JCgnc3RhdHVzJykuc3R5bGUuZGlzcGxheT0nbm9uZSc7fTsKIGZ1bmN0aW9uIGludm9pY2VLZXkoaCl7CiAgcmV0dXJuIFN0cmluZyhoLmlkfHxbaC5kYXRlfHwnJyxoLmN1c3RvbWVyfHwnJyxoLnNhdmVkQXR8fCcnLGgudG90YWw/PycnXS5qb2luKCd8JykpOwogfQogZnVuY3Rpb24gZ3Vlc3NTdGF0dXMoaCl7CiAgY29uc3Qga2V5PWludm9pY2VLZXkoaCk7CiAgaWYoWydDYXNoJywnVGVtcG8nLCdMdW5hcyddLmluY2x1ZGVzKHN0YXR1c01hcFtrZXldKSlyZXR1cm4gc3RhdHVzTWFwW2tleV07CiAgaWYoWydDYXNoJywnVGVtcG8nLCdMdW5hcyddLmluY2x1ZGVzKGgucGF5bWVudFN0YXR1cykpcmV0dXJuIGgucGF5bWVudFN0YXR1czsKICBjb25zdCBub3RlPVN0cmluZyhoLm5vdGVzfHwnJykudG9Mb2NhbGVMb3dlckNhc2UoJ2lkJyk7CiAgaWYoL1xiKHRlbXBvfGJvbnxwaXV0YW5nfGJlbHVtIGJheWFyfGJlbHVtIGRpYmF5YXJ8dGFnaWh8amF0dWggdGVtcG98dHJhbnNmZXJ8YmF5YXIgbmFudGl8a3JlZGl0KVxiLy50ZXN0KG5vdGUpKXJldHVybiAnVGVtcG8nOwogIHJldHVybiAnQ2FzaCc7CiB9CiBmdW5jdGlvbiBkYXlEYXRlKGRhdGUpewogIGlmKCEvXlxkezR9LVxkezJ9LVxkezJ9JC8udGVzdChTdHJpbmcoZGF0ZXx8JycpKSlyZXR1cm4gbnVsbDsKICBjb25zdCBbeSxtLGRdPWRhdGUuc3BsaXQoJy0nKS5tYXAoTnVtYmVyKTsKICBjb25zdCBkdD1uZXcgRGF0ZSh5LG0tMSxkLDEyLDAsMCk7CiAgcmV0dXJuIE51bWJlci5pc05hTihkdC5nZXRUaW1lKCkpP251bGw6ZHQ7CiB9CiBmdW5jdGlvbiBkaXNwbGF5RGF0ZShkYXRlKXsKICBjb25zdCBkdD1kYXlEYXRlKGRhdGUpOwogIHJldHVybiBkdD9kdC50b0xvY2FsZURhdGVTdHJpbmcoJ2lkLUlEJyx7ZGF5OicyLWRpZ2l0Jyxtb250aDonbG9uZycseWVhcjonbnVtZXJpYyd9KTooZGF0ZXx8J1RhbmdnYWwgdGlkYWsgdGVyc2VkaWEnKTsKIH0KIGZ1bmN0aW9uIGFkZERheXMoZGF0ZSxkYXlzKXsKICBjb25zdCBkdD1kYXlEYXRlKGRhdGUpO2lmKCFkdClyZXR1cm4gbnVsbDsKICBkdC5zZXREYXRlKGR0LmdldERhdGUoKStkYXlzKTsKICByZXR1cm4gZHQ7CiB9CiBmdW5jdGlvbiBmb3JtYXRTbGFzaChkdCl7CiAgcmV0dXJuIFN0cmluZyhkdC5nZXREYXRlKCkpLnBhZFN0YXJ0KDIsJzAnKSsnLycrU3RyaW5nKGR0LmdldE1vbnRoKCkrMSkucGFkU3RhcnQoMiwnMCcpKycvJytkdC5nZXRGdWxsWWVhcigpOwogfQogZnVuY3Rpb24gZHVlTGFiZWwoaCl7CiAgY29uc3QgZHQ9YWRkRGF5cyhoLmRhdGUsMzApO3JldHVybiBkdD9mb3JtYXRTbGFzaChkdCk6J1RhbmdnYWwgbm90YSBiZWx1bSB2YWxpZCc7CiB9CiBmdW5jdGlvbiB0b3RhbE9mKGgpewogIGlmKE51bWJlci5pc0Zpbml0ZShOdW1iZXIoaC50b3RhbCkpKXJldHVybiBOdW1iZXIoaC50b3RhbCk7CiAgcmV0dXJuIChoLml0ZW1zfHxbXSkucmVkdWNlKChzdW0scik9PnN1bSsoTnVtYmVyKHIucXR5KXx8MCkqKE51bWJlcihyLnByaWNlKXx8MCksMCk7CiB9CiBmdW5jdGlvbiBsb2FkRGF0YSgpewogIGhpZGVTdGF0dXMoKTsKICB0cnl7CiAgIGNvbnN0IGRhdGE9SlNPTi5wYXJzZShsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnYXNpZG9fbmV3YXBwX3YxX2hpc3RvcnknKXx8J1tdJyk7CiAgIGhpc3RvcnlEYXRhPUFycmF5LmlzQXJyYXkoZGF0YSk/ZGF0YTpbXTsKICAgbGV0IHNlZWRlZD1mYWxzZTsKICAgZm9yKGNvbnN0IGggb2YgaGlzdG9yeURhdGEpewogICAgY29uc3Qga2V5PWludm9pY2VLZXkoaCk7CiAgICBpZihndWVzc1N0YXR1cyhoKT09PSdDYXNoJyAmJiAhKHBheW1lbnRNYXBba2V5XXx8W10pLmxlbmd0aCl7CiAgICAgY29uc3QgdG90YWw9dG90YWxPZihoKTsKICAgICBpZih0b3RhbD4wKXtwYXltZW50TWFwW2tleV09W3thbW91bnQ6dG90YWwsZGF0ZTpTdHJpbmcoaC5kYXRlfHxuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCkuc2xpY2UoMCwxMCkpLGNyZWF0ZWRBdDpTdHJpbmcoaC5zYXZlZEF0fHxuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCkpLG1ldGhvZDonQ2FzaCd9XTtzdGF0dXNNYXBba2V5XT0nQ2FzaCc7c2VlZGVkPXRydWU7fQogICAgfQogICB9CiAgIGlmKHNlZWRlZCl7bG9jYWxTdG9yYWdlLnNldEl0ZW0ocGF5bWVudFN0b3JlS2V5LEpTT04uc3RyaW5naWZ5KHBheW1lbnRNYXApKTtsb2NhbFN0b3JhZ2Uuc2V0SXRlbShzdGF0dXNTdG9yZUtleSxKU09OLnN0cmluZ2lmeShzdGF0dXNNYXApKTt9CiAgfWNhdGNoKGUpe2hpc3RvcnlEYXRhPVtdO3Nob3dTdGF0dXMoJ0RhdGEgUml3YXlhdCBOb3RhIHRpZGFrIGRhcGF0IGRpYmFjYS4gSmFuZ2FuIGhhcHVzIHBlbnlpbXBhbmFuIGFwbGlrYXNpLicpO30KICByZW5kZXIoKTsKIH0KIGZ1bmN0aW9uIGZpbHRlcmVkUm93cygpewogIGNvbnN0IG1vbnRoPSQoJ21vbnRoRmlsdGVyJykudmFsdWU7CiAgY29uc3QgZmlsdGVyPSQoJ3N0YXR1c0ZpbHRlcicpLnZhbHVlOwogIHJldHVybiBoaXN0b3J5RGF0YS5tYXAoKGgsaW5kZXgpPT4oe2gsaW5kZXgsa2V5Omludm9pY2VLZXkoaCksc3RhdHVzOmd1ZXNzU3RhdHVzKGgpLHRvdGFsOnRvdGFsT2YoaCl9KSkKICAgLmZpbHRlcih4PT4oIW1vbnRofHxTdHJpbmcoeC5oLmRhdGV8fCcnKS5zdGFydHNXaXRoKG1vbnRoKSkmJihmaWx0ZXI9PT0nYWxsJ3x8eC5zdGF0dXM9PT1maWx0ZXIpKQogICAuc29ydCgoYSxiKT0+U3RyaW5nKGIuaC5kYXRlfHwnJykubG9jYWxlQ29tcGFyZShTdHJpbmcoYS5oLmRhdGV8fCcnKSl8fFN0cmluZyhiLmguc2F2ZWRBdHx8JycpLmxvY2FsZUNvbXBhcmUoU3RyaW5nKGEuaC5zYXZlZEF0fHwnJykpKTsKIH0KIGZ1bmN0aW9uIHJlbmRlcigpewogIGNvbnN0IHJvd3M9ZmlsdGVyZWRSb3dzKCk7CiAgY29uc3QgY2FzaD1yb3dzLmZpbHRlcih4PT54LnN0YXR1cz09PSdDYXNoJykucmVkdWNlKChzLHgpPT5zK3gudG90YWwsMCk7CiAgY29uc3QgbHVuYXM9cm93cy5maWx0ZXIoeD0+eC5zdGF0dXM9PT0nTHVuYXMnKS5yZWR1Y2UoKHMseCk9PnMreC50b3RhbCwwKTsKICBjb25zdCB0ZW1wbz1yb3dzLmZpbHRlcih4PT54LnN0YXR1cz09PSdUZW1wbycpLnJlZHVjZSgocyx4KT0+cytNYXRoLm1heCgwLHgudG90YWwtKHBheW1lbnRNYXBbeC5rZXldfHxbXSkucmVkdWNlKChhLHApPT5hKyhOdW1iZXIocC5hbW91bnQpfHwwKSwwKSksMCk7CiAgY29uc3QgdG90YWw9Y2FzaCtsdW5hcyt0ZW1wbzsKICAkKCdhbGxUb3RhbCcpLnRleHRDb250ZW50PW1vbmV5KHRvdGFsKTskKCdjYXNoVG90YWwnKS50ZXh0Q29udGVudD1tb25leShjYXNoKTskKCd0ZW1wb1RvdGFsJykudGV4dENvbnRlbnQ9bW9uZXkodGVtcG8pOyQoJ2x1bmFzVG90YWwnKS50ZXh0Q29udGVudD1tb25leShsdW5hcyk7CiAgJCgncmVwb3J0TWV0YScpLnRleHRDb250ZW50PXJvd3MubGVuZ3RoKycgdHJhbnNha3NpIGRpdGFtcGlsa2FuIMK3ICcrbmV3IFNldChyb3dzLm1hcCh4PT54LmguZGF0ZXx8JycpKS5zaXplKycgdGFuZ2dhbCBwZW5qdWFsYW4gwrcgc3VtYmVyOiBSaXdheWF0IE5vdGEgcGVyYW5na2F0IGluaS4nOwogIGlmKCFyb3dzLmxlbmd0aCl7JCgndHJhbnNhY3Rpb25zJykuaW5uZXJIVE1MPSc8ZGl2IGNsYXNzPSJlbXB0eSI+QmVsdW0gYWRhIG5vdGEgcGFkYSBwaWxpaGFuIGZpbHRlciBpbmkuPC9kaXY+JztyZXR1cm47fQogIGNvbnN0IGdyb3Vwcz1uZXcgTWFwKCk7CiAgcm93cy5mb3JFYWNoKHg9Pntjb25zdCBkYXk9eC5oLmRhdGV8fCdUYW5wYSB0YW5nZ2FsJztpZighZ3JvdXBzLmhhcyhkYXkpKWdyb3Vwcy5zZXQoZGF5LFtdKTtncm91cHMuZ2V0KGRheSkucHVzaCh4KTt9KTsKICBsZXQgaHRtbD0nJzsKICBmb3IoY29uc3QgW2RheSxpdGVtc10gb2YgZ3JvdXBzKXsKICAgY29uc3QgZGF5Q2FzaD1pdGVtcy5maWx0ZXIoeD0+eC5zdGF0dXM9PT0nQ2FzaCcpLnJlZHVjZSgocyx4KT0+cyt4LnRvdGFsLDApOwogICBjb25zdCBkYXlMdW5hcz1pdGVtcy5maWx0ZXIoeD0+eC5zdGF0dXM9PT0nTHVuYXMnKS5yZWR1Y2UoKHMseCk9PnMreC50b3RhbCwwKTsKICAgY29uc3QgZGF5VGVtcG89aXRlbXMuZmlsdGVyKHg9Pnguc3RhdHVzPT09J1RlbXBvJykucmVkdWNlKChzLHgpPT5zK01hdGgubWF4KDAseC50b3RhbC0ocGF5bWVudE1hcFt4LmtleV18fFtdKS5yZWR1Y2UoKGEscCk9PmErKE51bWJlcihwLmFtb3VudCl8fDApLDApKSwwKTsKICAgY29uc3QgZGF5QWxsPWRheUNhc2grZGF5THVuYXMrZGF5VGVtcG87CiAgIGh0bWwrPSc8ZGl2IGNsYXNzPSJkYXkiPjxkaXYgY2xhc3M9ImRheWhlYWQiPjxzcGFuPicrZXNjYXBlSHRtbChkaXNwbGF5RGF0ZShkYXkpKSsnPC9zcGFuPjxzcGFuIGNsYXNzPSJkYXltZXRhIj4nK2l0ZW1zLmxlbmd0aCsnIG5vdGEgwrcgVG90YWwgJyttb25leShkYXlBbGwpKyc8L3NwYW4+PC9kaXY+JzsKICAgaHRtbCs9JzxkaXYgY2xhc3M9Imdyb3VwLXN1bSI+Q2FzaCAnK21vbmV5KGRheUNhc2gpKycgJm5ic3A7wrcmbmJzcDsgVGVtcG8gJyttb25leShkYXlUZW1wbykrJyAmbmJzcDvCtyZuYnNwOyBMdW5hcyAnK21vbmV5KGRheUx1bmFzKSsnPC9kaXY+JzsKICAgaHRtbCs9JzxkaXYgY2xhc3M9InRhYmxld3JhcCI+PHRhYmxlPjx0aGVhZD48dHI+PHRoPlRnbDwvdGg+PHRoPk5hbWEgdG9rbzwvdGg+PHRoIHN0eWxlPSJ0ZXh0LWFsaWduOnJpZ2h0Ij5Ub3RhbDwvdGg+PHRoPktldGVyYW5nYW48L3RoPjwvdHI+PC90aGVhZD48dGJvZHk+JzsKICAgZm9yKGNvbnN0IHggb2YgaXRlbXMpewogICAgY29uc3QgY3VzdG9tZXI9U3RyaW5nKHguaC5jdXN0b21lcnx8J1BlbGFuZ2dhbicpOwogICAgY29uc3QgaWQ9ZXNjYXBlSHRtbCh4LmtleSk7CiAgICBjb25zdCBwYXlzPXBheW1lbnRNYXBbeC5rZXldfHxbXTtjb25zdCBwYWlkPXBheXMucmVkdWNlKChhLHApPT5hKyhOdW1iZXIocC5hbW91bnQpfHwwKSwwKTtjb25zdCByZW1haW5pbmc9TWF0aC5tYXgoMCx4LnRvdGFsLXBhaWQpOwogICAgY29uc3QgcGF5bG9nPXBheXMubWFwKChwLGkpPT4nUGVtYmF5YXJhbiAnKyhpKzEpKyc6ICcrZXNjYXBlSHRtbChkaXNwbGF5RGF0ZShwLmRhdGV8fCcnKSkrJyDigJQgJyttb25leShwLmFtb3VudCkpLmpvaW4oJzxicj4nKTsKICAgIGNvbnN0IHBhaWREYXRlPXBhaWREYXRlTWFwW3gua2V5XXx8Jyc7CiAgICBodG1sKz0nPHRyPjx0ZCBjbGFzcz0iZGF0ZSI+Jytlc2NhcGVIdG1sKFN0cmluZyh4LmguZGF0ZXx8Jy0nKSkrJzwvdGQ+PHRkPjxzdHJvbmc+Jytlc2NhcGVIdG1sKGN1c3RvbWVyKSsnPC9zdHJvbmc+JysoeC5oLmlkPyc8ZGl2IGNsYXNzPSJkYXltZXRhIj4nK2VzY2FwZUh0bWwoeC5oLmlkKSsnPC9kaXY+JzonJykrJzwvdGQ+PHRkIGNsYXNzPSJhbW91bnQiPicrbW9uZXkoeC50b3RhbCkrKHBheXMubGVuZ3RoPyc8ZGl2IGNsYXNzPSJkYXltZXRhIj5EaWJheWFyICcrbW9uZXkocGFpZCkrJzxicj5TaXNhICcrbW9uZXkocmVtYWluaW5nKSsnPC9kaXY+JzonJykrJzwvdGQ+PHRkPjxzZWxlY3QgY2xhc3M9InN0YXR1c3NlbGVjdCAnKyh4LnN0YXR1cz09PSdUZW1wbyc/J3RlbXBvJzooeC5zdGF0dXM9PT0nTHVuYXMnPydsdW5hcyc6J2Nhc2gnKSkrJyIgZGF0YS1zdGF0dXMta2V5PSInK2lkKyciPjxvcHRpb24gdmFsdWU9IkNhc2giICcrKHguc3RhdHVzPT09J0Nhc2gnPydzZWxlY3RlZCc6JycpKyc+Q2FzaDwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IlRlbXBvIiAnKyh4LnN0YXR1cz09PSdUZW1wbyc/J3NlbGVjdGVkJzonJykrJz5UZW1wbzwvb3B0aW9uPjxvcHRpb24gdmFsdWU9Ikx1bmFzIiAnKyh4LnN0YXR1cz09PSdMdW5hcyc/J3NlbGVjdGVkJzonJykrJz5MdW5hczwvb3B0aW9uPjwvc2VsZWN0PicrKHguc3RhdHVzPT09J1RlbXBvJz8nPGJ1dHRvbiB0eXBlPSJidXR0b24iIGNsYXNzPSJwYXlwbHVzIiBkYXRhLXBheT0iJytpZCsnIj7vvIsgUGVtYmF5YXJhbjwvYnV0dG9uPic6JycpKyhwYXlsb2c/JzxkaXYgY2xhc3M9InBheW1lbnRsb2ciPlJpd2F5YXQgcGVtYmF5YXJhbjo8YnI+JytwYXlsb2crJzwvZGl2Pic6JycpKyhwYWlkRGF0ZT8nPGRpdiBjbGFzcz0icGF5bWVudGxvZyI+PHN0cm9uZz5UYW5nZ2FsIHBlbHVuYXNhbjogJytlc2NhcGVIdG1sKGRpc3BsYXlEYXRlKHBhaWREYXRlKSkrJzwvc3Ryb25nPjwvZGl2Pic6JycpKyh4LnN0YXR1cz09PSdUZW1wbyc/JzxkaXYgY2xhc3M9ImR1ZSI+SmF0dWggdGVtcG86ICcrZXNjYXBlSHRtbChkdWVMYWJlbCh4LmgpKSsnPC9kaXY+PGJ1dHRvbiB0eXBlPSJidXR0b24iIGNsYXNzPSJyZW1pbmQiIGRhdGEtcmVtaW5kPSInK2lkKyciPvCfk4UgQnVhdCBwZW5naW5nYXQgMzAgaGFyaTwvYnV0dG9uPic6JycpKyc8L3RkPjwvdHI+JzsKICAgfQogICBodG1sKz0nPC90Ym9keT48L3RhYmxlPjwvZGl2PjwvZGl2Pic7CiAgfQogICQoJ3RyYW5zYWN0aW9ucycpLmlubmVySFRNTD1odG1sOwogICQoJ3RyYW5zYWN0aW9ucycpLnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLXN0YXR1cy1rZXldJykuZm9yRWFjaChzZWw9PnNlbC5hZGRFdmVudExpc3RlbmVyKCdjaGFuZ2UnLCgpPT57CiAgIGNvbnN0IGtleT1zZWwuZGF0YXNldC5zdGF0dXNLZXk7Y29uc3Qgcm93PXJvd3MuZmluZChyPT5yLmtleT09PWtleSk7aWYoIXJvdylyZXR1cm47CiAgIGNvbnN0IHBheXM9cGF5bWVudE1hcFtrZXldfHxbXTtjb25zdCBwYWlkPXBheXMucmVkdWNlKChhLHApPT5hKyhOdW1iZXIocC5hbW91bnQpfHwwKSwwKTtjb25zdCByZW1haW5pbmc9TWF0aC5tYXgoMCxyb3cudG90YWwtcGFpZCk7CiAgIGlmKHNlbC52YWx1ZT09PSdMdW5hcycpewogICAgYWxlcnQoJ1N0YXR1cyBMdW5hcyB0aWRhayBkYXBhdCBkaXBpbGloIG1hbnVhbC4gQ2F0YXQgcGVtYmF5YXJhbiBtZWxhbHVpIHRvbWJvbCDvvIsgUGVtYmF5YXJhbiBzYW1wYWkgc2VsdXJ1aCB0YWdpaGFuIHRlcmJheWFyLiBTaXNhIHNhYXQgaW5pOiAnK21vbmV5KHJlbWFpbmluZykrJy4nKTsKICAgIHJlbmRlcigpO3JldHVybjsKICAgfQogICBpZihzZWwudmFsdWU9PT0nQ2FzaCcpewogICAgaWYocGF5cy5sZW5ndGggJiYgIShwYXlzLmxlbmd0aD09PTEgJiYgcGF5c1swXS5tZXRob2Q9PT0nQ2FzaCcpKXthbGVydCgnU3RhdHVzIHRpZGFrIGRhcGF0IGRpdWJhaCBtZW5qYWRpIENhc2gga2FyZW5hIHN1ZGFoIGFkYSByaXdheWF0IGNpY2lsYW4uIFJpd2F5YXQgcGVtYmF5YXJhbiBoYXJ1cyBkaXBlcnRhaGFua2FuLicpO3JlbmRlcigpO3JldHVybjt9CiAgICBjb25zdCBvaz1jb25maXJtKCdUYW5kYWkgdHJhbnNha3NpIGluaSBzZWJhZ2FpIENhc2ggKGRpYmF5YXIgcGVudWggcGFkYSB0YW5nZ2FsIG5vdGEpPycpO2lmKCFvayl7cmVuZGVyKCk7cmV0dXJuO30KICAgIHBheW1lbnRNYXBba2V5XT1be2Ftb3VudDpyb3cudG90YWwsZGF0ZTpTdHJpbmcocm93LmguZGF0ZXx8bmV3IERhdGUoKS50b0lTT1N0cmluZygpLnNsaWNlKDAsMTApKSxjcmVhdGVkQXQ6bmV3IERhdGUoKS50b0lTT1N0cmluZygpLG1ldGhvZDonQ2FzaCd9XTsKICAgIGRlbGV0ZSBwYWlkRGF0ZU1hcFtrZXldO3N0YXR1c01hcFtrZXldPSdDYXNoJzsKICAgfWVsc2V7CiAgICBpZihwYXlzLmxlbmd0aCAmJiAhKHBheXMubGVuZ3RoPT09MSAmJiBwYXlzWzBdLm1ldGhvZD09PSdDYXNoJykgJiYgcGFpZD49cm93LnRvdGFsKXthbGVydCgnVHJhbnNha3NpIGluaSBzdWRhaCB0ZXJjYXRhdCBkaWJheWFyIHBlbnVoLiBSaXdheWF0IHBlbWJheWFyYW4gdGlkYWsgZGFwYXQgZGl1YmFoIG1lbmphZGkgVGVtcG8uJyk7cmVuZGVyKCk7cmV0dXJuO30KICAgIGlmKHBheXMubGVuZ3RoPT09MSAmJiBwYXlzWzBdLm1ldGhvZD09PSdDYXNoJylkZWxldGUgcGF5bWVudE1hcFtrZXldOwogICAgc3RhdHVzTWFwW2tleV09J1RlbXBvJztkZWxldGUgcGFpZERhdGVNYXBba2V5XTsKICAgfQogICB0cnl7bG9jYWxTdG9yYWdlLnNldEl0ZW0ocGF5bWVudFN0b3JlS2V5LEpTT04uc3RyaW5naWZ5KHBheW1lbnRNYXApKTtsb2NhbFN0b3JhZ2Uuc2V0SXRlbShzdGF0dXNTdG9yZUtleSxKU09OLnN0cmluZ2lmeShzdGF0dXNNYXApKTtsb2NhbFN0b3JhZ2Uuc2V0SXRlbShwYWlkRGF0ZVN0b3JlS2V5LEpTT04uc3RyaW5naWZ5KHBhaWREYXRlTWFwKSk7c2hvd1N0YXR1cygnS2V0ZXJhbmdhbiB0cmFuc2Frc2kgZGlzaW1wYW46ICcrc3RhdHVzTWFwW2tleV0rJy4gUml3YXlhdCBwZW1iYXlhcmFuIHRldGFwIGRpcGVydGFoYW5rYW4uJyk7fWNhdGNoKF8pe3Nob3dTdGF0dXMoJ1RpZGFrIGRhcGF0IG1lbnlpbXBhbiBrZXRlcmFuZ2FuIHBhZGEgcGVyYW5na2F0IGluaS4nKTt9CiAgIHJlbmRlcigpOwogIH0pKTsKICAkKCd0cmFuc2FjdGlvbnMnKS5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS1wYXldJykuZm9yRWFjaChidG49PmJ0bi5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsKCk9PnsKICAgY29uc3Qga2V5PWJ0bi5kYXRhc2V0LnBheTtjb25zdCByb3c9cm93cy5maW5kKHI9PnIua2V5PT09a2V5KTtpZighcm93KXJldHVybjsKICAgY29uc3QgbGlzdD1wYXltZW50TWFwW2tleV18fFtdO2NvbnN0IHBhaWQ9bGlzdC5yZWR1Y2UoKGEscCk9PmErKE51bWJlcihwLmFtb3VudCl8fDApLDApO2NvbnN0IHJlbWFpbmluZz1NYXRoLm1heCgwLHJvdy50b3RhbC1wYWlkKTsKICAgaWYocmVtYWluaW5nPD0wKXthbGVydCgnVGFnaWhhbiBpbmkgc3VkYWggbHVuYXMuJyk7cmV0dXJuO30KICAgJCgncGF5TW9kYWwnKS5kYXRhc2V0LmtleT1rZXk7CiAgICQoJ3BheUludm9pY2VJbmZvJykudGV4dENvbnRlbnQ9KHJvdy5oLmN1c3RvbWVyfHwnUGVsYW5nZ2FuJykrJyDCtyBUb3RhbCAnK21vbmV5KHJvdy50b3RhbCkrJyDCtyBTdWRhaCBkaWJheWFyICcrbW9uZXkocGFpZCkrJyDCtyBTaXNhICcrbW9uZXkocmVtYWluaW5nKTsKICAgJCgncGF5QW1vdW50JykudmFsdWU9Jyc7JCgncGF5QW1vdW50JykubWF4PVN0cmluZyhyZW1haW5pbmcpOwogICAkKCdwYXlEYXRlJykudmFsdWU9bmV3IERhdGUoKS50b0lTT1N0cmluZygpLnNsaWNlKDAsMTApOwogICAkKCdwYXlNb2RhbCcpLmNsYXNzTGlzdC5hZGQoJ29wZW4nKTsKICB9KSk7CiAgJCgndHJhbnNhY3Rpb25zJykucXVlcnlTZWxlY3RvckFsbCgnW2RhdGEtcmVtaW5kXScpLmZvckVhY2goYnRuPT5idG4uYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT57CiAgIGNvbnN0IHg9cm93cy5maW5kKHI9PnIua2V5PT09YnRuLmRhdGFzZXQucmVtaW5kKTtpZih4KWNyZWF0ZVJlbWluZGVyKHgpOwogIH0pKTsKIH0KICQoJ2NhbmNlbFBheScpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywoKT0+eyQoJ3BheU1vZGFsJykuY2xhc3NMaXN0LnJlbW92ZSgnb3BlbicpO30pOwogJCgncGF5TW9kYWwnKS5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsZT0+e2lmKGUudGFyZ2V0PT09JCgncGF5TW9kYWwnKSkkKCdwYXlNb2RhbCcpLmNsYXNzTGlzdC5yZW1vdmUoJ29wZW4nKTt9KTsKICQoJ3NhdmVQYXknKS5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsKCk9PnsKICBjb25zdCBrZXk9JCgncGF5TW9kYWwnKS5kYXRhc2V0LmtleTtjb25zdCByb3c9aGlzdG9yeURhdGEubWFwKGg9Pih7aCxrZXk6aW52b2ljZUtleShoKSx0b3RhbDp0b3RhbE9mKGgpfSkpLmZpbmQoeD0+eC5rZXk9PT1rZXkpO2lmKCFyb3cpcmV0dXJuOwogIGNvbnN0IGFtb3VudD1OdW1iZXIoJCgncGF5QW1vdW50JykudmFsdWUpO2NvbnN0IGRhdGU9JCgncGF5RGF0ZScpLnZhbHVlOwogIGlmKCFOdW1iZXIuaXNTYWZlSW50ZWdlcihhbW91bnQpfHxhbW91bnQ8PTApe2FsZXJ0KCdNYXN1a2thbiBub21pbmFsIGNpY2lsYW4gYmVydXBhIGFuZ2thIHJ1cGlhaCBidWxhdCB5YW5nIGxlYmloIGRhcmkgbm9sLicpO3JldHVybjt9CiAgaWYoIS9eXGR7NH0tXGR7Mn0tXGR7Mn0kLy50ZXN0KGRhdGUpIHx8ICFkYXlEYXRlKGRhdGUpIHx8IGRheURhdGUoZGF0ZSkuZ2V0RnVsbFllYXIoKSE9PU51bWJlcihkYXRlLnNsaWNlKDAsNCkpIHx8IGRheURhdGUoZGF0ZSkuZ2V0TW9udGgoKSsxIT09TnVtYmVyKGRhdGUuc2xpY2UoNSw3KSkgfHwgZGF5RGF0ZShkYXRlKS5nZXREYXRlKCkhPT1OdW1iZXIoZGF0ZS5zbGljZSg4LDEwKSkpe2FsZXJ0KCdQaWxpaCB0YW5nZ2FsIHBlbWJheWFyYW4geWFuZyBiZW5hci4nKTtyZXR1cm47fQogIGNvbnN0IGxpc3Q9KHBheW1lbnRNYXBba2V5XXx8W10pLnNsaWNlKCk7Y29uc3Qgb2xkUGFpZD1saXN0LnJlZHVjZSgoYSxwKT0+YSsoTnVtYmVyKHAuYW1vdW50KXx8MCksMCk7Y29uc3QgcmVtYWluaW5nPU1hdGgubWF4KDAscm93LnRvdGFsLW9sZFBhaWQpOwogIGlmKGFtb3VudD5yZW1haW5pbmcpe2FsZXJ0KCdOb21pbmFsIG1lbGViaWhpIHNpc2EgdGFnaWhhbiAnK21vbmV5KHJlbWFpbmluZykrJy4gUGVtYmF5YXJhbiB0aWRhayBkaXNpbXBhbi4nKTtyZXR1cm47fQogIGxpc3QucHVzaCh7YW1vdW50LGRhdGUsY3JlYXRlZEF0Om5ldyBEYXRlKCkudG9JU09TdHJpbmcoKX0pO3BheW1lbnRNYXBba2V5XT1saXN0OwogIGNvbnN0IHBhaWQ9bGlzdC5yZWR1Y2UoKGEscCk9PmErKE51bWJlcihwLmFtb3VudCl8fDApLDApO3N0YXR1c01hcFtrZXldPXBhaWQ9PT1yb3cudG90YWw/J0x1bmFzJzonVGVtcG8nOwogIGlmKHBhaWQ9PT1yb3cudG90YWwpcGFpZERhdGVNYXBba2V5XT1kYXRlO2Vsc2UgZGVsZXRlIHBhaWREYXRlTWFwW2tleV07CiAgdHJ5e2xvY2FsU3RvcmFnZS5zZXRJdGVtKHBheW1lbnRTdG9yZUtleSxKU09OLnN0cmluZ2lmeShwYXltZW50TWFwKSk7bG9jYWxTdG9yYWdlLnNldEl0ZW0oc3RhdHVzU3RvcmVLZXksSlNPTi5zdHJpbmdpZnkoc3RhdHVzTWFwKSk7bG9jYWxTdG9yYWdlLnNldEl0ZW0ocGFpZERhdGVTdG9yZUtleSxKU09OLnN0cmluZ2lmeShwYWlkRGF0ZU1hcCkpO30KICBjYXRjaChlcnIpe2FsZXJ0KCdHYWdhbCBtZW55aW1wYW4gcGVtYmF5YXJhbi4gVGlkYWsgYWRhIHBlcnViYWhhbiB5YW5nIGRhcGF0IGRpcGFzdGlrYW4gdGVyc2ltcGFuLicpO3JldHVybjt9CiAgJCgncGF5TW9kYWwnKS5jbGFzc0xpc3QucmVtb3ZlKCdvcGVuJyk7c2hvd1N0YXR1cyhwYWlkPT09cm93LnRvdGFsPydQZW1iYXlhcmFuIHRlcmFraGlyIHRlcnNpbXBhbi4gU3RhdHVzIGJlcnViYWggbWVuamFkaSBMdW5hcyAoYmlydSkuIFRhbmdnYWwgcGVsdW5hc2FuOiAnK2Rpc3BsYXlEYXRlKGRhdGUpKycuJzonQ2ljaWxhbiB0ZXJzaW1wYW4uIFRvdGFsIGRpYmF5YXIgJyttb25leShwYWlkKSsnLCBzaXNhICcrbW9uZXkocm93LnRvdGFsLXBhaWQpKycuJyk7cmVuZGVyKCk7CiB9KTsKIGZ1bmN0aW9uIHJlbWluZGVyUGF5bG9hZCh4KXsKICBjb25zdCBkdWU9YWRkRGF5cyh4LmguZGF0ZSwzMCk7CiAgaWYoIWR1ZSlyZXR1cm4gbnVsbDsKICByZXR1cm4gewogICBkdWVEYXRlOmR1ZS5nZXRGdWxsWWVhcigpKyctJytTdHJpbmcoZHVlLmdldE1vbnRoKCkrMSkucGFkU3RhcnQoMiwnMCcpKyctJytTdHJpbmcoZHVlLmdldERhdGUoKSkucGFkU3RhcnQoMiwnMCcpLAogICBjdXN0b21lcjpTdHJpbmcoeC5oLmN1c3RvbWVyfHwnUGVsYW5nZ2FuJyksCiAgIGFtb3VudDptb25leSh4LnRvdGFsKSwKICAgcmVmZXJlbmNlOlN0cmluZyh4LmguaWR8fHgua2V5KSwKICAgaW52b2ljZURhdGU6U3RyaW5nKHguaC5kYXRlfHwnJykKICB9OwogfQogZnVuY3Rpb24gY3JlYXRlUmVtaW5kZXIoeCl7CiAgY29uc3QgZHVlPWFkZERheXMoeC5oLmRhdGUsMzApOwogIGlmKCFkdWUpe3Nob3dTdGF0dXMoJ1RhbmdnYWwgbm90YSB0aWRhayB2YWxpZDsgcGVuZ2luZ2F0IHRpZGFrIGRhcGF0IGRpYnVhdC4nKTtyZXR1cm47fQogIGNvbnN0IHBheWxvYWQ9cmVtaW5kZXJQYXlsb2FkKHgpOwogIGlmKHdpbmRvdy5BbmRyb2lkQXNpZG8mJnR5cGVvZiB3aW5kb3cuQW5kcm9pZEFzaWRvLnNjaGVkdWxlVGVtcG9SZW1pbmRlcj09PSdmdW5jdGlvbicpewogICB0cnl7CiAgICB3aW5kb3cuQW5kcm9pZEFzaWRvLnNjaGVkdWxlVGVtcG9SZW1pbmRlcihwYXlsb2FkLmR1ZURhdGUscGF5bG9hZC5jdXN0b21lcixwYXlsb2FkLmFtb3VudCxwYXlsb2FkLnJlZmVyZW5jZSk7CiAgICBzaG93U3RhdHVzKCdQZXJtaW50YWFuIHBlbmdpbmdhdCBUZW1wbyBkaWtpcmltIGtlIGthbGVuZGVyIEFuZHJvaWQgdW50dWsgJytwYXlsb2FkLmN1c3RvbWVyKycgcGFkYSAnK2Zvcm1hdFNsYXNoKGR1ZSkrJy4nKTsKICAgfWNhdGNoKGUpe3Nob3dTdGF0dXMoJ1RpZGFrIGRhcGF0IG1lbmphZHdhbGthbiBLYWxlbmRlcjogJysoZS5tZXNzYWdlfHxTdHJpbmcoZSkpKTt9CiAgIHJldHVybjsKICB9CiAgY29uc3Qgbm90ZT0nSmF0dWggdGVtcG8gcGVtYmF5YXJhbiBBU0lETzogJytmb3JtYXRTbGFzaChkdWUpKycuIFRvdGFsICcrbW9uZXkoeC50b3RhbCkrJy4gTm90YSAnK1N0cmluZyh4LmguaWR8fCcnKSsnLiBNb2hvbiB0YWdpaCBwZW1iYXlhcmFuIFRlbXBvLic7CiAgaWYod2luZG93LkFuZHJvaWRBc2lkbyYmdHlwZW9mIHdpbmRvdy5BbmRyb2lkQXNpZG8uYWRkQ2FsZW5kYXJSZW1pbmRlcj09PSdmdW5jdGlvbicpewogICB3aW5kb3cuQW5kcm9pZEFzaWRvLmFkZENhbGVuZGFyUmVtaW5kZXIobm90ZSxwYXlsb2FkLmN1c3RvbWVyKTsKICAgc2hvd1N0YXR1cygnS2FsZW5kZXIgZGlidWthIHVudHVrICcrcGF5bG9hZC5jdXN0b21lcisnLiBUZWthbiBTaW1wYW4gcGFkYSBmb3JtdWxpciBrYWxlbmRlci4nKTsKICAgcmV0dXJuOwogIH0KICBjb25zdCBzdGFydD1uZXcgRGF0ZShkdWUuZ2V0RnVsbFllYXIoKSxkdWUuZ2V0TW9udGgoKSxkdWUuZ2V0RGF0ZSgpLDksMCwwKTsKICBjb25zdCBlbmQ9bmV3IERhdGUoZHVlLmdldEZ1bGxZZWFyKCksZHVlLmdldE1vbnRoKCksZHVlLmdldERhdGUoKSwxMCwwLDApOwogIGNvbnN0IGZtdD1kPT5kLmdldEZ1bGxZZWFyKCkrU3RyaW5nKGQuZ2V0TW9udGgoKSsxKS5wYWRTdGFydCgyLCcwJykrU3RyaW5nKGQuZ2V0RGF0ZSgpKS5wYWRTdGFydCgyLCcwJykrJ1QnK1N0cmluZyhkLmdldEhvdXJzKCkpLnBhZFN0YXJ0KDIsJzAnKStTdHJpbmcoZC5nZXRNaW51dGVzKCkpLnBhZFN0YXJ0KDIsJzAnKSsnMDAnOwogIGNvbnN0IHBhcmFtcz1uZXcgVVJMU2VhcmNoUGFyYW1zKHthY3Rpb246J1RFTVBMQVRFJyx0ZXh0OidKYXR1aCBUZW1wbyBBU0lETyDigJQgJytwYXlsb2FkLmN1c3RvbWVyLGRhdGVzOmZtdChzdGFydCkrJy8nK2ZtdChlbmQpLGRldGFpbHM6bm90ZX0pOwogIHdpbmRvdy5vcGVuKCdodHRwczovL2NhbGVuZGFyLmdvb2dsZS5jb20vY2FsZW5kYXIvcmVuZGVyPycrcGFyYW1zLnRvU3RyaW5nKCksJ19ibGFuaycpOwogIHNob3dTdGF0dXMoJ0dvb2dsZSBDYWxlbmRhciBkaWJ1a2EgZGVuZ2FuIGRldGFpbCBwZW5naW5nYXQuIFRla2FuIFNpbXBhbiBkaSBHb29nbGUgQ2FsZW5kYXIuJyk7CiB9CiBmdW5jdGlvbiBjcmVhdGVBbGxUZW1wb1JlbWluZGVycygpewogIGNvbnN0IGFsbD1oaXN0b3J5RGF0YS5tYXAoaD0+KHtoLGtleTppbnZvaWNlS2V5KGgpLHN0YXR1czpndWVzc1N0YXR1cyhoKSx0b3RhbDp0b3RhbE9mKGgpfSkpLmZpbHRlcih4PT54LnN0YXR1cz09PSdUZW1wbycpOwogIGNvbnN0IHBheWxvYWQ9YWxsLm1hcChyZW1pbmRlclBheWxvYWQpLmZpbHRlcihCb29sZWFuKTsKICBpZighcGF5bG9hZC5sZW5ndGgpe3Nob3dTdGF0dXMoJ0JlbHVtIGFkYSB0cmFuc2Frc2kgVGVtcG8gZGVuZ2FuIHRhbmdnYWwgbm90YSB5YW5nIHZhbGlkLicpO3JldHVybjt9CiAgaWYod2luZG93LkFuZHJvaWRBc2lkbyYmdHlwZW9mIHdpbmRvdy5BbmRyb2lkQXNpZG8uc2NoZWR1bGVUZW1wb1JlbWluZGVycz09PSdmdW5jdGlvbicpewogICB3aW5kb3cuQW5kcm9pZEFzaWRvLnNjaGVkdWxlVGVtcG9SZW1pbmRlcnMoSlNPTi5zdHJpbmdpZnkocGF5bG9hZCkpOwogICBzaG93U3RhdHVzKCdNZW1pbnRhIEFuZHJvaWQgbWVuamFkd2Fsa2FuICcrcGF5bG9hZC5sZW5ndGgrJyBwZW5naW5nYXQgVGVtcG8gcGFkYSB0YW5nZ2FsIG5vdGEgKzMwIGhhcmkuIEthbGVuZGVyIEdvb2dsZSBkaSBha3VuIEhQIGFrYW4gbWVuZXJpbWEgcGVuZ2luZ2F0IHlhbmcgYmVyaGFzaWwgZGlidWF0LicpOwogICByZXR1cm47CiAgfQogIHNob3dTdGF0dXMoJ0ZpdHVyIGphZHdhbGthbiBzZW11YSBUZW1wbyBvdG9tYXRpcyBtZW1lcmx1a2FuIEFQSyBBU0lETyB2ZXJzaSB0ZXJiYXJ1LiBBbmRhIG1hc2loIGRhcGF0IG1lbWJ1YXQgcGVuZ2luZ2F0IHNhdHUgcGVyIHNhdHUgbWVsYWx1aSB0b21ib2wgcGFkYSB0aWFwIG5vdGEuJyk7CiB9CiAkKCdyZW1pbmRBbGxUZW1wbycpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJyxjcmVhdGVBbGxUZW1wb1JlbWluZGVycyk7CiAkKCdyZWZyZXNoJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGxvYWREYXRhKTsKICQoJ21vbnRoRmlsdGVyJykuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJyxyZW5kZXIpOwogJCgnc3RhdHVzRmlsdGVyJykuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJyxyZW5kZXIpOwogJCgnY2xlYXJGaWx0ZXJzJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT57JCgnbW9udGhGaWx0ZXInKS52YWx1ZT0nJzskKCdzdGF0dXNGaWx0ZXInKS52YWx1ZT0nYWxsJztyZW5kZXIoKTt9KTsKICQoJ3ByaW50JykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT53aW5kb3cucHJpbnQoKSk7CiBsb2FkRGF0YSgpOwp9KSgpOwo8L3NjcmlwdD4KCjxzY3JpcHQ+CmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd1bmlmaWVkQmFja1RvTm90YScpPy5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsZnVuY3Rpb24oZSl7CiAgZS5wcmV2ZW50RGVmYXVsdCgpOwogIHBhcmVudC5wb3N0TWVzc2FnZSh7dHlwZTonQVNJRE9fU0hPV19OT1RBJ30sJyonKTsKfSk7Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4=')));
+  let loaded=false;
+  function showNota(){
+    shell.style.display='none';
+    shell.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+    window.scrollTo(0,window.__asidoNotaScrollY||0);
+  }
+  function showBookkeeping(){
+    window.__asidoNotaScrollY=window.scrollY;
+    if(!loaded){frame.srcdoc=bookHtml;loaded=true;}
+    shell.style.display='block';
+    shell.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  openBtn?.addEventListener('click',showBookkeeping);
+  backBtn?.addEventListener('click',showNota);
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='ASIDO_SHOW_NOTA')showNota();
+  });
+})();
+</script>
+</body></html>
