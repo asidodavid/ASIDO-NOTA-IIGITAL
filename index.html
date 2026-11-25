@@ -376,7 +376,7 @@ function validateBackupData(backup){
  const cleanProducts=backup.products.map((p,i)=>{
   if(!p||typeof p.name!=='string'||!p.name.trim()||!Number.isFinite(Number(p.price))||Number(p.price)<0)throw new Error('Data produk nomor '+(i+1)+' tidak valid. Tidak ada data yang diubah.');
   return {name:p.name.trim(),price:Number(p.price)};
- }).filter(p=>!ASIDO_REMOVED_PRODUCTS.has(p.name.trim().toLocaleLowerCase('id')));
+ }); // Keep every validated product from the backup; no undefined removal list may discard catalog entries.
  const newCatalogProducts=[{name:'Pel capit kartun warna',price:26500},{name:'Pel peras otomatis',price:24000}];
  for(const added of newCatalogProducts){
   const existing=cleanProducts.find(p=>p.name.toLocaleLowerCase('id')===added.name.toLocaleLowerCase('id'));
