@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
     private static final int VOICE_REQUEST = 7101;
     private static final int FILE_CHOOSER_REQUEST = 7102;
     private static final int CALENDAR_PERMISSION_REQUEST = 7103;
-    private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=1.5.0";
+    private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=2.0.0";
     private WebView web;
     private TextView status;
     private Uri lastPdfUri;
