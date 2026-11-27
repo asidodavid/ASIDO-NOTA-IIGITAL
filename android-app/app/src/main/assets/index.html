@@ -604,9 +604,11 @@ $('restorePreMergeBtn').onclick=()=>{
   $('backupStatus').textContent='Data sebelum penggabungan berhasil dipulihkan.';
  }catch(err){$('backupStatus').textContent='Pemulihan sebelum penggabungan gagal: '+(err.message||String(err));}
 };
-if(localStorage.getItem('asido_newapp_v1_pre_catalog_sync_backup'))$('restorePreCatalogBtn').hidden=false;
-if(localStorage.getItem('asido_newapp_v1_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
-if(localStorage.getItem('asido_newapp_v1_pre_merge_backup'))$('restorePreMergeBtn').hidden=false;
+try{
+ if(localStorage.getItem('asido_newapp_v1_pre_catalog_sync_backup'))$('restorePreCatalogBtn').hidden=false;
+ if(localStorage.getItem('asido_newapp_v1_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
+ if(localStorage.getItem('asido_newapp_v1_pre_merge_backup'))$('restorePreMergeBtn').hidden=false;
+}catch(storageError){console.warn('Pemeriksaan cadangan lokal dilewati:',storageError);}
 $('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
 function parseVoice(text){
  const low=text.toLowerCase();
