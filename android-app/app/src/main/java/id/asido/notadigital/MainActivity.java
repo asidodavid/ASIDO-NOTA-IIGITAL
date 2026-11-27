@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
     private static final int VOICE_REQUEST = 7101;
     private static final int FILE_CHOOSER_REQUEST = 7102;
     private static final int CALENDAR_PERMISSION_REQUEST = 7103;
-    private static final String APP_URL = "https://asidodavid.github.io/ASIDO-NOTA-IIGITAL/?nativeapk=1&build=2.0.0";
+    private static final String APP_URL = "file:///android_asset/index.html";
     private WebView web;
     private TextView status;
     private Uri lastPdfUri;
@@ -101,7 +101,9 @@ public class MainActivity extends Activity {
         s.setBuiltInZoomControls(false);
         s.setDisplayZoomControls(false);
         s.setSupportMultipleWindows(false);
-        s.setAllowFileAccess(false);
+        s.setAllowFileAccess(true);
+        s.setAllowFileAccessFromFileURLs(false);
+        s.setAllowUniversalAccessFromFileURLs(false);
         s.setAllowContentAccess(true);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         s.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -128,13 +130,13 @@ public class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String host = uri.getHost() == null ? "" : uri.getHost().toLowerCase(Locale.ROOT);
-                if ("asidodavid.github.io".equals(host)) return false;
+                if ("".equals(host) || "localhost".equals(host)) return false;
                 try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); }
                 catch (Exception e) { toast("Tidak dapat membuka tautan."); }
                 return true;
             }
             @Override public void onPageFinished(WebView view, String url) {
-                status.setText("Terhubung · Berbagi gambar memakai Android asli");
+                status.setText("Aplikasi mandiri · Program tersimpan di HP");
             }
         });
     }
