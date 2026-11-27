@@ -115,11 +115,16 @@ const savedCatalogVersion=localStorage.getItem('asido_newapp_catalog_version');
 let products;
 if(savedCatalogVersion!==CATALOG_VERSION){
  products=defaultProducts.map(p=>({...p}));
- localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
- localStorage.setItem('asido_newapp_catalog_version',CATALOG_VERSION);
+ try{
+  localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
+  localStorage.setItem('asido_newapp_catalog_version',CATALOG_VERSION);
+ }catch(storageError){console.warn('Penyimpanan katalog belum tersedia:',storageError);}
 }else{
  products=Array.isArray(storedProducts)?storedProducts:defaultProducts.map(p=>({...p}));
- if(!Array.isArray(storedProducts))localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
+ if(!Array.isArray(storedProducts)){
+  try{localStorage.setItem(CATALOG_KEY,JSON.stringify(products));}
+  catch(storageError){console.warn('Katalog digunakan sementara:',storageError);}
+ }
 }
 // Load this app's own invoice history before any save, render, export, or import operation.
 let rows=[];
