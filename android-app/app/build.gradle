@@ -5,11 +5,11 @@ android {
     namespace 'id.asido.notadigital'
     compileSdk 35
     defaultConfig {
-        // Separate package so this new app cannot overwrite the older ASIDO app.
-        applicationId 'id.asido.notadigital.v2'
+        // Unique package: installs alongside the existing ASIDO Nota Digital 2.0.0.
+        applicationId 'id.asido.notadigital.mandiri'
         minSdk 29
         targetSdk 34
-        versionCode 9
+        versionCode 1
         versionName '2.1.0'
     }
 }
