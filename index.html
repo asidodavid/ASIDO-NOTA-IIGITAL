@@ -122,6 +122,7 @@ if(savedCatalogVersion!==CATALOG_VERSION){
  if(!Array.isArray(storedProducts))localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
 }
 // Load this app's own invoice history before any save, render, export, or import operation.
+let rows=[];
 let historyData=[];
 try{
  const savedHistory=JSON.parse(localStorage.getItem('asido_newapp_v1_history')||'[]');
