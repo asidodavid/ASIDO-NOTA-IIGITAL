@@ -17,3 +17,8 @@ The APK's WebView storage is separate from Chrome's storage. Before switching, e
 The GitHub Actions workflow builds an installable debug APK. In GitHub, open **Actions → Build ASIDO Android APK**, then download the artifact named **ASIDO-Nota-Digital-Android-APK**. Open app-debug.apk on the Android phone and allow installation from that source if Android asks.
 
 This debug APK is for direct testing and is not signed for Play Store distribution.
+
+
+## Build Mandiri 2.1.0
+
+Paket aplikasi mandiri menggunakan `id.asido.notadigital.mandiri` agar dapat dipasang berdampingan dengan aplikasi ASIDO sebelumnya. Versi aplikasi: `2.1.0`.
