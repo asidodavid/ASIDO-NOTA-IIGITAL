@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123c7a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="ASIDO Nota"><title>ASIDO Nota Digital</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#172435;background:#f2f6fb}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#123c7a,#1769aa);color:#fff;padding:20px 14px}header h1{font-size:24px;margin:0}header p{margin:5px 0 0;font-size:14px}.wrap{max-width:850px;margin:auto;padding:12px}.card{background:#fff;border-radius:16px;margin:0 0 13px;padding:15px;box-shadow:0 4px 18px #152f5010}h2{font-size:18px;margin:0 0 12px;color:#123c7a}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}label{font-size:13px;font-weight:650;color:#47566b}input,select,textarea{font:inherit;width:100%;min-width:0;border:1px solid #d2dce8;border-radius:10px;padding:11px;background:#fff;color:#172435}button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:12px 14px;cursor:pointer;background:#123c7a;color:#fff}.secondary{background:#e8eef8;color:#123c7a}.green{background:#13814b}.red{background:#a52b36}.buttons{display:flex;gap:8px;flex-wrap:wrap}.buttons button{flex:1}.pdf-action-link{display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;font:inherit;font-weight:700;border-radius:10px;padding:12px 14px;flex:1;min-width:0}.pdf-action-link.secondary{background:#e8eef8;color:#123c7a}.pdf-action-link.green{background:#13814b;color:#fff}.item{border:1px solid #e0e7f0;border-radius:12px;padding:11px;margin:9px 0}.itemgrid{display:grid;grid-template-columns:1.5fr .65fr .95fr;gap:8px}.itemgrid label{display:block;margin-bottom:5px}.itemgrid .namefield{min-width:0}.muted{color:#68778b;font-size:12px;line-height:1.5}.total{text-align:right;color:#123c7a;font-size:23px;font-weight:800;margin:12px 0}.siggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sigbox{border:1px solid #e0e7f0;border-radius:12px;padding:10px}.sig{display:block;width:100%;height:150px;min-height:150px;border:1px dashed #7f94ad;border-radius:9px;touch-action:none;-ms-touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;background:#fff;cursor:crosshair;}.historyrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #edf0f5}.historyrow:last-child{border:0}.historyrow>div{min-width:0;overflow-wrap:anywhere}.historyactions{display:flex;gap:6px;flex-shrink:0}.historyactions button{padding:9px 11px;font-size:13px}.historyactions .red{background:#a52b36;color:#fff}.small{font-size:12px}@media(max-width:520px){.grid,.siggrid{grid-template-columns:1fr}.itemgrid{grid-template-columns:1fr 1fr}.itemgrid .namefield{grid-column:1/-1}.wrap{padding:9px}.card{padding:12px}header h1{font-size:22px}}
+</style></head><body>
+<header><div class="wrap"><h1>ASIDO Nota Digital</h1><p>Nota penjualan · input suara · dua tanda tangan · PDF dan gambar nota</p><p style="font-size:12px;font-weight:700;opacity:.95">Aplikasi mandiri · Nota + Pembukuan + Riwayat Cicilan</p><div style="margin-top:13px"><button type="button" id="installAppBtn" style="background:#fff;color:#123c7a;border-radius:11px;padding:10px 14px">＋ Pasang aplikasi di HP</button></div><p id="installHelp" style="font-size:12px;opacity:.9;margin-top:8px">Pasang sekali, lalu buka ASIDO dari ikon di layar utama.</p></div></header>
+<main class="wrap">
+<section class="card"><h2>1. Informasi Nota</h2><div class="grid">
+<div class="field"><label>Tanggal nota</label><input id="date" type="date"></div>
+<div class="field"><label>Nama pelanggan / toko *</label><input id="customer" placeholder="Contoh: Toko Sinar Baru"></div>
+</div></section>
+<section class="card"><h2>2. Daftar Barang</h2>
+<div class="field"><label>Pilih produk ASIDO</label><select id="productSelect"><option value="">Pilih produk...</option></select></div>
+<div class="buttons"><button type="button" id="addProduct" class="secondary">＋ Tambah produk</button><button type="button" id="voiceBtn">🎙 Input dengan suara</button></div>
+<p class="muted">Contoh ucapan: “Sapu ijuk 10 buah harga 15000”. Mohon periksa lagi jumlah dan harga setelah input suara. Pengenalan suara membutuhkan browser yang mendukungnya dan koneksi internet.</p>
+<div id="items"></div><button type="button" id="addBlank" class="secondary" style="width:100%">＋ Tambah baris barang manual</button><div class="total" id="grandTotal">TOTAL: Rp0</div>
+<details class="catalog" id="catalogManager" style="margin-top:14px;border:1px solid #d8e2ef;border-radius:12px;padding:12px">
+<summary style="font-weight:750;color:#123c7a;cursor:pointer">⚙️ Kelola daftar produk (nama &amp; harga)</summary>
+<p class="muted">Gunakan bagian ini untuk menambah produk atau mengubah nama dan harga standar produk. Perubahan disimpan di browser perangkat ini saja, bukan disinkronkan ke perangkat lain.</p>
+<div class="field"><label>Pilih produk yang ingin diubah atau dihapus</label><select id="manageProductSelect"><option value="">Pilih produk untuk diedit...</option></select></div>
+<div class="grid">
+ <div class="field"><label>Nama produk</label><input id="manageProductName" placeholder="Nama produk"></div>
+ <div class="field"><label>Harga standar (Rp)</label><input id="manageProductPrice" type="number" min="0" inputmode="numeric" placeholder="Contoh: 58000"></div>
+</div>
+<div class="buttons"><button type="button" id="updateCatalogProduct" class="green">Simpan perubahan</button><button type="button" id="deleteCatalogProduct" class="red">Hapus produk terpilih</button></div>
+<div class="buttons" style="margin-top:8px"><button type="button" id="addCatalogProduct" class="secondary">＋ Tambah produk baru</button><button type="button" id="clearCatalogForm" class="secondary">Kosongkan formulir</button></div>
+<p class="muted">Setelah mengubah katalog, barang yang sudah dimasukkan ke nota yang sedang dibuat tidak berubah otomatis. Pilih kembali produk yang diinginkan untuk menggunakan harga katalog terbaru.</p>
+</details>
+</section>
+<section class="card"><h2>3. Catatan</h2><div class="field"><label>Keterangan pembayaran</label><select id="paymentStatus"><option value="Cash">Cash</option><option value="Tempo">Tempo (jatuh tempo 30 hari)</option></select></div><div class="field" style="margin-top:10px"><label>Catatan transaksi (opsional)</label><textarea id="notes" rows="3" placeholder="Contoh: Transfer tanggal 30/10/26"></textarea></div><div class="buttons"><button type="button" id="addCalendarReminder" class="secondary">📅 Buat pengingat Google Kalender</button></div><p class="muted">Pilih Cash atau Tempo. Transaksi Tempo akan masuk ke Pembukuan ASIDO dengan perhitungan jatuh tempo 30 hari.</p><p id="calendarStatus" class="muted" role="status"></p></section>
+<section class="card"><h2>4. Tanda Tangan</h2><div class="siggrid">
+<div class="sigbox"><label>Tanda tangan pelanggan</label><canvas id="buyerSig" class="sig"></canvas><div class="buttons" style="margin-top:7px"><button type="button" class="secondary clearSig" data-canvas="buyerSig">Hapus</button></div></div>
+<div class="sigbox"><label>Tanda tangan penjual / ASIDO</label><canvas id="sellerSig" class="sig"></canvas><div class="buttons" style="margin-top:7px"><button type="button" class="secondary clearSig" data-canvas="sellerSig">Hapus</button></div></div>
+</div><p class="muted">Minta pelanggan dan penjual menggambar tanda tangan masing-masing dengan jari di area kotak.</p></section>
+<section class="card"><h2>5. Simpan Nota</h2>
+<div class="buttons"><button type="button" id="makeNotaImage" class="green">📲 Kirim Nota ke WhatsApp</button></div>
+<div id="notaImageActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px">
+ <strong style="color:#123c7a">Pratinjau nota</strong>
+ <p class="muted">Tombol utama membuat gambar nota putih dan, di aplikasi Android ASIDO, membuka WhatsApp dengan gambar sebagai lampiran. Pilih pelanggan lalu tekan Kirim.</p>
+ <img id="notaImagePreview" alt="Pratinjau gambar nota ASIDO" style="display:block;width:100%;height:auto;border:1px solid #d8e2ef;border-radius:8px;background:#fff;margin:10px 0">
+ <div class="buttons" style="margin-top:8px"><a id="downloadNotaImage" class="pdf-action-link secondary" href="#" download="ASIDO-Nota.png">Unduh Gambar PNG (cadangan)</a></div>
+ <p id="notaImageStatus" class="muted" role="status"></p>
+</div>
+<div style="margin-top:14px"><strong>PDF</strong></div>
+<div class="buttons"><button type="button" id="savePdf" class="secondary">Buat &amp; Simpan PDF ke HP</button><button type="button" id="printPdfPhone" class="secondary">Cetak / Simpan PDF</button></div>
+<div class="buttons" style="margin-top:8px"><button type="button" id="saveHistory" class="secondary">Simpan Riwayat</button></div>
+<p id="status" class="muted" role="status"></p>
+<div id="pdfActions" hidden style="margin-top:12px;border:1px solid #d8e2ef;background:#f6f9fd;border-radius:12px;padding:12px">
+ <strong style="color:#123c7a">PDF sudah tersimpan</strong>
+ <p class="muted">PDF disimpan di Downloads/ASIDO. Pilih Buka PDF untuk memeriksa nota atau Bagikan PDF untuk mengirim file PDF ke WhatsApp.</p>
+ <div class="buttons"><button type="button" id="openSavedPdf" class="secondary">Buka PDF</button><button type="button" id="shareSavedPdf" class="green">Bagikan PDF ke WhatsApp</button></div>
+ <div class="buttons" style="margin-top:8px"><a id="pdfDownloadLink" class="pdf-action-link secondary" href="#" download>Unduh PDF (cadangan)</a></div>
+ <p id="pdfNativeStatus" class="muted" role="status"></p>
+</div>
+</section><section class="card"><h2>📒 Pembukuan ASIDO</h2><p class="muted">Gabungkan nota berdasarkan tanggal, lihat total Cash dan Tempo, serta buat pengingat jatuh tempo 30 hari di Google Calendar.</p><div class="buttons"><button type="button" id="openUnifiedBookkeeping" style="display:block;width:100%;text-align:center;background:#143c73;color:#fff;border:0;border-radius:10px;padding:13px;font-weight:700;font-size:inherit;cursor:pointer">Buka Pembukuan ASIDO</button></div></section>
+<section class="card"><h2>6. Riwayat Nota</h2><p class="muted">Riwayat dan daftar produk aplikasi baru ini tersimpan secara terpisah pada perangkat ini. Aplikasi lama tidak dibaca atau diubah.</p>
+<div style="margin:12px 0;padding:12px;border:1px solid #d8e2ef;border-radius:12px;background:#f8fbff">
+ <strong style="color:#123c7a">🔎 Cari Nota berdasarkan Nama Toko</strong>
+ <p class="muted" style="margin:5px 0 9px">Ketik nama toko atau sebutkan lewat mikrofon. Hasil akan menampilkan tanggal transaksi, barang, jumlah, harga, dan total pesanan dari riwayat pada perangkat ini.</p>
+ <div class="field"><label for="storeSearchInput">Nama toko / pelanggan</label><input id="storeSearchInput" type="search" placeholder="Contoh: Toko Sinar Baru" autocomplete="off"></div>
+ <div class="buttons"><button type="button" id="searchStoreBtn" class="secondary">Cari Toko</button><button type="button" id="voiceStoreSearchBtn">🎙 Cari dengan Suara</button><button type="button" id="clearStoreSearchBtn" class="secondary">Hapus Pencarian</button></div>
+ <p id="storeSearchStatus" class="muted" role="status">Masukkan nama toko atau tekan Cari dengan Suara.</p>
+ <div id="storeSearchResults" aria-live="polite"></div>
+</div>
+<div style="margin:12px 0;padding:12px;border:1px solid #d8e2ef;border-radius:12px;background:#f8fbff">
+ <strong style="color:#123c7a">💾 Cadangan dan Pemulihan Data</strong>
+ <p class="muted" style="margin:5px 0 9px">Simpan nota, daftar barang, dan data Pembukuan ASIDO (Cash, Tempo, Lunas, cicilan, serta tanggal pelunasan) ke file JSON. File ini dapat dipindahkan ke perangkat lain.</p>
+ <div class="buttons"><button type="button" id="exportData" class="green">Ekspor Cadangan JSON</button></div>
+ <div class="buttons" style="margin-top:8px">
+  <button type="button" id="visibleImportMergeBtn" class="secondary">Impor &amp; Gabungkan</button>
+  <button type="button" id="visibleImportReplaceBtn" class="secondary">Impor &amp; Samakan Data</button>
+ </div>
+ <div class="buttons" style="margin-top:8px">
+  <button type="button" id="visibleImportProductsBtn" class="secondary">Samakan Daftar Barang Saja</button>
+ </div>
+ <p class="muted" style="margin-top:8px">Gabungkan mempertahankan data lama dan menambahkan data cadangan. Samakan Data mengganti daftar barang dan seluruh riwayat pada perangkat ini. Samakan Daftar Barang Saja hanya mengganti katalog dan harga, tanpa mengubah riwayat nota.</p>
+</div>
+<div hidden><button id="importMergeBtn"></button><button id="importReplaceBtn"></button><button id="importProductsOnlyBtn"></button><input type="file" id="importDataFile"><button id="restorePreSyncBtn"></button><button id="restorePreCatalogBtn"></button><button id="restorePreMergeBtn"></button></div><div class="buttons" style="margin-top:8px"><button type="button" id="newInvoice" class="secondary">Nota Baru</button></div><p id="backupStatus" class="muted" role="status"></p><div id="history" style="margin-top:8px"></div></section>
+</main>
+<script src="./vendor/jspdf.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>'Rp'+Math.max(0,Number(n)||0).toLocaleString('id-ID');
+const defaultProducts=[
+ {name:'Pel capit kartun warna',price:26500},
+ {name:'Pel capit katun',price:24500},
+ {name:'Pel lobi besi',price:55500},
+ {name:'Pel peras otomatis',price:24000},
+ {name:'Pengki Gagang Besi',price:11000},
+ {name:'Pengki Gagang Besi Cash',price:10000},
+ {name:'Pengki Gagang Kayu',price:10000},
+ {name:'Pengki Gagang Kayu Cash',price:9000},
+ {name:'Sapu ijuk',price:15000},
+ {name:'Sapu ijuk Gagang Besi',price:20500},
+ {name:'Sapu ijuk Gagang Besi cash',price:19500},
+ {name:'Sapu ijuk Gagang kayu',price:18500},
+ {name:'Sapu ijuk gagang kayu 90',price:20500},
+ {name:'Sapu ijuk gagang kayu 90 cash',price:19500},
+ {name:'Sapu ijuk gagang kayu cash',price:17500},
+ {name:'Sapu lidi',price:6000},
+ {name:'Sikat dorong ijuk',price:12500},
+ {name:'Sikat dorong senar',price:13500},
+ {name:'Wiper Gagang Besi',price:13500},
+ {name:'Wiper Gagang Besi Cash',price:12500},
+ {name:'Wiper Gagang Kayu',price:12500},
+ {name:'Wiper Gagang Kayu Cash',price:11500}
+];
+const CATALOG_VERSION='2026-11-25-v2';
+const CATALOG_KEY='asido_newapp_v1_products';
+let storedProducts;
+try{storedProducts=JSON.parse(localStorage.getItem(CATALOG_KEY)||'null');}catch(e){storedProducts=null;}
+const savedCatalogVersion=localStorage.getItem('asido_newapp_catalog_version');
+/* The new application starts with its own catalogue. Upgrade only this app's catalogue once;
+   invoice history and bookkeeping records are deliberately left untouched. */
+let products;
+if(savedCatalogVersion!==CATALOG_VERSION){
+ products=defaultProducts.map(p=>({...p}));
+ localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
+ localStorage.setItem('asido_newapp_catalog_version',CATALOG_VERSION);
+}else{
+ products=Array.isArray(storedProducts)?storedProducts:defaultProducts.map(p=>({...p}));
+ if(!Array.isArray(storedProducts))localStorage.setItem(CATALOG_KEY,JSON.stringify(products));
+}
+// Load this app's own invoice history before any save, render, export, or import operation.
+let rows=[];
+let historyData=[];
+try{
+ const savedHistory=JSON.parse(localStorage.getItem('asido_newapp_v1_history')||'[]');
+ historyData=Array.isArray(savedHistory)?savedHistory:[];
+}catch(e){historyData=[];}
+function sortedProductEntries(){
+ return products.map((p,index)=>({product:p,index}))
+  .sort((a,b)=>String(a.product.name||'').localeCompare(String(b.product.name||''),'id',{sensitivity:'base',numeric:true}));
+}
+function renderProducts(){
+ const ordered=sortedProductEntries();
+ $('productSelect').innerHTML='<option value="">Pilih produk...</option>'+ordered.map((entry,displayIndex)=>'<option value="'+entry.index+'">'+(displayIndex+1)+'. '+esc(entry.product.name)+' — '+money(entry.product.price)+'</option>').join('');
+ const ms=$('manageProductSelect');
+ if(ms){
+  const prior=ms.value;
+  ms.innerHTML='<option value="">Pilih produk untuk diedit...</option>'+ordered.map((entry,displayIndex)=>'<option value="'+entry.index+'">'+(displayIndex+1)+'. '+esc(entry.product.name)+' — '+money(entry.product.price)+'</option>').join('');
+  if(prior!==''&&Number(prior)<products.length)ms.value=prior;
+ }
+}
+function addRow(name='',qty=1,price=0){rows.push({name,qty,price});renderRows()}
+function renderTotal(){const sum=rows.reduce((a,r)=>a+(Number(r.qty)||0)*(Number(r.price)||0),0);$('grandTotal').textContent='TOTAL: '+money(sum);return sum}
+function renderRows(){$('items').innerHTML=rows.map((r,i)=>'<div class="item"><div class="itemgrid"><div class="namefield"><label>Nama barang</label><input data-i="'+i+'" data-k="name" value="'+esc(r.name)+'" placeholder="Nama barang"></div><div><label>Jumlah</label><input data-i="'+i+'" data-k="qty" type="number" min="0" step="any" value="'+r.qty+'" inputmode="decimal"></div><div><label>Harga satuan (Rp)</label><input data-i="'+i+'" data-k="price" type="number" min="0" value="'+r.price+'" inputmode="numeric"></div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><strong>Subtotal: '+money(r.qty*r.price)+'</strong><button type="button" class="red" data-remove="'+i+'" style="padding:7px 10px">Hapus</button></div></div>').join('');$('items').querySelectorAll('input').forEach(el=>el.addEventListener('input',e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;rows[i][k]=k==='name'?e.target.value:(Number(e.target.value)||0);e.target.closest('.item').querySelector('strong').textContent='Subtotal: '+money(rows[i].qty*rows[i].price);renderTotal()}));$('items').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{rows.splice(+b.dataset.remove,1);renderRows()});renderTotal()}
+function clearCatalogForm(){ $('manageProductSelect').value='';$('manageProductName').value='';$('manageProductPrice').value=''; }
+$('manageProductSelect').addEventListener('change',()=>{
+ const v=$('manageProductSelect').value;
+ if(v===''||!products[Number(v)])return;
+ $('manageProductName').value=products[Number(v)].name;
+ $('manageProductPrice').value=products[Number(v)].price;
+});
+$('clearCatalogForm').onclick=clearCatalogForm;
+$('addCatalogProduct').onclick=()=>{
+ const name=$('manageProductName').value.trim();
+ const price=Number($('manageProductPrice').value);
+ if(!name){alert('Isi nama produk terlebih dahulu.');return;}
+ if($('manageProductPrice').value===''||!Number.isFinite(price)||price<0){alert('Masukkan harga yang valid.');return;}
+ if(products.some(p=>p.name.trim().toLowerCase()===name.toLowerCase())){alert('Nama produk ini sudah ada. Pilih produk tersebut untuk mengubahnya, atau gunakan nama yang berbeda.');return;}
+ products.push({name,price});
+ localStorage.setItem('asido_newapp_v1_products',JSON.stringify(products));
+ renderProducts();
+ $('manageProductSelect').value=String(products.length-1);
+ $('status').textContent='Produk baru ditambahkan ke daftar katalog pada perangkat ini.';
+};
+$('updateCatalogProduct').onclick=()=>{
+ const raw=$('manageProductSelect').value;
+ if(raw===''){alert('Pilih produk dari daftar yang ingin diubah.');return;}
+ const i=Number(raw),name=$('manageProductName').value.trim(),price=Number($('manageProductPrice').value);
+ if(!products[i]){alert('Produk tidak ditemukan. Pilih ulang produk.');return;}
+ if(!name){alert('Nama produk tidak boleh kosong.');return;}
+ if($('manageProductPrice').value===''||!Number.isFinite(price)||price<0){alert('Masukkan harga yang valid.');return;}
+ if(products.some((p,j)=>j!==i&&p.name.trim().toLowerCase()===name.toLowerCase())){alert('Nama produk tersebut sudah digunakan oleh produk lain.');return;}
+ products[i]={name,price};
+ localStorage.setItem('asido_newapp_v1_products',JSON.stringify(products));
+ renderProducts();
+ $('manageProductSelect').value=String(i);
+ $('manageProductName').value=name;
+ $('manageProductPrice').value=price;
+ $('status').textContent='Katalog diperbarui: '+name+' — '+money(price)+'.';
+};
+$('deleteCatalogProduct').onclick=()=>{
+ const raw=$('manageProductSelect').value;
+ if(raw===''){alert('Pilih produk yang ingin dihapus terlebih dahulu.');return;}
+ const i=Number(raw);
+ if(!products[i]){alert('Produk tidak ditemukan.');return;}
+ if(!confirm('Hapus produk "'+products[i].name+'" dari daftar produk? Nota yang sudah dibuat tidak dihapus.'))return;
+ const deleted=products[i].name;
+ products.splice(i,1);
+ localStorage.setItem('asido_newapp_v1_products',JSON.stringify(products));
+ renderProducts();clearCatalogForm();
+ $('status').textContent='Produk "'+deleted+'" dihapus dari katalog pada perangkat ini.';
+};
+function addSelectedProduct(){
+ const select=$('productSelect');
+ const raw=select.value;
+ if(raw===''){alert('Pilih produk dahulu.');return;}
+ const index=Number(raw);
+ const product=products[index];
+ if(!Number.isInteger(index)||!product){alert('Produk tidak ditemukan. Muat ulang daftar produk lalu pilih kembali.');return;}
+ addRow(product.name,1,product.price);
+ select.value='';
+ const status=$('status');
+ if(status)status.textContent='Berhasil menambahkan '+product.name+' — '+money(product.price)+'. Silakan isi jumlah barang pada baris nota.';
+ const items=$('items');
+ if(items){items.scrollIntoView({behavior:'smooth',block:'center'});}
+}
+$('addProduct').onclick=addSelectedProduct;
+$('addBlank').onclick=()=>addRow();
+function parseDateFromCalendarNote(text){
+ const iso=text.match(/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/);
+ let year,month,day;
+ if(iso){year=Number(iso[1]);month=Number(iso[2]);day=Number(iso[3]);}
+ else{
+  const local=text.match(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2}|\d{4})\b/);
+  if(!local)return null;
+  day=Number(local[1]);month=Number(local[2]);year=Number(local[3]);if(year<100)year+=2000;
+ }
+ const dt=new Date(Date.UTC(year,month-1,day));
+ if(dt.getUTCFullYear()!==year||dt.getUTCMonth()!==month-1||dt.getUTCDate()!==day)return null;
+ return {year,month,day,date:year+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0')};
+}
+$('addCalendarReminder').onclick=()=>{
+ const note=$('notes').value.trim();
+ if(!note){$('calendarStatus').textContent='Isi Catatan terlebih dahulu, termasuk tanggal pengingat. Contoh: Toko A akan mentransfer uang tanggal 30/10/26.';alert('Isi Catatan terlebih dahulu, termasuk tanggal pengingat.');return;}
+ const parsed=parseDateFromCalendarNote(note);
+ if(!parsed){$('calendarStatus').textContent='Tanggal belum dikenali. Gunakan format DD/MM/YY atau DD/MM/YYYY, misalnya 30/10/26.';alert('Tanggal pada Catatan belum dikenali. Gunakan format DD/MM/YY atau DD/MM/YYYY, misalnya 30/10/26.');return;}
+ const start=String(parsed.year)+String(parsed.month).padStart(2,'0')+String(parsed.day).padStart(2,'0');
+ const endDate=new Date(Date.UTC(parsed.year,parsed.month-1,parsed.day+1));
+ const end=String(endDate.getUTCFullYear())+String(endDate.getUTCMonth()+1).padStart(2,'0')+String(endDate.getUTCDate()).padStart(2,'0');
+ const customer=$('customer').value.trim();
+ if(window.AndroidAsido&&typeof window.AndroidAsido.addCalendarReminder==='function'){
+  $('calendarStatus').textContent='Membuka aplikasi Kalender Android dengan pengingat yang sudah diisi…';
+  window.AndroidAsido.addCalendarReminder(note,customer);
+  return;
+ }
+ const title=(note.length>120?note.slice(0,117)+'…':note);
+ const details='Pengingat dari ASIDO Nota Digital.\nPelanggan/toko: '+(customer||'-')+'\nCatatan lengkap: '+note;
+ const url='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+'&dates='+start+'/'+end+'&details='+encodeURIComponent(details);
+ $('calendarStatus').textContent='Membuka Google Kalender untuk '+String(parsed.day).padStart(2,'0')+'/'+String(parsed.month).padStart(2,'0')+'/'+parsed.year+'. Periksa lalu tekan Simpan di Kalender.';
+ const win=window.open(url,'_blank');
+ if(!win)window.location.href=url;
+};
+function invoice(){return {date:$('date').value,customer:$('customer').value.trim(),items:rows.map(r=>({...r})),total:renderTotal(),paymentStatus:$('paymentStatus').value||'Cash',notes:$('notes').value.trim(),buyer:signatureData('buyerSig'),seller:signatureData('sellerSig'),savedAt:new Date().toISOString()}}
+function validate(v){if(!v.customer){alert('Isi nama pelanggan terlebih dahulu.');return false}if(!v.items.some(r=>r.name.trim()&&r.qty>0)){alert('Tambahkan setidaknya satu barang dengan jumlah lebih dari nol.');return false}return true}
+function saveHistory(){
+ const v=invoice();if(!validate(v))return;
+ v.id=v.id||('ASD-'+Date.now());
+ historyData.unshift(v);historyData=historyData.slice(0,100);
+ try{
+  localStorage.setItem('asido_newapp_v1_history',JSON.stringify(historyData));
+  renderHistory();
+  $('status').textContent='Nota tersimpan. Membuat backup otomatis…';
+  const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData,
+   bookkeepingStatus:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}'),
+   bookkeepingPayments:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}'),
+   bookkeepingPaidDates:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+  const backupJson=JSON.stringify(backup,null,2);
+  localStorage.setItem('asido_newapp_v1_last_auto_backup',backupJson);
+  if(window.AndroidAsido&&typeof window.AndroidAsido.saveJson==='function'){
+   const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+   const result=String(window.AndroidAsido.saveJson(backupJson,'ASIDO-Nota-Backup-'+stamp+'.json'));
+   if(!result.startsWith('OK|'))throw new Error(result.replace(/^ERROR\\|/,'')||'Gagal menyimpan file backup otomatis.');
+   $('status').textContent='Nota tersimpan dan backup otomatis berhasil dibuat di Download/ASIDO. Kirim salinan ke Google Drive melalui tombol Ekspor Cadangan JSON.';
+  }else{
+   $('status').textContent='Nota tersimpan dan snapshot backup otomatis dibuat di penyimpanan aplikasi/browser. Ekspor JSON untuk menyimpan file di HP dan Google Drive.';
+  }
+ }catch(err){
+  $('status').textContent='PERHATIAN: Nota sudah masuk riwayat, tetapi backup otomatis gagal: '+(err.message||String(err))+'. Segera gunakan Ekspor Cadangan JSON.';
+ }
+}
+$('saveHistory').onclick=saveHistory;
+function renderHistory(){
+ $('history').innerHTML=historyData.slice(0,20).map((h,i)=>'<div class="historyrow"><div><strong>'+esc(h.customer)+'</strong><br><span class="muted">'+esc(h.date||'')+' · '+money(h.total)+'</span></div><div class="historyactions"><button type="button" class="secondary" data-load="'+i+'">Buka</button><button type="button" class="red" data-delete="'+i+'">Hapus</button></div></div>').join('')||'<p class="muted">Belum ada riwayat nota.</p>';
+ $('history').querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{const h=historyData[Number(b.dataset.load)];if(h)loadInvoice(h);});
+ $('history').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{
+  const i=Number(b.dataset.delete),h=historyData[i];if(!h)return;
+  const customer=String(h.customer||'nota ini');
+  if(!confirm('Hapus nota "'+customer+'" tanggal '+(h.date||'-')+' dari Riwayat Nota pada perangkat ini? File PDF atau gambar yang sudah diunduh tidak ikut terhapus.'))return;
+  historyData.splice(i,1);
+  localStorage.setItem('asido_newapp_v1_history',JSON.stringify(historyData));
+  renderHistory();
+  const status=$('backupStatus')||$('status');
+  if(status)status.textContent='Nota "'+customer+'" sudah dihapus dari riwayat perangkat ini.';
+ });
+ renderStoreSearch();
+}
+function normalizeStoreSearch(value){
+ return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('id').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+}
+function storeNameOf(h){
+ return String(h.customer||h.toko||h.storeName||h.shopName||'Tanpa nama toko');
+}
+function calculateInvoiceTotal(h){
+ const explicit=Number(h.total);
+ if(Number.isFinite(explicit)&&explicit>0)return explicit;
+ return (Array.isArray(h.items)?h.items:[]).reduce((sum,item)=>sum+(Number(item.qty)||0)*(Number(item.price)||0),0);
+}
+function renderStoreSearch(){
+ const input=$('storeSearchInput'),results=$('storeSearchResults'),status=$('storeSearchStatus');
+ if(!input||!results||!status)return;
+ const raw=input.value.trim(),query=normalizeStoreSearch(raw);
+ if(!query){results.innerHTML='';status.textContent='Masukkan nama toko atau tekan Cari dengan Suara.';return;}
+ const matches=historyData.map((h,index)=>({h,index})).filter(({h})=>normalizeStoreSearch(storeNameOf(h)).includes(query))
+  .sort((a,b)=>String(b.h.date||'').localeCompare(String(a.h.date||''))||String(b.h.savedAt||'').localeCompare(String(a.h.savedAt||'')));
+ if(!matches.length){results.innerHTML='';status.textContent='Belum ada nota dengan nama toko “'+raw+'” di riwayat perangkat ini. Periksa ejaan atau coba sebagian nama toko.';return;}
+ status.textContent='Ditemukan '+matches.length+' nota untuk pencarian “'+raw+'”.';
+ results.innerHTML=matches.map(({h,index})=>{
+  const items=(Array.isArray(h.items)?h.items:[]).filter(item=>String(item.name||'').trim());
+  const total=calculateInvoiceTotal(h);
+  const itemHtml=items.length?items.map(item=>{
+   const price=Number(item.price)||0,subtotal=(Number(item.qty)||0)*price;
+   return '<li style="margin:4px 0">'+esc(item.name)+' — <strong>'+esc(item.qty??0)+' '+(item.unit?esc(item.unit)+' ':'')+'</strong> × '+money(price)+' = '+money(subtotal)+'</li>';
+  }).join(''):'<li>Rincian barang tidak tersedia pada nota ini.</li>';
+  return '<div class="item" style="background:#fff;margin:9px 0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>'+esc(storeNameOf(h))+'</strong><span class="muted">Tanggal: '+esc(h.date||'-')+'</span></div><div class="muted" style="margin-top:4px">Jumlah jenis barang: '+items.length+' · Pembayaran: '+esc(h.paymentStatus||'-')+'</div><ul style="margin:8px 0 10px;padding-left:20px">'+itemHtml+'</ul><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #edf0f5;padding-top:9px"><strong style="color:#123c7a">Total pesanan: '+money(total)+'</strong><button type="button" class="secondary" data-open-search-invoice="'+index+'" style="padding:8px 11px">Buka Nota</button></div></div>';
+ }).join('');
+ results.querySelectorAll('[data-open-search-invoice]').forEach(button=>button.onclick=()=>{
+  const h=historyData[Number(button.dataset.openSearchInvoice)];
+  if(!h)return;
+  loadInvoice(h);
+  $('status').textContent='Nota '+storeNameOf(h)+' tanggal '+(h.date||'-')+' dibuka dari hasil pencarian.';
+  window.scrollTo({top:0,behavior:'smooth'});
+ });
+}
+$('storeSearchInput').addEventListener('input',renderStoreSearch);
+$('searchStoreBtn').onclick=renderStoreSearch;
+$('clearStoreSearchBtn').onclick=()=>{
+ $('storeSearchInput').value='';
+ renderStoreSearch();
+ $('storeSearchInput').focus();
+};
+$('voiceStoreSearchBtn').onclick=()=>{
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){
+  $('storeSearchStatus').textContent='Pencarian suara belum didukung di browser/aplikasi ini. Silakan ketik nama toko pada kotak pencarian.';
+  return;
+ }
+ try{
+  const recognition=new SpeechRecognition();
+  recognition.lang='id-ID';recognition.continuous=false;recognition.interimResults=false;recognition.maxAlternatives=1;
+  const voiceButton=$('voiceStoreSearchBtn');
+  voiceButton.disabled=true;voiceButton.textContent='Mendengarkan…';
+  $('storeSearchStatus').textContent='Silakan sebutkan nama toko dengan jelas.';
+  recognition.onresult=event=>{
+   const transcript=event.results&&event.results[0]&&event.results[0][0]?event.results[0][0].transcript:'';
+   $('storeSearchInput').value=String(transcript||'').trim();
+   renderStoreSearch();
+  };
+  recognition.onerror=event=>{
+   $('storeSearchStatus').textContent='Pencarian suara gagal ('+(event.error||'tidak diketahui')+'). Bapak bisa mengetik nama toko sebagai alternatif.';
+  };
+  recognition.onend=()=>{
+   voiceButton.disabled=false;voiceButton.textContent='🎙 Cari dengan Suara';
+  };
+  recognition.start();
+ }catch(error){
+  $('storeSearchStatus').textContent='Mikrofon tidak dapat dimulai. Periksa izin mikrofon Chrome, lalu coba lagi atau ketik nama toko.';
+  $('voiceStoreSearchBtn').disabled=false;$('voiceStoreSearchBtn').textContent='🎙 Cari dengan Suara';
+ }
+};
+function loadInvoice(v){$('date').value=v.date||'';$('customer').value=v.customer||'';$('paymentStatus').value=v.paymentStatus||'Cash';$('notes').value=v.notes||'';rows=(v.items||[]).map(r=>({...r}));renderRows();['buyerSig','sellerSig'].forEach(id=>clearSignature(id));[['buyerSig',v.buyer],['sellerSig',v.seller]].forEach(([id,data])=>{if(data){const im=new Image();im.onload=()=>{const c=$(id),cx=c.getContext('2d'),rect=c.getBoundingClientRect();cx.drawImage(im,0,0,rect.width,rect.height);sigInk[id]=true};im.src=data}});window.scrollTo({top:0,behavior:'smooth'});$('status').textContent='Nota lama dimuat.'}
+function downloadBlobFile(blob,name){
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=name;a.rel='noopener';a.style.display='none';
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>{try{URL.revokeObjectURL(url)}catch(_){}},60000);
+}
+$('exportData').onclick=()=>{
+ const status=$('backupStatus');
+ try{
+  const backup={format:'asido-nota-backup-v1',exportedAt:new Date().toISOString(),products,history:historyData,
+   bookkeepingStatus:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}'),
+   bookkeepingPayments:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}'),
+   bookkeepingPaidDates:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+  const backupJson=JSON.stringify(backup,null,2);
+  // Native Android APK: save the complete nota + bookkeeping backup directly to Downloads/ASIDO.
+  if(window.AndroidAsido&&typeof window.AndroidAsido.saveJson==='function'){
+   const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+   const nativeResult=String(window.AndroidAsido.saveJson(backupJson,'ASIDO-Backup-'+stamp+'.json'));
+   if(!nativeResult.startsWith('OK|'))throw new Error(nativeResult.replace(/^ERROR\|/,'')||'Android gagal menyimpan cadangan JSON.');
+   status.textContent='Cadangan JSON Nota + Pembukuan berhasil disimpan di HP, folder Downloads/ASIDO. Simpan juga salinannya ke Google Drive.';
+   return;
+  }
+  const blob=new Blob([backupJson],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const oldLink=$('backupDownloadLink');if(oldLink)oldLink.remove();
+  const link=document.createElement('a');
+  link.id='backupDownloadLink';link.href=url;link.download='asido-backup.json';
+  link.className='pdf-action-link green';link.textContent='Unduh file JSON sekarang';
+  link.style.display='inline-block';link.style.marginTop='8px';
+  status.textContent='File cadangan siap. Bila unduhan otomatis tidak muncul, tekan tautan hijau di bawah ini. Setelah terunduh, cari asido-backup.json di folder Download.';
+  status.appendChild(document.createElement('br'));status.appendChild(link);
+  try{link.click();}catch(downloadErr){}
+  setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(_){}},10*60*1000);
+ }catch(err){status.textContent='Gagal membuat cadangan: '+(err.message||String(err));}
+};
+let importMode='merge';
+$('importMergeBtn').onclick=()=>{importMode='merge';$('importDataFile').value='';$('importDataFile').click();};
+$('importReplaceBtn').onclick=()=>{importMode='replace';$('importDataFile').value='';$('importDataFile').click();};
+$('importProductsOnlyBtn').onclick=()=>{importMode='products-only';$('importDataFile').value='';$('importDataFile').click();};
+$('visibleImportMergeBtn').onclick=()=>$('importMergeBtn').click();
+$('visibleImportReplaceBtn').onclick=()=>$('importReplaceBtn').click();
+$('visibleImportProductsBtn').onclick=()=>$('importProductsOnlyBtn').click();
+function validateBackupData(backup){
+ if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('File bukan cadangan ASIDO yang valid.');
+ const cleanProducts=backup.products.map((p,i)=>{
+  if(!p||typeof p.name!=='string'||!p.name.trim()||!Number.isFinite(Number(p.price))||Number(p.price)<0)throw new Error('Data produk nomor '+(i+1)+' tidak valid. Tidak ada data yang diubah.');
+  return {name:p.name.trim(),price:Number(p.price)};
+ }); // Keep every validated product from the backup; no undefined removal list may discard catalog entries.
+ const newCatalogProducts=[{name:'Pel capit kartun warna',price:26500},{name:'Pel peras otomatis',price:24000}];
+ for(const added of newCatalogProducts){
+  const existing=cleanProducts.find(p=>p.name.toLocaleLowerCase('id')===added.name.toLocaleLowerCase('id'));
+  if(existing)existing.price=added.price;
+  else cleanProducts.push({...added});
+ }
+ const cleanHistory=backup.history.map((h,i)=>{
+  if(!h||typeof h!=='object'||!Array.isArray(h.items))throw new Error('Data nota nomor '+(i+1)+' tidak valid. Tidak ada data yang diubah.');
+  return h;
+ });
+ return {products:cleanProducts,history:cleanHistory,bookkeepingStatus:backup.bookkeepingStatus&&typeof backup.bookkeepingStatus==='object'?backup.bookkeepingStatus:{},bookkeepingPayments:backup.bookkeepingPayments&&typeof backup.bookkeepingPayments==='object'?backup.bookkeepingPayments:{},bookkeepingPaidDates:backup.bookkeepingPaidDates&&typeof backup.bookkeepingPaidDates==='object'?backup.bookkeepingPaidDates:{}};
+}
+$('importDataFile').addEventListener('change',e=>{
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const backup=JSON.parse(String(reader.result||''));
+   const incoming=validateBackupData(backup);
+   if(importMode==='products-only'){
+    const ok=confirm('SAMAKAN DAFTAR BARANG SAJA?\n\nKatalog barang dan harga pada perangkat ini akan DIGANTI dengan '+incoming.products.length+' produk dari file cadangan. Riwayat nota pada perangkat ini TIDAK DIUBAH.\n\nAplikasi akan menyimpan cadangan daftar barang sebelumnya agar bisa dipulihkan. Lanjutkan?');
+    if(!ok){$('backupStatus').textContent='Penyamaan daftar barang dibatalkan. Data tidak berubah.';e.target.value='';return;}
+    const previousCatalog={format:'asido-catalog-restore-v1',savedAt:new Date().toISOString(),products:products};
+    try{localStorage.setItem('asido_newapp_v1_pre_catalog_sync_backup',JSON.stringify(previousCatalog));}
+    catch(storageErr){throw new Error('Tidak cukup ruang untuk menyimpan cadangan katalog lama. Ekspor cadangan perangkat ini terlebih dahulu, lalu coba lagi.');}
+    const oldProducts=localStorage.getItem('asido_newapp_v1_products');
+    try{localStorage.setItem('asido_newapp_v1_products',JSON.stringify(incoming.products));}
+    catch(storageErr){if(oldProducts===null)localStorage.removeItem('asido_newapp_v1_products');else localStorage.setItem('asido_newapp_v1_products',oldProducts);throw new Error('Penyimpanan katalog gagal. Daftar barang lama dipertahankan.');}
+    products=incoming.products;
+    $('restorePreCatalogBtn').hidden=false;
+    renderProducts();
+    $('backupStatus').textContent='PENYAMAAN DAFTAR BARANG BERHASIL. Katalog perangkat ini sekarang berisi '+products.length+' produk dari file cadangan. Riwayat nota perangkat ini tetap utuh.';
+   }else if(importMode==='replace'){
+    const ok=confirm('SAMAKAN DATA PERANGKAT INI?\n\nDaftar produk ('+incoming.products.length+') dan riwayat nota ('+incoming.history.length+') pada perangkat ini akan DIGANTI dengan isi file cadangan. Data lokal yang tidak ada di file akan hilang dari perangkat ini.\n\nSebelum mengganti, aplikasi akan membuat cadangan pemulihan lokal. Lanjutkan?');
+    if(!ok){$('backupStatus').textContent='Penyamaan dibatalkan. Data perangkat tidak berubah.';e.target.value='';return;}
+    const previous={format:'asido-nota-restore-v1',savedAt:new Date().toISOString(),products:products,history:historyData,bookkeepingStatus:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}'),bookkeepingPayments:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}'),bookkeepingPaidDates:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+    try{localStorage.setItem('asido_newapp_v1_pre_sync_backup',JSON.stringify(previous));}
+    catch(storageErr){throw new Error('Tidak cukup ruang untuk membuat cadangan pemulihan. Ekspor cadangan perangkat ini terlebih dahulu, lalu coba lagi.');}
+    const oldProducts=localStorage.getItem('asido_newapp_v1_products');
+    const oldHistory=localStorage.getItem('asido_newapp_v1_history');
+    try{
+     localStorage.setItem('asido_newapp_v1_products',JSON.stringify(incoming.products));
+     localStorage.setItem('asido_newapp_v1_history',JSON.stringify(incoming.history));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(incoming.bookkeepingStatus||{}));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(incoming.bookkeepingPayments||{}));
+      localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(incoming.bookkeepingPaidDates||{}));
+    }catch(storageErr){
+     if(oldProducts===null)localStorage.removeItem('asido_newapp_v1_products');else localStorage.setItem('asido_newapp_v1_products',oldProducts);
+     if(oldHistory===null)localStorage.removeItem('asido_newapp_v1_history');else localStorage.setItem('asido_newapp_v1_history',oldHistory);
+     throw new Error('Penyimpanan perangkat tidak cukup. Data lama dipertahankan; kosongkan ruang browser atau kurangi ukuran riwayat lalu coba lagi.');
+    }
+    products=incoming.products;
+    historyData=incoming.history;
+    $('restorePreSyncBtn').hidden=false;
+    renderProducts();renderHistory();
+    $('backupStatus').textContent='PENYAMAAN BERHASIL. Perangkat ini sekarang memakai '+products.length+' produk dan '+historyData.length+' nota dari file cadangan. Pembaruan berikutnya tetap perlu Ekspor dari perangkat sumber dan Impor & Samakan Data di perangkat ini.';
+   }else{
+    const ok=confirm('Gabungkan '+incoming.products.length+' produk dan '+incoming.history.length+' nota dari file cadangan dengan data yang sudah ada di perangkat ini? Data lama yang tidak ada di file akan tetap dipertahankan.');
+    if(!ok){$('backupStatus').textContent='Impor gabungan dibatalkan. Data perangkat tidak berubah.';e.target.value='';return;}
+    const preMerge={format:'asido-nota-pre-merge-v1',savedAt:new Date().toISOString(),products:products,history:historyData};
+    try{localStorage.setItem('asido_newapp_v1_pre_merge_backup',JSON.stringify(preMerge));}
+    catch(storageErr){throw new Error('Cadangan pengaman sebelum penggabungan tidak dapat disimpan karena ruang browser tidak cukup. Tidak ada data yang digabungkan. Ekspor cadangan perangkat ini terlebih dahulu.');}
+    $('backupStatus').textContent='Sedang memeriksa dan menggabungkan cadangan. Mohon tunggu…';
+    const productMap=new Map(products.map(p=>[String(p.name||'').trim(),{...p}]));
+    let addedProducts=0;
+    incoming.products.forEach(p=>{
+     const key=String(p.name||'').trim();
+     if(!productMap.has(key)){productMap.set(key,{...p});addedProducts++;}
+    });
+    const mergedProducts=Array.from(productMap.values());
+    const mergedHistory=historyData.map(h=>({...h}));
+    const signature=h=>JSON.stringify([h.date||'',String(h.customer||'').trim().toLowerCase(),Number(h.total)||0,h.items||[],h.paymentStatus||'',h.notes||'',h.savedAt||'',h.buyer||'',h.seller||'']);
+    const historyById=new Map();
+    const signatureSet=new Set();
+    for(const existing of mergedHistory){
+     if(existing.id)historyById.set(String(existing.id),existing);
+     signatureSet.add(signature(existing));
+    }
+    let addedHistory=0,duplicateHistory=0,collisionCount=0;
+    for(const h of incoming.history){
+     const sig=signature(h);
+     const sameId=h.id?historyById.get(String(h.id)):null;
+     if(sameId){
+      if(signature(sameId)===sig){duplicateHistory++;continue;}
+      const copy={...h,originalImportedId:h.id,id:String(h.id)+'-IMP-'+Date.now()+'-'+(++collisionCount)};
+      mergedHistory.push(copy);addedHistory++;
+      historyById.set(String(copy.id),copy);signatureSet.add(signature(copy));
+      continue;
+     }
+     if(signatureSet.has(sig)){duplicateHistory++;continue;}
+     const copy={...h};mergedHistory.push(copy);addedHistory++;
+     if(copy.id)historyById.set(String(copy.id),copy);
+     signatureSet.add(sig);
+    }
+    mergedHistory.sort((a,b)=>String(b.savedAt||'').localeCompare(String(a.savedAt||'')));
+    const storageKeys=['asido_newapp_v1_products','asido_newapp_v1_history','asido_newapp_v1_bookkeeping_status','asido_newapp_v1_bookkeeping_payments','asido_newapp_v1_bookkeeping_paid_dates'];
+    const oldValues=new Map(storageKeys.map(key=>[key,localStorage.getItem(key)]));
+    try{
+     localStorage.setItem('asido_newapp_v1_products',JSON.stringify(mergedProducts));
+     localStorage.setItem('asido_newapp_v1_history',JSON.stringify(mergedHistory));
+     const localBookStatus=JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}');
+     const mergedBookStatus={...incoming.bookkeepingStatus,...localBookStatus};
+     const localBookPayments=JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}');
+     const mergedBookPayments={...incoming.bookkeepingPayments,...localBookPayments};
+     for(const key of Object.keys(incoming.bookkeepingPayments||{})){
+      if(localBookPayments[key]){
+       const all=[...(incoming.bookkeepingPayments[key]||[]),...(localBookPayments[key]||[])];
+       const seen=new Set();
+       mergedBookPayments[key]=all.filter(p=>{
+        const sig=String(p.createdAt||'')+'|'+String(p.date||'')+'|'+Number(p.amount||0);
+        if(seen.has(sig))return false;seen.add(sig);return true;
+       });
+      }
+     }
+     const mergedPaidDates={...incoming.bookkeepingPaidDates,...JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')};
+     localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(mergedBookStatus));
+     localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(mergedBookPayments));
+     localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(mergedPaidDates));
+     const verifyProducts=JSON.parse(localStorage.getItem('asido_newapp_v1_products')||'null');
+     const verifyHistory=JSON.parse(localStorage.getItem('asido_newapp_v1_history')||'null');
+     if(!Array.isArray(verifyProducts)||verifyProducts.length!==mergedProducts.length||!Array.isArray(verifyHistory)||verifyHistory.length!==mergedHistory.length)throw new Error('Pemeriksaan setelah penyimpanan tidak cocok. Data sebelumnya dipulihkan.');
+    }catch(storageErr){
+     for(const [key,value] of oldValues){if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}
+     throw new Error('Penyimpanan atau pemeriksaan gagal ('+(storageErr.message||String(storageErr))+'). Data sebelum penggabungan dipulihkan; tidak ada hasil gabungan yang dipakai.');
+    }
+    products=mergedProducts;historyData=mergedHistory;
+    $('restorePreMergeBtn').hidden=false;
+    renderProducts();renderHistory();
+    $('backupStatus').textContent='PENGGABUNGAN BERHASIL. '+products.length+' produk dan '+historyData.length+' nota sekarang tersimpan di perangkat ini. '+addedProducts+' produk baru dan '+addedHistory+' nota baru ditambahkan; '+duplicateHistory+' nota duplikat dilewati. Semua nama produk dari file dipertahankan.';
+   }
+  }catch(err){$('backupStatus').textContent='Impor gagal: '+(err.message||String(err))+'. Data perangkat tidak diganti.';}
+  e.target.value='';
+ };
+ reader.onerror=()=>{$('backupStatus').textContent='File cadangan tidak dapat dibaca.';e.target.value='';};
+ reader.readAsText(file);
+});
+$('restorePreSyncBtn').onclick=()=>{
+ const raw=localStorage.getItem('asido_newapp_v1_pre_sync_backup');
+ if(!raw){$('backupStatus').textContent='Tidak ada cadangan pemulihan pada perangkat ini.';$('restorePreSyncBtn').hidden=true;return;}
+ if(!confirm('Pulihkan daftar produk dan riwayat yang tersimpan tepat sebelum penyamaan terakhir? Data saat ini akan diganti dengan cadangan pemulihan tersebut.'))return;
+ try{
+  const backup=JSON.parse(raw);
+  if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('Cadangan pemulihan tidak valid.');
+  localStorage.setItem('asido_newapp_v1_products',JSON.stringify(backup.products));
+  localStorage.setItem('asido_newapp_v1_history',JSON.stringify(backup.history));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(backup.bookkeepingStatus||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(backup.bookkeepingPayments||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(backup.bookkeepingPaidDates||{}));
+  products=backup.products;historyData=backup.history;
+  renderProducts();renderHistory();
+  localStorage.removeItem('asido_newapp_v1_pre_sync_backup');
+  $('restorePreSyncBtn').hidden=true;
+  $('backupStatus').textContent='Cadangan sebelum penyamaan berhasil dipulihkan.';
+ }catch(err){$('backupStatus').textContent='Pemulihan gagal: '+(err.message||String(err));}
+};
+$('restorePreCatalogBtn').onclick=()=>{
+ const raw=localStorage.getItem('asido_newapp_v1_pre_catalog_sync_backup');
+ if(!raw){$('backupStatus').textContent='Tidak ada cadangan daftar barang sebelumnya pada perangkat ini.';$('restorePreCatalogBtn').hidden=true;return;}
+ if(!confirm('Pulihkan daftar barang yang tersimpan tepat sebelum penyamaan katalog terakhir? Riwayat nota tidak diubah.'))return;
+ try{
+  const backup=JSON.parse(raw);
+  if(!backup||!Array.isArray(backup.products))throw new Error('Cadangan katalog tidak valid.');
+  localStorage.setItem('asido_newapp_v1_products',JSON.stringify(backup.products));
+  products=backup.products;
+  renderProducts();
+  localStorage.removeItem('asido_newapp_v1_pre_catalog_sync_backup');
+  $('restorePreCatalogBtn').hidden=true;
+  $('backupStatus').textContent='Daftar barang sebelumnya berhasil dipulihkan. Riwayat nota tetap utuh.';
+ }catch(err){$('backupStatus').textContent='Pemulihan katalog gagal: '+(err.message||String(err));}
+};
+$('restorePreMergeBtn').onclick=()=>{
+ const raw=localStorage.getItem('asido_newapp_v1_pre_merge_backup');
+ if(!raw){$('backupStatus').textContent='Tidak ada cadangan sebelum penggabungan pada perangkat ini.';$('restorePreMergeBtn').hidden=true;return;}
+ if(!confirm('Pulihkan daftar produk dan riwayat yang tersimpan tepat sebelum penggabungan terakhir? Data saat ini akan diganti dengan cadangan pengaman tersebut.'))return;
+ try{
+  const backup=JSON.parse(raw);
+  if(!backup||!Array.isArray(backup.products)||!Array.isArray(backup.history))throw new Error('Cadangan sebelum penggabungan tidak valid.');
+  localStorage.setItem('asido_newapp_v1_products',JSON.stringify(backup.products));
+  localStorage.setItem('asido_newapp_v1_history',JSON.stringify(backup.history));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(backup.bookkeepingStatus||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(backup.bookkeepingPayments||{}));
+  localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(backup.bookkeepingPaidDates||{}));
+  products=backup.products;historyData=backup.history;
+  renderProducts();renderHistory();
+  localStorage.removeItem('asido_newapp_v1_pre_merge_backup');
+  $('restorePreMergeBtn').hidden=true;
+  $('backupStatus').textContent='Data sebelum penggabungan berhasil dipulihkan.';
+ }catch(err){$('backupStatus').textContent='Pemulihan sebelum penggabungan gagal: '+(err.message||String(err));}
+};
+if(localStorage.getItem('asido_newapp_v1_pre_catalog_sync_backup'))$('restorePreCatalogBtn').hidden=false;
+if(localStorage.getItem('asido_newapp_v1_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
+if(localStorage.getItem('asido_newapp_v1_pre_merge_backup'))$('restorePreMergeBtn').hidden=false;
+$('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
+function parseVoice(text){
+ const low=text.toLowerCase();
+ const cleanName=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+ const spoken=cleanName(low);
+ const found=products.find(p=>spoken.includes(cleanName(p.name)));
+ const amount=n=>{let s=String(n).trim();if(/\.\d{3}$/.test(s))s=s.replace(/\./g,'');if(/,\d{3}$/.test(s))s=s.replace(/,/g,'');else s=s.replace(',','.');return Number(s)||0;};
+ const qtyPart=low.split(/\bharga\b/)[0];
+ const qMatch=qtyPart.match(/(\d+(?:[.,]\d+)?)\s*(lusin|dozen|kodi|buah|pcs|biji|unit|batang|set)?/);
+ let qty=qMatch?amount(qMatch[1]):1;
+ const unit=qMatch&&qMatch[2]?qMatch[2]:'';
+ if(unit==='lusin'||unit==='dozen')qty*=12;
+ else if(unit==='kodi')qty*=20;
+ let explicitPrice=null;
+ const pm=low.match(/\bharga\s*(\d[\d.,]*)\s*(ribu|rb)?/);
+ if(pm){explicitPrice=amount(pm[1]);if(pm[2])explicitPrice*=1000;}
+ else {
+   const pm2=low.match(/(\d[\d.,]*)\s*(ribu|rb)\b/);
+   if(pm2 && (!qMatch || pm2[1]!==qMatch[1])) explicitPrice=amount(pm2[1])*1000;
+ }
+ let selected=found;
+ if(!selected){
+   const typed=prompt('Saya menangkap ucapan: "'+text+'". Nama barang belum terdengar atau tidak cocok dengan daftar produk. Ketik nama barangnya, misalnya Sapu ijuk atau Pel capit katun.','');
+   if(!typed)return;
+   const typedNorm=cleanName(typed);
+   selected=products.find(p=>typedNorm===cleanName(p.name)||typedNorm.includes(cleanName(p.name))||cleanName(p.name).includes(typedNorm));
+   const productName=selected?selected.name:typed.trim();
+   if(!qMatch){const q=prompt('Jumlah barang (gunakan satuan dasar/buah):','1');if(q===null)return;qty=Number(q)||0;}
+   let price=explicitPrice!==null?explicitPrice:(selected?selected.price:null);
+   if(price===null){const p=prompt('Harga satuan dalam rupiah (angka saja):','0');if(p===null)return;price=amount(p);}
+   if(qty>0 && price>=0){addRow(productName,qty,price);$('status').textContent='Ditambahkan: '+productName+' · '+qty+' unit · '+money(price)+' per unit. Periksa kembali data barang.';}
+   return;
+ }
+ if(!qMatch){const q=prompt('Jumlah untuk '+found.name+' (satuan dasar/buah):','1');if(q===null)return;qty=Number(q)||0;}
+ const price=explicitPrice!==null?explicitPrice:found.price;
+ if(qty>0 && price>=0){addRow(found.name,qty,price);$('status').textContent='Ditambahkan: '+found.name+' · '+qty+' unit · '+money(price)+' per unit. Periksa kembali data barang.';}
+}
+window.onAsidoVoiceResult=function(t){$('voiceBtn').textContent='🎙 Input dengan suara';$('status').textContent='Ucapan dikenali: “'+t+'”. Mohon periksa hasilnya.';parseVoice(t);};
+$('voiceBtn').onclick=()=>{if(window.AndroidAsido&&typeof window.AndroidAsido.startVoiceInput==='function'){$('voiceBtn').textContent='🎙 Mendengarkan…';window.AndroidAsido.startVoiceInput();return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Browser belum mendukung input suara. Gunakan Chrome terbaru atau masukkan barang manual.');return}const rec=new SR();rec.lang='id-ID';rec.interimResults=false;rec.maxAlternatives=1;$('voiceBtn').textContent='🎙 Mendengarkan…';rec.onresult=e=>{const t=e.results[0][0].transcript;$('status').textContent='Ucapan dikenali: “'+t+'”. Mohon periksa hasilnya.';parseVoice(t)};rec.onerror=e=>$('status').textContent='Input suara gagal ('+e.error+'). Silakan masukkan secara manual.';rec.onend=()=>$('voiceBtn').textContent='🎙 Input dengan suara';rec.start()};
+const sigInk={};const canvases=['buyerSig','sellerSig'];
+function setupCanvas(id){
+ const c=$(id);
+ const cx=c.getContext('2d');
+ let drawing=false,last=null;
+ function styleContext(){
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  cx.lineWidth=2.4;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#172435';
+ }
+ function pos(clientX,clientY){
+  const r=c.getBoundingClientRect();
+  return {x:clientX-r.left,y:clientY-r.top};
+ }
+ function startAt(x,y,e){
+  if(e&&e.cancelable)e.preventDefault();
+  drawing=true;sigInk[id]=true;last=pos(x,y);
+  // Draw a small dot for a tap, so a brief touch is still visible.
+  cx.beginPath();cx.arc(last.x,last.y,1.2,0,Math.PI*2);cx.fillStyle='#172435';cx.fill();
+  try{if(e&&typeof e.pointerId==='number'&&c.setPointerCapture)c.setPointerCapture(e.pointerId)}catch(_){}
+ }
+ function moveTo(x,y,e){
+  if(!drawing)return;
+  if(e&&e.cancelable)e.preventDefault();
+  const p=pos(x,y);
+  cx.beginPath();cx.moveTo(last.x,last.y);cx.lineTo(p.x,p.y);cx.stroke();last=p;
+ }
+ function finish(e){if(e&&e.cancelable)e.preventDefault();drawing=false;last=null}
+ function resizeCanvas(){
+  const r=c.getBoundingClientRect();
+  if(!r.width)return;
+  let saved=null;
+  if(sigInk[id]){try{saved=c.toDataURL('image/png')}catch(_){}}
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  c.width=Math.round(r.width*dpr);
+  c.height=Math.round(Math.max(r.height,150)*dpr);
+  styleContext();
+  if(saved){const im=new Image();im.onload=()=>{const rr=c.getBoundingClientRect();cx.drawImage(im,0,0,rr.width,rr.height)};im.src=saved;}
+ }
+ resizeCanvas();
+ if('PointerEvent' in window){
+  c.addEventListener('pointerdown',e=>startAt(e.clientX,e.clientY,e),{passive:false});
+  c.addEventListener('pointermove',e=>moveTo(e.clientX,e.clientY,e),{passive:false});
+  c.addEventListener('pointerup',finish,{passive:false});
+  c.addEventListener('pointercancel',finish,{passive:false});
+  c.addEventListener('lostpointercapture',()=>{drawing=false;last=null});
+ }else{
+  c.addEventListener('touchstart',e=>{if(e.touches.length){const t=e.touches[0];startAt(t.clientX,t.clientY,e)}},{passive:false});
+  c.addEventListener('touchmove',e=>{if(e.touches.length){const t=e.touches[0];moveTo(t.clientX,t.clientY,e)}},{passive:false});
+  c.addEventListener('touchend',finish,{passive:false});
+  c.addEventListener('touchcancel',finish,{passive:false});
+  c.addEventListener('mousedown',e=>startAt(e.clientX,e.clientY,e));
+  window.addEventListener('mousemove',e=>moveTo(e.clientX,e.clientY,e));
+  window.addEventListener('mouseup',finish);
+ }
+}
+function clearSignature(id){const c=$(id),cx=c.getContext('2d');cx.clearRect(0,0,c.width,c.height);sigInk[id]=false}
+function signatureData(id){return sigInk[id]?$(id).toDataURL('image/png'):null}
+document.querySelectorAll('.clearSig').forEach(b=>b.onclick=()=>clearSignature(b.dataset.canvas));
+canvases.forEach(setupCanvas);
+window.addEventListener('resize',()=>{canvases.forEach(id=>{const c=$(id),cx=c.getContext('2d');let saved=null;if(sigInk[id]){try{saved=c.toDataURL('image/png')}catch(_){}}const r=c.getBoundingClientRect(),dpr=Math.max(1,window.devicePixelRatio||1);if(!r.width)return;c.width=Math.round(r.width*dpr);c.height=Math.round(Math.max(r.height,150)*dpr);cx.setTransform(dpr,0,0,dpr,0,0);cx.lineWidth=2.4;cx.lineCap='round';cx.lineJoin='round';cx.strokeStyle='#172435';if(saved){const im=new Image();im.onload=()=>cx.drawImage(im,0,0,r.width,r.height);im.src=saved;}})});
+
+let latestPdfBlob=null,latestPdfName='',latestPdfUrl='',latestPdfDoc=null;
+function preparePdfActions(blob,name,doc){
+ if(latestPdfUrl){try{URL.revokeObjectURL(latestPdfUrl)}catch(_){}}
+ latestPdfBlob=blob;latestPdfName=name;latestPdfDoc=doc||null;latestPdfUrl=URL.createObjectURL(blob);
+ const download=$('pdfDownloadLink'),share=$('pdfShareLink'),preview=$('pdfPreviewLink');
+ if(download){download.href=latestPdfUrl;download.download=name;}
+ if(share){share.href=latestPdfUrl;share.download=name;}
+ if(preview){preview.href=latestPdfUrl;}
+ $('pdfActions').hidden=false;
+ $('status').textContent='PDF berhasil dibuat. Untuk menyimpan di HP, ketuk tautan Unduh PDF di bawah ini. Tautan langsung ini memberi browser kesempatan menangani unduhan.';
+}
+function triggerPdfDownload(showStatus=true){
+ if(!latestPdfBlob){$('status').textContent='Buat / Simpan PDF terlebih dahulu.';return false}
+ try{
+  if(latestPdfDoc&&typeof latestPdfDoc.save==='function')latestPdfDoc.save(latestPdfName);
+  else downloadBlobFile(latestPdfBlob,latestPdfName);
+  if(showStatus)$('status').textContent='Perintah unduh dikirim. Periksa notifikasi unduhan atau My Files > Downloads.';
+  return true;
+ }catch(err){$('status').textContent='Unduhan gagal: '+(err.message||String(err))+'. Ketuk tautan Unduh PDF secara langsung.';return false;}
+}
+function isPhoneBrowser(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(('ontouchstart' in window)&&Math.min(screen.width||9999,screen.height||9999)<700);}
+function printInvoiceForPhone(){
+ const v=invoice();if(!validate(v))return;
+ const validItems=v.items.filter(r=>r.name.trim()&&r.qty>0);
+ const itemRows=validItems.map(r=>'<tr><td>'+esc(r.name)+'</td><td class="qty">'+esc(r.qty)+'</td><td class="num">'+money(r.price)+'</td><td class="num">'+money(r.qty*r.price)+'</td></tr>').join('');
+ const buyerSig=v.buyer?'<img class="sigimg" alt="Tanda tangan pelanggan" src="'+v.buyer+'">':'<div class="signblank"></div>';
+ const sellerSig=v.seller?'<img class="sigimg" alt="Tanda tangan ASIDO" src="'+v.seller+'">':'<div class="signblank"></div>';
+ let sheet=document.getElementById('asidoPrintSheet');if(!sheet){sheet=document.createElement('div');sheet.id='asidoPrintSheet';document.body.appendChild(sheet);}
+ let printCss=document.getElementById('asidoPrintCss');if(!printCss){printCss=document.createElement('style');printCss.id='asidoPrintCss';document.head.appendChild(printCss);}
+ printCss.textContent=`
+ #asidoPrintSheet{display:none}
+ @media print{
+  @page{size:A4;margin:12mm}
+  html,body{background:#fff!important;color:#111!important}
+  body>*:not(#asidoPrintSheet){display:none!important}
+  #asidoPrintSheet{display:block!important;color:#171717;font-family:Arial,sans-serif;font-size:10pt;background:#fff;width:100%;padding:0}
+  #asidoPrintSheet *{box-sizing:border-box}
+  #asidoPrintSheet .heading{display:flex;align-items:center;gap:9px;margin-bottom:18px;color:#123c7a}
+  #asidoPrintSheet .brand{font-size:25pt;font-weight:800;letter-spacing:-1px}
+  #asidoPrintSheet .divider{font-size:24pt;font-weight:300}
+  #asidoPrintSheet .title{font-size:15pt;font-weight:700}
+  #asidoPrintSheet .date{float:right;text-align:right;margin-top:0}
+  #asidoPrintSheet .customer{margin:6px 0 17px}
+  #asidoPrintSheet .customer small{display:block;color:#555;font-size:9pt;margin-bottom:3px}
+  #asidoPrintSheet .customer strong{font-size:13pt}
+  #asidoPrintSheet table{width:100%;border-collapse:collapse;margin-top:8px}
+  #asidoPrintSheet th{background:#e6eef8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-align:left;padding:7px 6px}
+  #asidoPrintSheet td{padding:8px 6px;border-bottom:1px solid #eee;vertical-align:top}
+  #asidoPrintSheet .qty{text-align:center;width:12%}
+  #asidoPrintSheet .num{text-align:right;white-space:nowrap;width:21%}
+  #asidoPrintSheet .totals{margin:16px 0 0 auto;width:46%;border-top:1px solid #333;padding-top:10px}
+  #asidoPrintSheet .totrow{display:flex;justify-content:space-between;margin:5px 0}
+  #asidoPrintSheet .grand{font-weight:800;font-size:14pt;margin-top:8px}
+  #asidoPrintSheet .notes{margin-top:22px;white-space:pre-wrap;border:1px solid #b5c3d5;border-radius:5px;padding:10px;min-height:28px}
+  #asidoPrintSheet .notes strong{display:block;color:#123c7a;margin-bottom:5px}
+  #asidoPrintSheet .signatures{display:grid;grid-template-columns:1fr 1fr;gap:45px;margin-top:36px;break-inside:avoid;page-break-inside:avoid}
+  #asidoPrintSheet .sigarea{text-align:center}
+  #asidoPrintSheet .sigcaption{text-align:left;margin-bottom:4px}
+  #asidoPrintSheet .sigimg{height:58px;max-width:100%;width:100%;object-fit:contain;object-position:center}
+  #asidoPrintSheet .signblank{height:58px}
+  #asidoPrintSheet .line{border-top:1px solid #555;margin-top:2px;padding-top:5px}
+  #asidoPrintSheet .footer{position:fixed;bottom:0;left:0;font-size:8pt;color:#555}
+ }
+ `;
+ sheet.innerHTML='<div class="date">Tanggal: '+esc(v.date||'-')+'</div><div class="heading"><span class="brand">ASIDO</span><span class="divider">|</span><span class="title">NOTA PENJUALAN</span></div><div class="customer"><small>Pelanggan:</small><strong>'+esc(v.customer)+'</strong></div><table><thead><tr><th>Barang</th><th class="qty">Qty</th><th class="num">Harga</th><th class="num">Subtotal</th></tr></thead><tbody>'+itemRows+'</tbody></table><div class="totals"><div class="totrow"><span>Subtotal:</span><span>'+money(v.total)+'</span></div><div class="totrow grand"><span>TOTAL:</span><span>'+money(v.total)+'</span></div></div>'+(v.notes?'<div class="notes"><strong>Catatan:</strong>'+esc(v.notes).replace(/\n/g,'<br>')+'</div>':'')+'<div class="signatures"><div class="sigarea"><div class="sigcaption">Pelanggan,</div>'+buyerSig+'<div class="line">('+esc(v.customer)+')</div></div><div class="sigarea"><div class="sigcaption">ASIDO,</div>'+sellerSig+'<div class="line">(David Asido)</div></div></div><div class="footer">Dibuat dengan ASIDO Nota Digital</div>';
+ $('status').textContent='Membuka dialog cetak Android. Pilih “Simpan sebagai PDF”, lalu pilih lokasi dan tekan Simpan.';
+ if(typeof window.print!=='function'){alert('Fitur cetak tidak tersedia pada browser ini. Buka halaman ini di Chrome.');return;}
+ window.print();
+}
+$('printPdfPhone').onclick=()=>printInvoiceForPhone();
+async function loadSignatureImage(dataUrl){
+ if(!dataUrl)return null;
+ return new Promise(resolve=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=dataUrl;});
+}
+function wrapCanvasText(ctx,text,maxWidth){
+ const words=String(text||'').split(/\s+/);const lines=[];let line='';
+ words.forEach(word=>{const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}else line=test;});
+ if(line)lines.push(line);return lines.length?lines:[''];
+}
+function roundedRect(ctx,x,y,w,h,r){
+ const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+}
+function createCanvasNota(v,buyerImage,sellerImage){
+ const W=1400,pad=76,rowFont=28,lineHeight=36;
+ const rows=v.items.filter(r=>String(r.name||'').trim()&&Number(r.qty)>0);
+ const measure=document.createElement('canvas').getContext('2d');measure.font='28px Arial, sans-serif';
+ const rowData=rows.map(r=>({r,lines:wrapCanvasText(measure,r.name,620)}));
+ let H=360;
+ rowData.forEach(d=>{H+=Math.max(76,d.lines.length*lineHeight+28);});
+ H+=155;
+ let noteLines=[];
+ if(v.notes){measure.font='25px Arial, sans-serif';noteLines=wrapCanvasText(measure,v.notes,W-pad*2-42);H+=62+noteLines.length*34+28;}
+ H+=330;
+ const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+ const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+ const blue='#123c7a',pale='#e6eef8',dark='#172435',gray='#556477',border='#c9d5e4';
+ ctx.fillStyle=blue;ctx.font='bold 66px Arial, sans-serif';ctx.fillText('ASIDO',pad,106);
+ ctx.strokeStyle=blue;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(320,49);ctx.lineTo(320,118);ctx.stroke();
+ ctx.font='bold 44px Arial, sans-serif';ctx.fillText('NOTA PENJUALAN',355,99);
+ ctx.fillStyle=gray;ctx.textAlign='right';ctx.font='26px Arial, sans-serif';ctx.fillText('Tanggal: '+(v.date||'-'),W-pad,154);ctx.textAlign='left';
+ ctx.fillStyle=gray;ctx.font='26px Arial, sans-serif';ctx.fillText('Pelanggan:',pad,205);
+ ctx.fillStyle=dark;ctx.font='bold 38px Arial, sans-serif';
+ const custLines=wrapCanvasText(ctx,v.customer,W-pad*2);let cy=252;custLines.forEach(line=>{ctx.fillText(line,pad,cy);cy+=45;});
+ let y=Math.max(305,cy+18);
+ ctx.fillStyle=pale;roundedRect(ctx,pad,y,W-pad*2,58,8);ctx.fill();
+ ctx.fillStyle=dark;ctx.font='bold 25px Arial, sans-serif';ctx.textAlign='left';ctx.fillText('Barang',pad+18,y+38);ctx.textAlign='right';ctx.fillText('Qty',860,y+38);ctx.fillText('Harga',1095,y+38);ctx.fillText('Subtotal',W-pad-18,y+38);ctx.textAlign='left';
+ y+=58;
+ rowData.forEach(({r,lines})=>{
+  const rh=Math.max(76,lines.length*lineHeight+28);
+  ctx.strokeStyle='#e6eaf0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,y+rh);ctx.lineTo(W-pad,y+rh);ctx.stroke();
+  ctx.fillStyle=dark;ctx.font='27px Arial, sans-serif';let ty=y+39;lines.forEach(line=>{ctx.fillText(line,pad+18,ty);ty+=lineHeight;});
+  ctx.textAlign='right';ctx.font='26px Arial, sans-serif';ctx.fillText(String(r.qty),860,y+42);ctx.fillText(money(r.price),1095,y+42);ctx.font='bold 26px Arial, sans-serif';ctx.fillText(money((Number(r.qty)||0)*(Number(r.price)||0)),W-pad-18,y+42);ctx.textAlign='left';
+  y+=rh;
+ });
+ y+=26;ctx.strokeStyle='#343b45';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(855,y);ctx.lineTo(W-pad,y);ctx.stroke();y+=48;
+ ctx.fillStyle=dark;ctx.font='27px Arial, sans-serif';ctx.fillText('Subtotal:',900,y);ctx.textAlign='right';ctx.fillText(money(v.total),W-pad-18,y);y+=48;
+ ctx.fillStyle=blue;ctx.font='bold 36px Arial, sans-serif';ctx.fillText('TOTAL:',900,y);ctx.fillText(money(v.total),W-pad-18,y);ctx.textAlign='left';y+=40;
+ if(v.notes){
+  y+=20;ctx.fillStyle=blue;ctx.font='bold 27px Arial, sans-serif';ctx.fillText('Catatan:',pad,y);y+=18;
+  const boxH=noteLines.length*34+32;ctx.strokeStyle=border;ctx.lineWidth=2;roundedRect(ctx,pad,y,W-pad*2,boxH,8);ctx.stroke();
+  ctx.fillStyle=dark;ctx.font='25px Arial, sans-serif';let ny=y+38;noteLines.forEach(line=>{ctx.fillText(line,pad+18,ny);ny+=34;});y+=boxH+8;
+ }
+ y+=34;ctx.fillStyle=dark;ctx.font='25px Arial, sans-serif';ctx.fillText('Pelanggan,',pad+35,y);ctx.fillText('ASIDO,',W/2+80,y);y+=10;
+ const sigW=440,sigH=125,sigLeft=pad+35,sigRight=W/2+65;
+ if(buyerImage){ctx.drawImage(buyerImage,sigLeft,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigLeft,y,sigW,sigH);}
+ if(sellerImage){ctx.drawImage(sellerImage,sigRight,y,sigW,sigH);}else{ctx.strokeStyle='#d6dce5';ctx.strokeRect(sigRight,y,sigW,sigH);}
+ y+=sigH+8;ctx.strokeStyle='#454b55';ctx.lineWidth=2;
+ ctx.beginPath();ctx.moveTo(sigLeft,y);ctx.lineTo(sigLeft+sigW,y);ctx.moveTo(sigRight,y);ctx.lineTo(sigRight+sigW,y);ctx.stroke();y+=38;
+ ctx.fillStyle=dark;ctx.font='23px Arial, sans-serif';ctx.textAlign='center';ctx.fillText('('+v.customer+')',sigLeft+sigW/2,y);ctx.fillText('(David Asido)',sigRight+sigW/2,y);ctx.textAlign='left';
+ ctx.fillStyle=gray;ctx.font='19px Arial, sans-serif';ctx.fillText('Dibuat dengan ASIDO Nota Digital',pad,H-24);
+ return canvas;
+}
+let latestNotaImageBlob=null,latestNotaImageFile=null,latestNotaImageUrl='';
+function dataUrlToPngBlob(dataUrl){
+ const comma=dataUrl.indexOf(',');
+ if(comma<0)throw new Error('Format gambar PNG tidak valid.');
+ const raw=atob(dataUrl.slice(comma+1));
+ const bytes=new Uint8Array(raw.length);
+ for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+ return new Blob([bytes],{type:'image/png'});
+}
+$('makeNotaImage').onclick=()=>{
+ const btn=$('makeNotaImage');
+ try{
+  const v=invoice();if(!validate(v))return;
+  btn.disabled=true;
+  btn.textContent='Menyiapkan nota untuk WhatsApp…';
+  $('notaImageStatus').textContent='Membuat gambar nota putih untuk '+v.customer+'…';
+
+  // Create exactly the white invoice sheet, including both signatures.
+  const buyerCanvas=sigInk['buyerSig']?$('buyerSig'):null;
+  const sellerCanvas=sigInk['sellerSig']?$('sellerSig'):null;
+  const canvas=createCanvasNota(v,buyerCanvas,sellerCanvas);
+  const dataUrl=canvas.toDataURL('image/png');
+  const blob=dataUrlToPngBlob(dataUrl);
+  if(!blob||blob.type!=='image/png'||blob.size<1000)throw new Error('Gambar nota kosong atau tidak valid.');
+
+  const datePart=(v.date||'').replace(/-/g,'');
+  const safeCustomer=(v.customer||'Pelanggan').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').slice(0,32)||'Pelanggan';
+  const fileName='ASIDO-Nota-'+datePart+'-'+safeCustomer+'.png';
+  const file=new File([blob],fileName,{type:'image/png',lastModified:Date.now()});
+
+  latestNotaImageBlob=blob;
+  latestNotaImageFile=file;
+  if(latestNotaImageUrl&&latestNotaImageUrl.startsWith('blob:')){try{URL.revokeObjectURL(latestNotaImageUrl)}catch(_){}}
+  latestNotaImageUrl=URL.createObjectURL(blob);
+  $('notaImagePreview').src=latestNotaImageUrl;
+  $('downloadNotaImage').href=latestNotaImageUrl;
+  $('downloadNotaImage').download=fileName;
+  $('notaImageActions').hidden=false;
+  $('pdfActions').hidden=true;
+
+  // Native APK: pass the PNG to Android ACTION_SEND directly from this button.
+  if(window.AndroidAsido&&typeof window.AndroidAsido.sharePng==='function'){
+   $('notaImageStatus').textContent='Menyiapkan lampiran gambar nota di WhatsApp…';
+   window.AndroidAsido.sharePng(dataUrl,fileName,v.customer);
+   $('status').textContent='Nota '+v.customer+' disiapkan untuk WhatsApp.';
+   return;
+  }
+
+  // Android Web Share: share the PNG file only (no text payload).
+  // Call synchronously in the original button tap to preserve user activation.
+  if(!navigator.share){
+   $('notaImageStatus').textContent='HP/browser ini tidak menyediakan berbagi file langsung. Gambar nota sudah dibuat; gunakan Unduh Gambar PNG sebagai cadangan.';
+   return;
+  }
+  if(navigator.canShare&&!navigator.canShare({files:[file]})){
+   $('notaImageStatus').textContent='HP/browser ini tidak mendukung lampiran file gambar melalui menu berbagi. Gunakan Unduh Gambar PNG sebagai cadangan.';
+   return;
+  }
+
+  $('notaImageStatus').textContent='Membuka menu Bagikan Android dengan satu lampiran gambar nota '+v.customer+'. Pilih WhatsApp.';
+  const shareCaption='Nota penjualan ASIDO untuk '+v.customer+'. Total '+money(v.total)+'.';
+  const sharePromise=navigator.share({
+   files:[file],
+   title:'Nota ASIDO - '+v.customer,
+   text:shareCaption
+  });
+  sharePromise.then(()=>{
+   $('notaImageStatus').textContent='Menu berbagi ditutup. Jika Anda memilih WhatsApp, pastikan foto nota putih terlihat di pratinjau, lalu tekan Kirim.';
+  }).catch(err=>{
+   if(err&&err.name==='AbortError'){
+    $('notaImageStatus').textContent='Berbagi dibatalkan. Gambar nota masih tersedia melalui Unduh Gambar PNG.';
+   }else{
+    $('notaImageStatus').textContent='Menu berbagi tidak dapat melampirkan gambar: '+(err&&err.message?err.message:'kesalahan perangkat')+'. Gunakan Unduh Gambar PNG sebagai cadangan.';
+   }
+  });
+ }catch(err){
+  $('notaImageStatus').textContent='Gagal menyiapkan gambar nota: '+(err&&err.message?err.message:String(err));
+ }finally{
+  btn.disabled=false;
+  btn.textContent='📲 Kirim Nota ke WhatsApp';
+ }
+};
+$('shareSavedPdf').onclick=()=>{
+ if(!window.AndroidAsido||typeof window.AndroidAsido.shareSavedPdf!=='function'){
+  $('pdfNativeStatus').textContent='Bagikan PDF langsung tersedia di APK ASIDO. Pada browser, unduh PDF lalu bagikan dari My Files.';
+  return;
+ }
+ const result=String(window.AndroidAsido.shareSavedPdf());
+ $('pdfNativeStatus').textContent=result.startsWith('OK|')?'Menu berbagi Android dibuka dengan file PDF nota.':result.replace(/^ERROR\|/,'Bagikan PDF gagal: ');
+};
+$('openSavedPdf').onclick=()=>{
+ if(!window.AndroidAsido||typeof window.AndroidAsido.openSavedPdf!=='function'){
+  $('pdfNativeStatus').textContent='Buka PDF dengan aplikasi pembaca tersedia di APK Android. Pada browser, gunakan link Unduh PDF.';
+  return;
+ }
+ const result=String(window.AndroidAsido.openSavedPdf());
+ $('pdfNativeStatus').textContent=result.startsWith('OK|')?'Membuka file PDF dari Downloads/ASIDO.':result.replace(/^ERROR\|/,'Buka PDF gagal: ');
+};
+$('savePdf').onclick=()=>{try{const v=invoice();if(!validate(v))return;if(!window.jspdf){$('status').textContent='Pustaka PDF belum termuat. Periksa koneksi internet, muat ulang halaman, lalu coba lagi.';alert('Pustaka PDF belum termuat. Periksa koneksi internet lalu coba lagi.');return}const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4'});const blue=[18,60,122],pale=[230,238,248];d.setTextColor(...blue);d.setFont('helvetica','bold');d.setFontSize(22);d.text('ASIDO',14,19);d.setDrawColor(...blue);d.setLineWidth(.5);d.line(47,9,47,21);d.setFontSize(15);d.text('NOTA PENJUALAN',51,18);d.setTextColor(30);d.setFont('helvetica','normal');d.setFontSize(10);d.text('Tanggal: '+(v.date||'-'),196,29,{align:'right'});d.setTextColor(90);d.text('Pelanggan:',14,35);d.setTextColor(25);d.setFont('helvetica','bold');d.setFontSize(12);d.text(v.customer,14,42);let y=51;d.setFillColor(...pale);d.rect(14,y-5,182,8,'F');d.setFont('helvetica','bold');d.setFontSize(10);d.text('Barang',17,y);d.text('Qty',112,y,{align:'right'});d.text('Harga',147,y,{align:'right'});d.text('Subtotal',193,y,{align:'right'});d.setFont('helvetica','normal');y+=8;v.items.filter(r=>r.name.trim()&&r.qty>0).forEach(r=>{const lines=d.splitTextToSize(r.name,85);if(y+Math.max(7,lines.length*5)>245){d.addPage();y=20}d.text(lines,17,y);d.text(String(r.qty),112,y,{align:'right'});d.text(money(r.price),147,y,{align:'right'});d.text(money(r.qty*r.price),193,y,{align:'right'});y+=Math.max(8,lines.length*5)});y+=2;d.setDrawColor(30);d.line(120,y,196,y);y+=7;d.setFontSize(10);d.text('Subtotal:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=8;d.setFont('helvetica','bold');d.setFontSize(13);d.text('TOTAL:',130,y);d.text(money(v.total),193,y,{align:'right'});y+=11;
+if(v.notes){d.setFont('helvetica','bold');d.setTextColor(...blue);d.setFontSize(11);d.text('Catatan:',14,y);y+=6;d.setDrawColor(175,190,210);d.setLineWidth(.3);const noteLines=d.splitTextToSize(v.notes,172);const h=Math.min(28,Math.max(13,noteLines.length*5+5));d.roundedRect(14,y-4,182,h,2,2,'S');d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(9);d.text(noteLines.slice(0,5),17,y+2);y+=h+8}else y+=3;
+let sigY=Math.max(y+8,218);if(sigY>258){d.addPage();sigY=35}d.setFont('helvetica','normal');d.setTextColor(30);d.setFontSize(10);d.text('Pelanggan,',20,sigY);d.text('ASIDO,',145,sigY);if(v.buyer)d.addImage(v.buyer,'PNG',17,sigY+2,63,20);if(v.seller)d.addImage(v.seller,'PNG',132,sigY+2,63,20);d.setDrawColor(50);d.line(16,sigY+24,82,sigY+24);d.line(130,sigY+24,196,sigY+24);d.setFontSize(9);d.text('('+v.customer+')',49,sigY+30,{align:'center'});d.text('(David Asido)',163,sigY+30,{align:'center'});d.setTextColor(80);d.setFontSize(8);d.text('Dibuat dengan ASIDO Nota Digital',14,287);const file='ASIDO-Nota-'+(v.date||'').replaceAll('-','')+'-'+v.customer.replace(/[^a-z0-9]/gi,'-').slice(0,20)+'.pdf';const blob=d.output('blob');preparePdfActions(blob,file,d);if(window.AndroidAsido&&typeof window.AndroidAsido.savePdf==='function'){const nativeResult=String(window.AndroidAsido.savePdf(d.output('datauristring'),file));if(!nativeResult.startsWith('OK|'))throw new Error(nativeResult.replace(/^ERROR\\|/,'')||'Android gagal menyimpan PDF.');$('pdfNativeStatus').textContent='PDF berhasil disimpan ke Downloads/ASIDO. Gunakan tombol Buka PDF atau Bagikan PDF.';$('status').textContent='PDF berhasil disimpan ke HP.';$('pdfActions').hidden=false;return;}$('status').textContent='PDF siap. Gunakan tautan Unduh PDF di bawah.';}catch(err){console.error(err);$('status').textContent='PDF belum berhasil dibuat: '+(err&&err.message?err.message:'kesalahan tidak dikenal')+'. Muat ulang halaman dan coba lagi.';alert('PDF belum berhasil dibuat. Periksa pesan di bawah tombol PDF; bila perlu muat ulang halaman.');}};
+
+let asidoInstallPrompt=null;
+const asidoInstallBtn=$('installAppBtn');
+const asidoIsInstalled=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+function updateInstallButton(){
+ if(asidoInstallBtn)asidoInstallBtn.hidden=asidoIsInstalled();
+ if(asidoIsInstalled()&&$('installHelp'))$('installHelp').textContent='ASIDO sudah terpasang. Buka aplikasi melalui ikon di layar utama.';
+}
+window.addEventListener('beforeinstallprompt',event=>{
+ event.preventDefault();
+ asidoInstallPrompt=event;
+ if(asidoInstallBtn)asidoInstallBtn.hidden=false;
+});
+if(asidoInstallBtn){
+ asidoInstallBtn.addEventListener('click',async()=>{
+  if(asidoIsInstalled()){
+   $('installHelp').textContent='ASIDO sudah terpasang. Gunakan ikon di layar utama untuk membukanya.';
+   return;
+  }
+  if(asidoInstallPrompt){
+   asidoInstallPrompt.prompt();
+   const choice=await asidoInstallPrompt.userChoice;
+   asidoInstallPrompt=null;
+   $('installHelp').textContent=choice&&choice.outcome==='accepted'?'Permintaan pemasangan diterima. Cari ikon ASIDO di layar utama.':'Pemasangan belum dilakukan. Anda bisa mencoba lagi dari menu Chrome.';
+  }else{
+   alert('Untuk memasang ASIDO: buka menu ⋮ di Chrome, lalu pilih “Install app / Pasang aplikasi” atau “Tambahkan ke layar utama”. Jika pilihan “Tambahkan ke layar utama” muncul, pilih itu.');
+  }
+ });
+}
+window.addEventListener('appinstalled',()=>{
+ if(asidoInstallBtn)asidoInstallBtn.hidden=true;
+ if($('installHelp'))$('installHelp').textContent='ASIDO berhasil dipasang. Buka lewat ikon ASIDO di layar utama.';
+});
+updateInstallButton();
+if('serviceWorker' in navigator){
+ window.addEventListener('load',async()=>{
+  try{
+   const registration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
+   await registration.update();
+   if(registration.waiting){registration.waiting.postMessage({type:'SKIP_WAITING'});}
+  }catch(err){console.warn('Pembaruan aplikasi ASIDO belum berhasil diperiksa:',err);}
+ });
+}
+
+renderProducts();renderRows();renderHistory();
+</script>
+<script>
+/* ASIDO catalog recovery: independent from the main application script. */
+(function(){
+  const key='asido_newapp_v1_products';
+  const defaults=[
+    {name:'Sapu ijuk',price:15000},
+    {name:'Sapu lidi',price:10000},
+    {name:'Pel lobi besi',price:58000},
+    {name:'Pel capit katun',price:35000},
+    {name:'Pel capit kartun warna',price:26500},
+    {name:'Pel peras otomatis',price:24000},
+    {name:'Sikat dorong senar',price:25000},
+    {name:'Sikat dorong ijuk',price:25000}
+  ];
+  function loadCatalog(){
+    const select=document.getElementById('productSelect');
+    if(!select) return;
+    let list=[];
+    try { list=JSON.parse(localStorage.getItem(key)||'[]'); } catch(e) { list=[]; }
+    if(!Array.isArray(list)||list.length===0){ list=defaults.map(p=>({...p})); }
+    list=list.filter(p=>p&&typeof p.name==='string'&&p.name.trim()&&Number.isFinite(Number(p.price))&&Number(p.price)>=0);
+    if(!list.length) list=defaults.map(p=>({...p}));
+    try { localStorage.setItem(key,JSON.stringify(list)); } catch(e) {}
+    const current=select.value;
+    select.innerHTML='<option value="">Pilih produk...</option>'+
+      list.map((p,i)=>'<option value="'+i+'">'+(i+1)+'. '+p.name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+' — Rp'+Number(p.price).toLocaleString('id-ID')+'</option>').join('');
+    if(current!==''&&Number(current)<list.length) select.value=current;
+    const manage=document.getElementById('manageProductSelect');
+    if(manage){
+      manage.innerHTML='<option value="">Pilih produk untuk diedit...</option>'+list.map((p,i)=>'<option value="'+i+'">'+(i+1)+'. '+p.name+' — Rp'+Number(p.price).toLocaleString('id-ID')+'</option>').join('');
+    }
+  }
+  loadCatalog();
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)loadCatalog();});
+})();
+</script>
+<style>
+#asidoUnifiedBookkeepingShell{display:none;position:fixed;inset:0;z-index:99999;background:#edf2f8;}
+#asidoUnifiedBookkeepingShell .unified-toolbar{height:54px;display:flex;align-items:center;gap:10px;padding:7px 12px;background:#123c7a;color:#fff;font:600 15px system-ui,sans-serif;}
+#asidoUnifiedBookkeepingShell .unified-toolbar button{border:0;border-radius:8px;padding:9px 13px;background:#e3ebf5;color:#173f75;font-weight:700;}
+#asidoUnifiedBookkeepingFrame{display:block;width:100%;height:calc(100% - 54px);border:0;background:#edf2f8;}
+</style>
+<div id="asidoUnifiedBookkeepingShell" aria-hidden="true">
+  <div class="unified-toolbar">
+    <button type="button" id="asidoUnifiedBack">← Nota Digital</button>
+    <span>Pembukuan ASIDO</span>
+  </div>
+  <iframe id="asidoUnifiedBookkeepingFrame" title="Pembukuan ASIDO"></iframe>
+</div>
+<script>
+(function(){
+  const shell=document.getElementById('asidoUnifiedBookkeepingShell');
+  const frame=document.getElementById('asidoUnifiedBookkeepingFrame');
+  const openBtn=document.getElementById('openUnifiedBookkeeping');
+  const backBtn=document.getElementById('asidoUnifiedBack');
+  const bookHtml=decodeURIComponent(escape(atob('PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImlkIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEsdmlld3BvcnQtZml0PWNvdmVyIj4KPG1ldGEgbmFtZT0idGhlbWUtY29sb3IiIGNvbnRlbnQ9IiMxNDNjNzMiPgo8dGl0bGU+UGVtYnVrdWFuIEFTSURPPC90aXRsZT4KPHN0eWxlPgo6cm9vdHstLWJsdWU6IzE0M2M3MzstLWJsdWUyOiMxZDRmOTE7LS1iZzojZWRmMmY4Oy0tY2FyZDojZmZmOy0taW5rOiMxZDI5Mzk7LS1tdXRlZDojNjg3NTg3Oy0tbGluZTojZGNlM2VjOy0tY2FzaDojMTc2OWMyOy0tdGVtcG86I2M2MjgyODstLWx1bmFzOiMxNzY5YzJ9Cip7Ym94LXNpemluZzpib3JkZXItYm94fWJvZHl7bWFyZ2luOjA7YmFja2dyb3VuZDp2YXIoLS1iZyk7Y29sb3I6dmFyKC0taW5rKTtmb250LWZhbWlseTpBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZjtmb250LXNpemU6MTVweH0udG9we2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEyMGRlZyx2YXIoLS1ibHVlKSwjMjE2NmE3KTtjb2xvcjp3aGl0ZTtwYWRkaW5nOjIycHggMThweCAxOHB4fS50b3AgaDF7bWFyZ2luOjA7Zm9udC1zaXplOjI1cHh9LnRvcCBwe21hcmdpbjo3cHggMCAwO29wYWNpdHk6Ljl9LndyYXB7bWF4LXdpZHRoOjkwMHB4O21hcmdpbjphdXRvO3BhZGRpbmc6MTRweH0uYWN0aW9uc3tkaXNwbGF5OmZsZXg7Z2FwOjlweDtmbGV4LXdyYXA6d3JhcDttYXJnaW46MTJweCAwfS5idG57Ym9yZGVyOjA7Ym9yZGVyLXJhZGl1czoxMHB4O2JhY2tncm91bmQ6I2UzZWJmNTtjb2xvcjojMTczZjc1O2ZvbnQtd2VpZ2h0OjcwMDtmb250LXNpemU6MTVweDtwYWRkaW5nOjEycHggMTRweDttaW4taGVpZ2h0OjQ2cHg7Y3Vyc29yOnBvaW50ZXJ9LmJ0bi5wcmltYXJ5e2JhY2tncm91bmQ6IzE3NjljMjtjb2xvcjojZmZmfS5idG4uZGFya3tiYWNrZ3JvdW5kOiMxNDNjNzM7Y29sb3I6I2ZmZn0uYnRuOmRpc2FibGVke29wYWNpdHk6LjU1fS5jYXJke2JhY2tncm91bmQ6dmFyKC0tY2FyZCk7Ym9yZGVyLXJhZGl1czoxNnB4O3BhZGRpbmc6MTZweDttYXJnaW46MTNweCAwO2JveC1zaGFkb3c6MCAycHggMTJweCAjMGQyMzQwMGF9LmNhcmQgaDJ7Zm9udC1zaXplOjE5cHg7Y29sb3I6dmFyKC0tYmx1ZSk7bWFyZ2luOjAgMCAxM3B4fS5tdXRlZHtjb2xvcjp2YXIoLS1tdXRlZCk7bGluZS1oZWlnaHQ6MS41NX0uc3VtbWFyeXtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCg0LG1pbm1heCgwLDFmcikpO2dhcDo5cHh9Lm1ldHJpY3tib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHg7bWluLXdpZHRoOjB9Lm1ldHJpYyBsYWJlbHtkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLW11dGVkKTttYXJnaW4tYm90dG9tOjZweH0ubWV0cmljIHN0cm9uZ3tkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToxN3B4O292ZXJmbG93LXdyYXA6YW55d2hlcmV9Lm1ldHJpYy5jYXNoIHN0cm9uZ3tjb2xvcjp2YXIoLS1jYXNoKX0ubWV0cmljLnRlbXBvIHN0cm9uZ3tjb2xvcjp2YXIoLS10ZW1wbyl9Lm1ldHJpYy5sdW5hcyBzdHJvbmd7Y29sb3I6dmFyKC0tbHVuYXMpfS5maWx0ZXJze2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcjtnYXA6MTBweH0uZmllbGQgbGFiZWx7ZGlzcGxheTpibG9jaztmb250LXNpemU6MTNweDtmb250LXdlaWdodDo3MDA7Y29sb3I6IzRhNTk2YjttYXJnaW4tYm90dG9tOjZweH0uZmllbGQgc2VsZWN0LC5maWVsZCBpbnB1dHt3aWR0aDoxMDAlO3BhZGRpbmc6MTFweDtib3JkZXI6MXB4IHNvbGlkICNjZmQ4ZTM7Ym9yZGVyLXJhZGl1czo5cHg7YmFja2dyb3VuZDojZmZmO2NvbG9yOiMxZDI5Mzk7Zm9udC1zaXplOjE1cHh9LmRheXttYXJnaW46MTRweCAwIDE4cHh9LmRheWhlYWR7YmFja2dyb3VuZDojZTZlZGY3O2JvcmRlci1yYWRpdXM6MTBweDtwYWRkaW5nOjExcHggMTJweDtmb250LXdlaWdodDo3MDA7Y29sb3I6IzE3M2Y3NTtkaXNwbGF5OmZsZXg7ZmxleC13cmFwOndyYXA7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47Z2FwOjZweH0uZGF5bWV0YXtmb250LXdlaWdodDo0MDA7Y29sb3I6IzUzNjU3ZDtmb250LXNpemU6MTJweH0udGFibGV3cmFwe292ZXJmbG93LXg6YXV0b310YWJsZXt3aWR0aDoxMDAlO2JvcmRlci1jb2xsYXBzZTpjb2xsYXBzZTttaW4td2lkdGg6NTQwcHh9dGgsdGR7cGFkZGluZzoxMHB4IDhweDt0ZXh0LWFsaWduOmxlZnQ7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgdmFyKC0tbGluZSk7dmVydGljYWwtYWxpZ246bWlkZGxlfXRoe2ZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLW11dGVkKTtmb250LXdlaWdodDo3MDB9dGQuYW1vdW50e3RleHQtYWxpZ246cmlnaHQ7Zm9udC13ZWlnaHQ6NzAwO3doaXRlLXNwYWNlOm5vd3JhcH10ZC5kYXRle3doaXRlLXNwYWNlOm5vd3JhcDtjb2xvcjojNTI2MTc2O2ZvbnQtc2l6ZToxM3B4fS5zdGF0dXNzZWxlY3R7Ym9yZGVyOjFweCBzb2xpZCAjY2JkNWUxO2JhY2tncm91bmQ6d2hpdGU7Ym9yZGVyLXJhZGl1czo4cHg7cGFkZGluZzo4cHg7bWluLXdpZHRoOjEwMHB4O2ZvbnQtd2VpZ2h0OjcwMH0uc3RhdHVzc2VsZWN0LmNhc2h7Y29sb3I6dmFyKC0tY2FzaCl9LnN0YXR1c3NlbGVjdC50ZW1wb3tjb2xvcjp2YXIoLS10ZW1wbyl9LnN0YXR1c3NlbGVjdC5sdW5hc3tjb2xvcjp2YXIoLS1sdW5hcyk7Ym9yZGVyLWNvbG9yOnZhcigtLWx1bmFzKX0ucGF5cGx1c3tkaXNwbGF5OmJsb2NrO3dpZHRoOjEwMCU7Ym9yZGVyOjA7YmFja2dyb3VuZDojMTc2OWMyO2NvbG9yOiNmZmY7Ym9yZGVyLXJhZGl1czo4cHg7cGFkZGluZzoxMXB4IDEycHg7Zm9udC13ZWlnaHQ6NzAwO2ZvbnQtc2l6ZToxNHB4O21hcmdpbjo4cHggMCAwO2N1cnNvcjpwb2ludGVyfS5wYXltZW50bG9ne2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM1MzY1N2Q7bWFyZ2luLXRvcDo3cHg7bGluZS1oZWlnaHQ6MS41NX0ucGF5bW9kYWx7cG9zaXRpb246Zml4ZWQ7aW5zZXQ6MDtiYWNrZ3JvdW5kOiMxMDI0M2RjYztkaXNwbGF5Om5vbmU7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7cGFkZGluZzoxOHB4O3otaW5kZXg6OTk5OX0ucGF5bW9kYWwub3BlbntkaXNwbGF5OmZsZXh9LnBheWJveHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNnB4O3BhZGRpbmc6MThweDt3aWR0aDptaW4oMTAwJSw0MjBweCk7Ym94LXNoYWRvdzowIDEycHggNDBweCAjMDAwNH0ucGF5Ym94IGgze21hcmdpbjowIDAgMTRweDtjb2xvcjojMTQzYzczO2ZvbnQtc2l6ZToyMHB4fS5wYXlib3ggbGFiZWx7ZGlzcGxheTpibG9jaztmb250LXdlaWdodDo3MDA7Y29sb3I6IzQzNTI2NzttYXJnaW46MTJweCAwIDZweH0ucGF5Ym94IGlucHV0e3dpZHRoOjEwMCU7cGFkZGluZzoxMnB4O2JvcmRlcjoxcHggc29saWQgI2NmZDhlMztib3JkZXItcmFkaXVzOjlweDtmb250LXNpemU6MTZweH0ucGF5Ym94IC5hY3Rpb25ze21hcmdpbi10b3A6MTZweH0ucGF5Ym94IC5zYXZlcGF5e2JhY2tncm91bmQ6IzE3NjljMjtjb2xvcjojZmZmfS5wYXlib3ggLmNhbmNlbHBheXtiYWNrZ3JvdW5kOiNlOGVkZjQ7Y29sb3I6IzE3M2Y3NX0ucGF5bWVudGxvZ3tmb250LXNpemU6MTFweDtjb2xvcjojNTM2NTdkO21hcmdpbi10b3A6NXB4O2xpbmUtaGVpZ2h0OjEuNDV9LmR1ZXtmb250LXNpemU6MTJweDtjb2xvcjp2YXIoLS10ZW1wbyk7bWFyZ2luLXRvcDo1cHh9LnJlbWluZHtmb250LXNpemU6MTJweDtwYWRkaW5nOjhweCA5cHg7bWFyZ2luLXRvcDo1cHg7Ym9yZGVyLXJhZGl1czo4cHg7Ym9yZGVyOjA7YmFja2dyb3VuZDojZmZmMGRjO2NvbG9yOiM4NzUwMGY7Zm9udC13ZWlnaHQ6NzAwfS5lbXB0eXt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nOjI1cHggMTBweDtjb2xvcjp2YXIoLS1tdXRlZCl9LmZvb3R7Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tbXV0ZWQpO2xpbmUtaGVpZ2h0OjEuNTttYXJnaW46MThweCA0cHh9LnN0YXR1c3tiYWNrZ3JvdW5kOiNlZWY3ZjE7Ym9yZGVyOjFweCBzb2xpZCAjY2NlOGQ1O2NvbG9yOiMxNzY0M2Q7cGFkZGluZzoxMHB4O2JvcmRlci1yYWRpdXM6OXB4O21hcmdpbjoxMHB4IDA7ZGlzcGxheTpub25lfS5ncm91cC1zdW17Zm9udC1zaXplOjEycHg7Y29sb3I6IzUzNjU3ZDttYXJnaW46N3B4IDJweCAycHh9LnBpbGx7ZGlzcGxheTppbmxpbmUtYmxvY2s7Ym9yZGVyLXJhZGl1czoxMDBweDtwYWRkaW5nOjNweCA4cHg7Zm9udC1zaXplOjExcHg7YmFja2dyb3VuZDojZWRmMmY4O2NvbG9yOiM1MzY1N2R9CkBtZWRpYShtYXgtd2lkdGg6NTIwcHgpey5zdW1tYXJ5e2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyfS5tZXRyaWMudG90YWx7Z3JpZC1jb2x1bW46MS8tMX0uZmlsdGVyc3tncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyfS53cmFwe3BhZGRpbmc6MTBweH0uY2FyZHtwYWRkaW5nOjEzcHh9LnRvcHtwYWRkaW5nOjE5cHggMTRweH19CkBtZWRpYSBwcmludHtib2R5e2JhY2tncm91bmQ6d2hpdGV9LnRvcHtiYWNrZ3JvdW5kOndoaXRlO2NvbG9yOiMxNDNjNzM7cGFkZGluZzowIDAgMTJweH0ud3JhcHttYXgtd2lkdGg6bm9uZTtwYWRkaW5nOjB9LmFjdGlvbnMsLmZpbHRlcnMsLnJlbWluZCwuYnRuLC5mb290e2Rpc3BsYXk6bm9uZSFpbXBvcnRhbnR9LmNhcmR7Ym94LXNoYWRvdzpub25lO2JvcmRlcjowO3BhZGRpbmc6MH0uZGF5aGVhZHtiYWNrZ3JvdW5kOiNlZWU7cHJpbnQtY29sb3ItYWRqdXN0OmV4YWN0fS5zdGF0dXNzZWxlY3R7Ym9yZGVyOjA7cGFkZGluZzowO2FwcGVhcmFuY2U6bm9uZX10YWJsZXttaW4td2lkdGg6MH10aCx0ZHtmb250LXNpemU6MTFweDtwYWRkaW5nOjZweCA0cHh9fQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8aGVhZGVyIGNsYXNzPSJ0b3AiPjxoMT5QZW1idWt1YW4gQVNJRE88L2gxPjxwPkxhcG9yYW4gcGVuanVhbGFuIGhhcmlhbiDCtyBDYXNoIMK3IFRlbXBvIMK3IEx1bmFzIMK3IFBlbWJheWFyYW4gYmVydGFoYXA8L3A+PC9oZWFkZXI+CjxtYWluIGNsYXNzPSJ3cmFwIj4KIDxkaXYgY2xhc3M9ImFjdGlvbnMiPgogIDxhIGNsYXNzPSJidG4gZGFyayIgaHJlZj0iI25vdGEiIGlkPSJ1bmlmaWVkQmFja1RvTm90YSIgc3R5bGU9InRleHQtZGVjb3JhdGlvbjpub25lO2Rpc3BsYXk6aW5saW5lLWZsZXg7YWxpZ24taXRlbXM6Y2VudGVyIj7ihpAgS2VtYmFsaSBrZSBOb3RhIERpZ2l0YWw8L2E+CiAgPGJ1dHRvbiBjbGFzcz0iYnRuIiBpZD0icmVmcmVzaCI+TXVhdCB1bGFuZyBkYXRhIG5vdGE8L2J1dHRvbj4KICA8YnV0dG9uIGNsYXNzPSJidG4iIGlkPSJwcmludCI+Q2V0YWsgbGFwb3JhbjwvYnV0dG9uPgogPC9kaXY+CiA8c2VjdGlvbiBjbGFzcz0iY2FyZCI+CiAgPGgyPlJpbmdrYXNhbiBQZW1idWt1YW48L2gyPgogIDxkaXYgY2xhc3M9InN1bW1hcnkiPgogICA8ZGl2IGNsYXNzPSJtZXRyaWMgdG90YWwiPjxsYWJlbD5Ub3RhbCBwZW5qdWFsYW48L2xhYmVsPjxzdHJvbmcgaWQ9ImFsbFRvdGFsIj5ScDA8L3N0cm9uZz48L2Rpdj4KICAgPGRpdiBjbGFzcz0ibWV0cmljIGNhc2giPjxsYWJlbD5DYXNoPC9sYWJlbD48c3Ryb25nIGlkPSJjYXNoVG90YWwiPlJwMDwvc3Ryb25nPjwvZGl2PgogICA8ZGl2IGNsYXNzPSJtZXRyaWMgdGVtcG8iPjxsYWJlbD5TaXNhIFRlbXBvPC9sYWJlbD48c3Ryb25nIGlkPSJ0ZW1wb1RvdGFsIj5ScDA8L3N0cm9uZz48L2Rpdj4KICAgPGRpdiBjbGFzcz0ibWV0cmljIGx1bmFzIj48bGFiZWw+THVuYXM8L2xhYmVsPjxzdHJvbmcgaWQ9Imx1bmFzVG90YWwiPlJwMDwvc3Ryb25nPjwvZGl2PgogIDwvZGl2PgogIDxwIGNsYXNzPSJtdXRlZCIgaWQ9InJlcG9ydE1ldGEiIHN0eWxlPSJtYXJnaW46MTJweCAwIDAiPkRhdGEgZGliYWNhIGxhbmdzdW5nIGRhcmkgUml3YXlhdCBOb3RhIHBhZGEgcGVyYW5na2F0IGluaS48L3A+CiA8L3NlY3Rpb24+CiA8c2VjdGlvbiBjbGFzcz0iY2FyZCI+CiAgPGgyPkRhZnRhciBUcmFuc2Frc2k8L2gyPgogIDxkaXYgY2xhc3M9ImZpbHRlcnMiPgogICA8ZGl2IGNsYXNzPSJmaWVsZCI+PGxhYmVsIGZvcj0ibW9udGhGaWx0ZXIiPlBpbGloIGJ1bGFuPC9sYWJlbD48aW5wdXQgaWQ9Im1vbnRoRmlsdGVyIiB0eXBlPSJtb250aCI+PC9kaXY+CiAgIDxkaXYgY2xhc3M9ImZpZWxkIj48bGFiZWwgZm9yPSJzdGF0dXNGaWx0ZXIiPktldGVyYW5nYW4gcGVtYmF5YXJhbjwvbGFiZWw+PHNlbGVjdCBpZD0ic3RhdHVzRmlsdGVyIj48b3B0aW9uIHZhbHVlPSJhbGwiPlNlbXVhOiBDYXNoICsgVGVtcG8gKyBMdW5hczwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IkNhc2giPkNhc2g8L29wdGlvbj48b3B0aW9uIHZhbHVlPSJUZW1wbyI+VGVtcG88L29wdGlvbj48b3B0aW9uIHZhbHVlPSJMdW5hcyI+THVuYXM8L29wdGlvbj48L3NlbGVjdD48L2Rpdj4KICA8L2Rpdj4KICA8ZGl2IGNsYXNzPSJhY3Rpb25zIj48YnV0dG9uIGNsYXNzPSJidG4iIGlkPSJjbGVhckZpbHRlcnMiPlRhbXBpbGthbiBzZW11YTwvYnV0dG9uPjxidXR0b24gY2xhc3M9ImJ0biBwcmltYXJ5IiBpZD0icmVtaW5kQWxsVGVtcG8iPvCfk4UgSmFkd2Fsa2FuIHNlbXVhIFRlbXBvICszMCBoYXJpPC9idXR0b24+PC9kaXY+CiAgPGRpdiBpZD0ic3RhdHVzIiBjbGFzcz0ic3RhdHVzIiByb2xlPSJzdGF0dXMiPjwvZGl2PgogIDxkaXYgaWQ9InRyYW5zYWN0aW9ucyI+PC9kaXY+CiA8L3NlY3Rpb24+CiA8ZGl2IGNsYXNzPSJwYXltb2RhbCIgaWQ9InBheU1vZGFsIiByb2xlPSJkaWFsb2ciIGFyaWEtbW9kYWw9InRydWUiIGFyaWEtbGFiZWxsZWRieT0icGF5VGl0bGUiPjxkaXYgY2xhc3M9InBheWJveCI+PGgzIGlkPSJwYXlUaXRsZSI+77yLIENhdGF0IFBlbWJheWFyYW48L2gzPjxwIGlkPSJwYXlJbnZvaWNlSW5mbyIgY2xhc3M9Im11dGVkIj48L3A+PGxhYmVsIGZvcj0icGF5QW1vdW50Ij5Ob21pbmFsIGNpY2lsYW4gKFJwKTwvbGFiZWw+PGlucHV0IGlkPSJwYXlBbW91bnQiIHR5cGU9Im51bWJlciIgbWluPSIxIiBzdGVwPSIxIiBpbnB1dG1vZGU9Im51bWVyaWMiIHBsYWNlaG9sZGVyPSJDb250b2g6IDEwMDAwMCI+PGxhYmVsIGZvcj0icGF5RGF0ZSI+VGFuZ2dhbCBwZW1iYXlhcmFuPC9sYWJlbD48aW5wdXQgaWQ9InBheURhdGUiIHR5cGU9ImRhdGUiPjxkaXYgY2xhc3M9ImFjdGlvbnMiPjxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0iYnRuIGNhbmNlbHBheSIgaWQ9ImNhbmNlbFBheSI+QmF0YWw8L2J1dHRvbj48YnV0dG9uIHR5cGU9ImJ1dHRvbiIgY2xhc3M9ImJ0biBzYXZlcGF5IiBpZD0ic2F2ZVBheSI+U2ltcGFuIHBlbWJheWFyYW48L2J1dHRvbj48L2Rpdj48L2Rpdj48L2Rpdj4KIDxwIGNsYXNzPSJmb290Ij5DYXRhdGFuOiB0cmFuc2Frc2kgZGVuZ2FuIGtldGVyYW5nYW4g4oCcdGVtcG/igJ0sIOKAnGJvbuKAnSwg4oCccGl1dGFuZ+KAnSwg4oCcdHJhbnNmZXLigJ0sIGF0YXUg4oCcYmVsdW0gYmF5YXLigJ0gcGFkYSBjYXRhdGFuIG5vdGEgYWthbiBkaWtlbmFsaSBzZWJhZ2FpIFRlbXBvLiBUcmFuc2Frc2kgbGFpbm55YSBtdWxhaSBzZWJhZ2FpIENhc2guIENhc2ggZGljYXRhdCBzZWJhZ2FpIHBlbWJheWFyYW4gcGVudWggcGFkYSB0YW5nZ2FsIG5vdGEuIFRlbXBvIGRhcGF0IG1lbmVyaW1hIHBlbWJheWFyYW4gYmVya2FsaS1rYWxpIG1lbGFsdWkgdG9tYm9sIO+8iyBQZW1iYXlhcmFuLiBTZXRpYXAgcGVtYmF5YXJhbiBtZW55aW1wYW4gbm9taW5hbCwgdGFuZ2dhbCBsZW5na2FwLCBkYW4gd2FrdHUgcGVuY2F0YXRhbi4gU3RhdHVzIEx1bmFzIGRpdGV0YXBrYW4gb3RvbWF0aXMgaGFueWEga2V0aWthIHRvdGFsIHBlbWJheWFyYW4gc2FtYSBkZW5nYW4gdG90YWwgbm90YTsgdGFuZ2dhbCBwZWx1bmFzYW4gdGVyYWtoaXIgZGlzaW1wYW4gdGVycGlzYWggZGFyaSB0YW5nZ2FsIG5vdGEuIFBlbWJheWFyYW4geWFuZyBtZWxlYmloaSBzaXNhIHRhZ2loYW4gZGl0b2xhay4gUGVydWJhaGFuIGtldGVyYW5nYW4gZGlzaW1wYW4gZGkgcGVyYW5na2F0IGluaSBkYW4gdGlkYWsgbWVuZ3ViYWggbm90YSBhc2xpbnlhLiBOb3RhIGRlbmdhbiB0YW5nZ2FsIHNhbWEgZGlrZWxvbXBva2thbiBiZXJzYW1hOyB0b3RhbCBoYXJpYW4gZGFuIHRvdGFsIENhc2gvVGVtcG8gZGloaXR1bmcgb3RvbWF0aXMuPC9wPgo8L21haW4+CjxzY3JpcHQ+CihmdW5jdGlvbigpewogY29uc3QgJD1pZD0+ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaWQpOwogY29uc3QgbW9uZXk9bj0+J1JwJytNYXRoLnJvdW5kKE51bWJlcihuKXx8MCkudG9Mb2NhbGVTdHJpbmcoJ2lkLUlEJyk7CiBjb25zdCBlc2NhcGVIdG1sPXM9PlN0cmluZyhzPz8nJykucmVwbGFjZSgvWyY8PiInXS9nLGNoPT4oeycmJzonJmFtcDsnLCc8JzonJmx0OycsJz4nOicmZ3Q7JywnIic6JyZxdW90OycsIiciOicmIzM5Oyd9W2NoXSkpOwogY29uc3Qgc3RhdHVzU3RvcmVLZXk9J2FzaWRvX25ld2FwcF92MV9ib29ra2VlcGluZ19zdGF0dXMnOwogY29uc3QgcGF5bWVudFN0b3JlS2V5PSdhc2lkb19uZXdhcHBfdjFfYm9va2tlZXBpbmdfcGF5bWVudHMnOwogY29uc3QgcGFpZERhdGVTdG9yZUtleT0nYXNpZG9fbmV3YXBwX3YxX2Jvb2trZWVwaW5nX3BhaWRfZGF0ZXMnOwogbGV0IHBhaWREYXRlTWFwPXt9OwogdHJ5e3BhaWREYXRlTWFwPUpTT04ucGFyc2UobG9jYWxTdG9yYWdlLmdldEl0ZW0ocGFpZERhdGVTdG9yZUtleSl8fCd7fScpfHx7fTt9Y2F0Y2goXyl7cGFpZERhdGVNYXA9e307fQogbGV0IHBheW1lbnRNYXA9e307CiB0cnl7cGF5bWVudE1hcD1KU09OLnBhcnNlKGxvY2FsU3RvcmFnZS5nZXRJdGVtKHBheW1lbnRTdG9yZUtleSl8fCd7fScpfHx7fTt9Y2F0Y2goXyl7cGF5bWVudE1hcD17fTt9CiBsZXQgaGlzdG9yeURhdGE9W107CiBsZXQgc3RhdHVzTWFwPXt9OwogdHJ5e3N0YXR1c01hcD1KU09OLnBhcnNlKGxvY2FsU3RvcmFnZS5nZXRJdGVtKHN0YXR1c1N0b3JlS2V5KXx8J3t9Jyl8fHt9O31jYXRjaChfKXtzdGF0dXNNYXA9e307fQogY29uc3Qgc2hvd1N0YXR1cz1tc2c9Pntjb25zdCBlbD0kKCdzdGF0dXMnKTtlbC50ZXh0Q29udGVudD1tc2c7ZWwuc3R5bGUuZGlzcGxheT0nYmxvY2snO307CiBjb25zdCBoaWRlU3RhdHVzPSgpPT57JCgnc3RhdHVzJykuc3R5bGUuZGlzcGxheT0nbm9uZSc7fTsKIGZ1bmN0aW9uIGludm9pY2VLZXkoaCl7CiAgcmV0dXJuIFN0cmluZyhoLmlkfHxbaC5kYXRlfHwnJyxoLmN1c3RvbWVyfHwnJyxoLnNhdmVkQXR8fCcnLGgudG90YWw/PycnXS5qb2luKCd8JykpOwogfQogZnVuY3Rpb24gZ3Vlc3NTdGF0dXMoaCl7CiAgY29uc3Qga2V5PWludm9pY2VLZXkoaCk7CiAgaWYoWydDYXNoJywnVGVtcG8nLCdMdW5hcyddLmluY2x1ZGVzKHN0YXR1c01hcFtrZXldKSlyZXR1cm4gc3RhdHVzTWFwW2tleV07CiAgaWYoWydDYXNoJywnVGVtcG8nLCdMdW5hcyddLmluY2x1ZGVzKGgucGF5bWVudFN0YXR1cykpcmV0dXJuIGgucGF5bWVudFN0YXR1czsKICBjb25zdCBub3RlPVN0cmluZyhoLm5vdGVzfHwnJykudG9Mb2NhbGVMb3dlckNhc2UoJ2lkJyk7CiAgaWYoL1xiKHRlbXBvfGJvbnxwaXV0YW5nfGJlbHVtIGJheWFyfGJlbHVtIGRpYmF5YXJ8dGFnaWh8amF0dWggdGVtcG98dHJhbnNmZXJ8YmF5YXIgbmFudGl8a3JlZGl0KVxiLy50ZXN0KG5vdGUpKXJldHVybiAnVGVtcG8nOwogIHJldHVybiAnQ2FzaCc7CiB9CiBmdW5jdGlvbiBkYXlEYXRlKGRhdGUpewogIGlmKCEvXlxkezR9LVxkezJ9LVxkezJ9JC8udGVzdChTdHJpbmcoZGF0ZXx8JycpKSlyZXR1cm4gbnVsbDsKICBjb25zdCBbeSxtLGRdPWRhdGUuc3BsaXQoJy0nKS5tYXAoTnVtYmVyKTsKICBjb25zdCBkdD1uZXcgRGF0ZSh5LG0tMSxkLDEyLDAsMCk7CiAgcmV0dXJuIE51bWJlci5pc05hTihkdC5nZXRUaW1lKCkpP251bGw6ZHQ7CiB9CiBmdW5jdGlvbiBkaXNwbGF5RGF0ZShkYXRlKXsKICBjb25zdCBkdD1kYXlEYXRlKGRhdGUpOwogIHJldHVybiBkdD9kdC50b0xvY2FsZURhdGVTdHJpbmcoJ2lkLUlEJyx7ZGF5OicyLWRpZ2l0Jyxtb250aDonbG9uZycseWVhcjonbnVtZXJpYyd9KTooZGF0ZXx8J1RhbmdnYWwgdGlkYWsgdGVyc2VkaWEnKTsKIH0KIGZ1bmN0aW9uIGFkZERheXMoZGF0ZSxkYXlzKXsKICBjb25zdCBkdD1kYXlEYXRlKGRhdGUpO2lmKCFkdClyZXR1cm4gbnVsbDsKICBkdC5zZXREYXRlKGR0LmdldERhdGUoKStkYXlzKTsKICByZXR1cm4gZHQ7CiB9CiBmdW5jdGlvbiBmb3JtYXRTbGFzaChkdCl7CiAgcmV0dXJuIFN0cmluZyhkdC5nZXREYXRlKCkpLnBhZFN0YXJ0KDIsJzAnKSsnLycrU3RyaW5nKGR0LmdldE1vbnRoKCkrMSkucGFkU3RhcnQoMiwnMCcpKycvJytkdC5nZXRGdWxsWWVhcigpOwogfQogZnVuY3Rpb24gZHVlTGFiZWwoaCl7CiAgY29uc3QgZHQ9YWRkRGF5cyhoLmRhdGUsMzApO3JldHVybiBkdD9mb3JtYXRTbGFzaChkdCk6J1RhbmdnYWwgbm90YSBiZWx1bSB2YWxpZCc7CiB9CiBmdW5jdGlvbiB0b3RhbE9mKGgpewogIGlmKE51bWJlci5pc0Zpbml0ZShOdW1iZXIoaC50b3RhbCkpKXJldHVybiBOdW1iZXIoaC50b3RhbCk7CiAgcmV0dXJuIChoLml0ZW1zfHxbXSkucmVkdWNlKChzdW0scik9PnN1bSsoTnVtYmVyKHIucXR5KXx8MCkqKE51bWJlcihyLnByaWNlKXx8MCksMCk7CiB9CiBmdW5jdGlvbiBsb2FkRGF0YSgpewogIGhpZGVTdGF0dXMoKTsKICB0cnl7CiAgIGNvbnN0IGRhdGE9SlNPTi5wYXJzZShsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnYXNpZG9fbmV3YXBwX3YxX2hpc3RvcnknKXx8J1tdJyk7CiAgIGhpc3RvcnlEYXRhPUFycmF5LmlzQXJyYXkoZGF0YSk/ZGF0YTpbXTsKICAgbGV0IHNlZWRlZD1mYWxzZTsKICAgZm9yKGNvbnN0IGggb2YgaGlzdG9yeURhdGEpewogICAgY29uc3Qga2V5PWludm9pY2VLZXkoaCk7CiAgICBpZihndWVzc1N0YXR1cyhoKT09PSdDYXNoJyAmJiAhKHBheW1lbnRNYXBba2V5XXx8W10pLmxlbmd0aCl7CiAgICAgY29uc3QgdG90YWw9dG90YWxPZihoKTsKICAgICBpZih0b3RhbD4wKXtwYXltZW50TWFwW2tleV09W3thbW91bnQ6dG90YWwsZGF0ZTpTdHJpbmcoaC5kYXRlfHxuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCkuc2xpY2UoMCwxMCkpLGNyZWF0ZWRBdDpTdHJpbmcoaC5zYXZlZEF0fHxuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCkpLG1ldGhvZDonQ2FzaCd9XTtzdGF0dXNNYXBba2V5XT0nQ2FzaCc7c2VlZGVkPXRydWU7fQogICAgfQogICB9CiAgIGlmKHNlZWRlZCl7bG9jYWxTdG9yYWdlLnNldEl0ZW0ocGF5bWVudFN0b3JlS2V5LEpTT04uc3RyaW5naWZ5KHBheW1lbnRNYXApKTtsb2NhbFN0b3JhZ2Uuc2V0SXRlbShzdGF0dXNTdG9yZUtleSxKU09OLnN0cmluZ2lmeShzdGF0dXNNYXApKTt9CiAgfWNhdGNoKGUpe2hpc3RvcnlEYXRhPVtdO3Nob3dTdGF0dXMoJ0RhdGEgUml3YXlhdCBOb3RhIHRpZGFrIGRhcGF0IGRpYmFjYS4gSmFuZ2FuIGhhcHVzIHBlbnlpbXBhbmFuIGFwbGlrYXNpLicpO30KICByZW5kZXIoKTsKIH0KIGZ1bmN0aW9uIGZpbHRlcmVkUm93cygpewogIGNvbnN0IG1vbnRoPSQoJ21vbnRoRmlsdGVyJykudmFsdWU7CiAgY29uc3QgZmlsdGVyPSQoJ3N0YXR1c0ZpbHRlcicpLnZhbHVlOwogIHJldHVybiBoaXN0b3J5RGF0YS5tYXAoKGgsaW5kZXgpPT4oe2gsaW5kZXgsa2V5Omludm9pY2VLZXkoaCksc3RhdHVzOmd1ZXNzU3RhdHVzKGgpLHRvdGFsOnRvdGFsT2YoaCl9KSkKICAgLmZpbHRlcih4PT4oIW1vbnRofHxTdHJpbmcoeC5oLmRhdGV8fCcnKS5zdGFydHNXaXRoKG1vbnRoKSkmJihmaWx0ZXI9PT0nYWxsJ3x8eC5zdGF0dXM9PT1maWx0ZXIpKQogICAuc29ydCgoYSxiKT0+U3RyaW5nKGIuaC5kYXRlfHwnJykubG9jYWxlQ29tcGFyZShTdHJpbmcoYS5oLmRhdGV8fCcnKSl8fFN0cmluZyhiLmguc2F2ZWRBdHx8JycpLmxvY2FsZUNvbXBhcmUoU3RyaW5nKGEuaC5zYXZlZEF0fHwnJykpKTsKIH0KIGZ1bmN0aW9uIHJlbmRlcigpewogIGNvbnN0IHJvd3M9ZmlsdGVyZWRSb3dzKCk7CiAgY29uc3QgY2FzaD1yb3dzLmZpbHRlcih4PT54LnN0YXR1cz09PSdDYXNoJykucmVkdWNlKChzLHgpPT5zK3gudG90YWwsMCk7CiAgY29uc3QgbHVuYXM9cm93cy5maWx0ZXIoeD0+eC5zdGF0dXM9PT0nTHVuYXMnKS5yZWR1Y2UoKHMseCk9PnMreC50b3RhbCwwKTsKICBjb25zdCB0ZW1wbz1yb3dzLmZpbHRlcih4PT54LnN0YXR1cz09PSdUZW1wbycpLnJlZHVjZSgocyx4KT0+cytNYXRoLm1heCgwLHgudG90YWwtKHBheW1lbnRNYXBbeC5rZXldfHxbXSkucmVkdWNlKChhLHApPT5hKyhOdW1iZXIocC5hbW91bnQpfHwwKSwwKSksMCk7CiAgY29uc3QgdG90YWw9Y2FzaCtsdW5hcyt0ZW1wbzsKICAkKCdhbGxUb3RhbCcpLnRleHRDb250ZW50PW1vbmV5KHRvdGFsKTskKCdjYXNoVG90YWwnKS50ZXh0Q29udGVudD1tb25leShjYXNoKTskKCd0ZW1wb1RvdGFsJykudGV4dENvbnRlbnQ9bW9uZXkodGVtcG8pOyQoJ2x1bmFzVG90YWwnKS50ZXh0Q29udGVudD1tb25leShsdW5hcyk7CiAgJCgncmVwb3J0TWV0YScpLnRleHRDb250ZW50PXJvd3MubGVuZ3RoKycgdHJhbnNha3NpIGRpdGFtcGlsa2FuIMK3ICcrbmV3IFNldChyb3dzLm1hcCh4PT54LmguZGF0ZXx8JycpKS5zaXplKycgdGFuZ2dhbCBwZW5qdWFsYW4gwrcgc3VtYmVyOiBSaXdheWF0IE5vdGEgcGVyYW5na2F0IGluaS4nOwogIGlmKCFyb3dzLmxlbmd0aCl7JCgndHJhbnNhY3Rpb25zJykuaW5uZXJIVE1MPSc8ZGl2IGNsYXNzPSJlbXB0eSI+QmVsdW0gYWRhIG5vdGEgcGFkYSBwaWxpaGFuIGZpbHRlciBpbmkuPC9kaXY+JztyZXR1cm47fQogIGNvbnN0IGdyb3Vwcz1uZXcgTWFwKCk7CiAgcm93cy5mb3JFYWNoKHg9Pntjb25zdCBkYXk9eC5oLmRhdGV8fCdUYW5wYSB0YW5nZ2FsJztpZighZ3JvdXBzLmhhcyhkYXkpKWdyb3Vwcy5zZXQoZGF5LFtdKTtncm91cHMuZ2V0KGRheSkucHVzaCh4KTt9KTsKICBsZXQgaHRtbD0nJzsKICBmb3IoY29uc3QgW2RheSxpdGVtc10gb2YgZ3JvdXBzKXsKICAgY29uc3QgZGF5Q2FzaD1pdGVtcy5maWx0ZXIoeD0+eC5zdGF0dXM9PT0nQ2FzaCcpLnJlZHVjZSgocyx4KT0+cyt4LnRvdGFsLDApOwogICBjb25zdCBkYXlMdW5hcz1pdGVtcy5maWx0ZXIoeD0+eC5zdGF0dXM9PT0nTHVuYXMnKS5yZWR1Y2UoKHMseCk9PnMreC50b3RhbCwwKTsKICAgY29uc3QgZGF5VGVtcG89aXRlbXMuZmlsdGVyKHg9Pnguc3RhdHVzPT09J1RlbXBvJykucmVkdWNlKChzLHgpPT5zK01hdGgubWF4KDAseC50b3RhbC0ocGF5bWVudE1hcFt4LmtleV18fFtdKS5yZWR1Y2UoKGEscCk9PmErKE51bWJlcihwLmFtb3VudCl8fDApLDApKSwwKTsKICAgY29uc3QgZGF5QWxsPWRheUNhc2grZGF5THVuYXMrZGF5VGVtcG87CiAgIGh0bWwrPSc8ZGl2IGNsYXNzPSJkYXkiPjxkaXYgY2xhc3M9ImRheWhlYWQiPjxzcGFuPicrZXNjYXBlSHRtbChkaXNwbGF5RGF0ZShkYXkpKSsnPC9zcGFuPjxzcGFuIGNsYXNzPSJkYXltZXRhIj4nK2l0ZW1zLmxlbmd0aCsnIG5vdGEgwrcgVG90YWwgJyttb25leShkYXlBbGwpKyc8L3NwYW4+PC9kaXY+JzsKICAgaHRtbCs9JzxkaXYgY2xhc3M9Imdyb3VwLXN1bSI+Q2FzaCAnK21vbmV5KGRheUNhc2gpKycgJm5ic3A7wrcmbmJzcDsgVGVtcG8gJyttb25leShkYXlUZW1wbykrJyAmbmJzcDvCtyZuYnNwOyBMdW5hcyAnK21vbmV5KGRheUx1bmFzKSsnPC9kaXY+JzsKICAgaHRtbCs9JzxkaXYgY2xhc3M9InRhYmxld3JhcCI+PHRhYmxlPjx0aGVhZD48dHI+PHRoPlRnbDwvdGg+PHRoPk5hbWEgdG9rbzwvdGg+PHRoIHN0eWxlPSJ0ZXh0LWFsaWduOnJpZ2h0Ij5Ub3RhbDwvdGg+PHRoPktldGVyYW5nYW48L3RoPjwvdHI+PC90aGVhZD48dGJvZHk+JzsKICAgZm9yKGNvbnN0IHggb2YgaXRlbXMpewogICAgY29uc3QgY3VzdG9tZXI9U3RyaW5nKHguaC5jdXN0b21lcnx8J1BlbGFuZ2dhbicpOwogICAgY29uc3QgaWQ9ZXNjYXBlSHRtbCh4LmtleSk7CiAgICBjb25zdCBwYXlzPXBheW1lbnRNYXBbeC5rZXldfHxbXTtjb25zdCBwYWlkPXBheXMucmVkdWNlKChhLHApPT5hKyhOdW1iZXIocC5hbW91bnQpfHwwKSwwKTtjb25zdCByZW1haW5pbmc9TWF0aC5tYXgoMCx4LnRvdGFsLXBhaWQpOwogICAgY29uc3QgcGF5bG9nPXBheXMubWFwKChwLGkpPT4nUGVtYmF5YXJhbiAnKyhpKzEpKyc6ICcrZXNjYXBlSHRtbChkaXNwbGF5RGF0ZShwLmRhdGV8fCcnKSkrJyDigJQgJyttb25leShwLmFtb3VudCkpLmpvaW4oJzxicj4nKTsKICAgIGNvbnN0IHBhaWREYXRlPXBhaWREYXRlTWFwW3gua2V5XXx8Jyc7CiAgICBodG1sKz0nPHRyPjx0ZCBjbGFzcz0iZGF0ZSI+Jytlc2NhcGVIdG1sKFN0cmluZyh4LmguZGF0ZXx8Jy0nKSkrJzwvdGQ+PHRkPjxzdHJvbmc+Jytlc2NhcGVIdG1sKGN1c3RvbWVyKSsnPC9zdHJvbmc+JysoeC5oLmlkPyc8ZGl2IGNsYXNzPSJkYXltZXRhIj4nK2VzY2FwZUh0bWwoeC5oLmlkKSsnPC9kaXY+JzonJykrJzwvdGQ+PHRkIGNsYXNzPSJhbW91bnQiPicrbW9uZXkoeC50b3RhbCkrKHBheXMubGVuZ3RoPyc8ZGl2IGNsYXNzPSJkYXltZXRhIj5EaWJheWFyICcrbW9uZXkocGFpZCkrJzxicj5TaXNhICcrbW9uZXkocmVtYWluaW5nKSsnPC9kaXY+JzonJykrJzwvdGQ+PHRkPjxzZWxlY3QgY2xhc3M9InN0YXR1c3NlbGVjdCAnKyh4LnN0YXR1cz09PSdUZW1wbyc/J3RlbXBvJzooeC5zdGF0dXM9PT0nTHVuYXMnPydsdW5hcyc6J2Nhc2gnKSkrJyIgZGF0YS1zdGF0dXMta2V5PSInK2lkKyciPjxvcHRpb24gdmFsdWU9IkNhc2giICcrKHguc3RhdHVzPT09J0Nhc2gnPydzZWxlY3RlZCc6JycpKyc+Q2FzaDwvb3B0aW9uPjxvcHRpb24gdmFsdWU9IlRlbXBvIiAnKyh4LnN0YXR1cz09PSdUZW1wbyc/J3NlbGVjdGVkJzonJykrJz5UZW1wbzwvb3B0aW9uPjxvcHRpb24gdmFsdWU9Ikx1bmFzIiAnKyh4LnN0YXR1cz09PSdMdW5hcyc/J3NlbGVjdGVkJzonJykrJz5MdW5hczwvb3B0aW9uPjwvc2VsZWN0PicrKHguc3RhdHVzPT09J1RlbXBvJz8nPGJ1dHRvbiB0eXBlPSJidXR0b24iIGNsYXNzPSJwYXlwbHVzIiBkYXRhLXBheT0iJytpZCsnIj7vvIsgUGVtYmF5YXJhbjwvYnV0dG9uPic6JycpKyhwYXlsb2c/JzxkaXYgY2xhc3M9InBheW1lbnRsb2ciPlJpd2F5YXQgcGVtYmF5YXJhbjo8YnI+JytwYXlsb2crJzwvZGl2Pic6JycpKyhwYWlkRGF0ZT8nPGRpdiBjbGFzcz0icGF5bWVudGxvZyI+PHN0cm9uZz5UYW5nZ2FsIHBlbHVuYXNhbjogJytlc2NhcGVIdG1sKGRpc3BsYXlEYXRlKHBhaWREYXRlKSkrJzwvc3Ryb25nPjwvZGl2Pic6JycpKyh4LnN0YXR1cz09PSdUZW1wbyc/JzxkaXYgY2xhc3M9ImR1ZSI+SmF0dWggdGVtcG86ICcrZXNjYXBlSHRtbChkdWVMYWJlbCh4LmgpKSsnPC9kaXY+PGJ1dHRvbiB0eXBlPSJidXR0b24iIGNsYXNzPSJyZW1pbmQiIGRhdGEtcmVtaW5kPSInK2lkKyciPvCfk4UgQnVhdCBwZW5naW5nYXQgMzAgaGFyaTwvYnV0dG9uPic6JycpKyc8L3RkPjwvdHI+JzsKICAgfQogICBodG1sKz0nPC90Ym9keT48L3RhYmxlPjwvZGl2PjwvZGl2Pic7CiAgfQogICQoJ3RyYW5zYWN0aW9ucycpLmlubmVySFRNTD1odG1sOwogICQoJ3RyYW5zYWN0aW9ucycpLnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLXN0YXR1cy1rZXldJykuZm9yRWFjaChzZWw9PnNlbC5hZGRFdmVudExpc3RlbmVyKCdjaGFuZ2UnLCgpPT57CiAgIGNvbnN0IGtleT1zZWwuZGF0YXNldC5zdGF0dXNLZXk7Y29uc3Qgcm93PXJvd3MuZmluZChyPT5yLmtleT09PWtleSk7aWYoIXJvdylyZXR1cm47CiAgIGNvbnN0IHBheXM9cGF5bWVudE1hcFtrZXldfHxbXTtjb25zdCBwYWlkPXBheXMucmVkdWNlKChhLHApPT5hKyhOdW1iZXIocC5hbW91bnQpfHwwKSwwKTtjb25zdCByZW1haW5pbmc9TWF0aC5tYXgoMCxyb3cudG90YWwtcGFpZCk7CiAgIGlmKHNlbC52YWx1ZT09PSdMdW5hcycpewogICAgYWxlcnQoJ1N0YXR1cyBMdW5hcyB0aWRhayBkYXBhdCBkaXBpbGloIG1hbnVhbC4gQ2F0YXQgcGVtYmF5YXJhbiBtZWxhbHVpIHRvbWJvbCDvvIsgUGVtYmF5YXJhbiBzYW1wYWkgc2VsdXJ1aCB0YWdpaGFuIHRlcmJheWFyLiBTaXNhIHNhYXQgaW5pOiAnK21vbmV5KHJlbWFpbmluZykrJy4nKTsKICAgIHJlbmRlcigpO3JldHVybjsKICAgfQogICBpZihzZWwudmFsdWU9PT0nQ2FzaCcpewogICAgaWYocGF5cy5sZW5ndGggJiYgIShwYXlzLmxlbmd0aD09PTEgJiYgcGF5c1swXS5tZXRob2Q9PT0nQ2FzaCcpKXthbGVydCgnU3RhdHVzIHRpZGFrIGRhcGF0IGRpdWJhaCBtZW5qYWRpIENhc2gga2FyZW5hIHN1ZGFoIGFkYSByaXdheWF0IGNpY2lsYW4uIFJpd2F5YXQgcGVtYmF5YXJhbiBoYXJ1cyBkaXBlcnRhaGFua2FuLicpO3JlbmRlcigpO3JldHVybjt9CiAgICBjb25zdCBvaz1jb25maXJtKCdUYW5kYWkgdHJhbnNha3NpIGluaSBzZWJhZ2FpIENhc2ggKGRpYmF5YXIgcGVudWggcGFkYSB0YW5nZ2FsIG5vdGEpPycpO2lmKCFvayl7cmVuZGVyKCk7cmV0dXJuO30KICAgIHBheW1lbnRNYXBba2V5XT1be2Ftb3VudDpyb3cudG90YWwsZGF0ZTpTdHJpbmcocm93LmguZGF0ZXx8bmV3IERhdGUoKS50b0lTT1N0cmluZygpLnNsaWNlKDAsMTApKSxjcmVhdGVkQXQ6bmV3IERhdGUoKS50b0lTT1N0cmluZygpLG1ldGhvZDonQ2FzaCd9XTsKICAgIGRlbGV0ZSBwYWlkRGF0ZU1hcFtrZXldO3N0YXR1c01hcFtrZXldPSdDYXNoJzsKICAgfWVsc2V7CiAgICBpZihwYXlzLmxlbmd0aCAmJiAhKHBheXMubGVuZ3RoPT09MSAmJiBwYXlzWzBdLm1ldGhvZD09PSdDYXNoJykgJiYgcGFpZD49cm93LnRvdGFsKXthbGVydCgnVHJhbnNha3NpIGluaSBzdWRhaCB0ZXJjYXRhdCBkaWJheWFyIHBlbnVoLiBSaXdheWF0IHBlbWJheWFyYW4gdGlkYWsgZGFwYXQgZGl1YmFoIG1lbmphZGkgVGVtcG8uJyk7cmVuZGVyKCk7cmV0dXJuO30KICAgIGlmKHBheXMubGVuZ3RoPT09MSAmJiBwYXlzWzBdLm1ldGhvZD09PSdDYXNoJylkZWxldGUgcGF5bWVudE1hcFtrZXldOwogICAgc3RhdHVzTWFwW2tleV09J1RlbXBvJztkZWxldGUgcGFpZERhdGVNYXBba2V5XTsKICAgfQogICB0cnl7bG9jYWxTdG9yYWdlLnNldEl0ZW0ocGF5bWVudFN0b3JlS2V5LEpTT04uc3RyaW5naWZ5KHBheW1lbnRNYXApKTtsb2NhbFN0b3JhZ2Uuc2V0SXRlbShzdGF0dXNTdG9yZUtleSxKU09OLnN0cmluZ2lmeShzdGF0dXNNYXApKTtsb2NhbFN0b3JhZ2Uuc2V0SXRlbShwYWlkRGF0ZVN0b3JlS2V5LEpTT04uc3RyaW5naWZ5KHBhaWREYXRlTWFwKSk7c2hvd1N0YXR1cygnS2V0ZXJhbmdhbiB0cmFuc2Frc2kgZGlzaW1wYW46ICcrc3RhdHVzTWFwW2tleV0rJy4gUml3YXlhdCBwZW1iYXlhcmFuIHRldGFwIGRpcGVydGFoYW5rYW4uJyk7fWNhdGNoKF8pe3Nob3dTdGF0dXMoJ1RpZGFrIGRhcGF0IG1lbnlpbXBhbiBrZXRlcmFuZ2FuIHBhZGEgcGVyYW5na2F0IGluaS4nKTt9CiAgIHJlbmRlcigpOwogIH0pKTsKICAkKCd0cmFuc2FjdGlvbnMnKS5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS1wYXldJykuZm9yRWFjaChidG49PmJ0bi5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsKCk9PnsKICAgY29uc3Qga2V5PWJ0bi5kYXRhc2V0LnBheTtjb25zdCByb3c9cm93cy5maW5kKHI9PnIua2V5PT09a2V5KTtpZighcm93KXJldHVybjsKICAgY29uc3QgbGlzdD1wYXltZW50TWFwW2tleV18fFtdO2NvbnN0IHBhaWQ9bGlzdC5yZWR1Y2UoKGEscCk9PmErKE51bWJlcihwLmFtb3VudCl8fDApLDApO2NvbnN0IHJlbWFpbmluZz1NYXRoLm1heCgwLHJvdy50b3RhbC1wYWlkKTsKICAgaWYocmVtYWluaW5nPD0wKXthbGVydCgnVGFnaWhhbiBpbmkgc3VkYWggbHVuYXMuJyk7cmV0dXJuO30KICAgJCgncGF5TW9kYWwnKS5kYXRhc2V0LmtleT1rZXk7CiAgICQoJ3BheUludm9pY2VJbmZvJykudGV4dENvbnRlbnQ9KHJvdy5oLmN1c3RvbWVyfHwnUGVsYW5nZ2FuJykrJyDCtyBUb3RhbCAnK21vbmV5KHJvdy50b3RhbCkrJyDCtyBTdWRhaCBkaWJheWFyICcrbW9uZXkocGFpZCkrJyDCtyBTaXNhICcrbW9uZXkocmVtYWluaW5nKTsKICAgJCgncGF5QW1vdW50JykudmFsdWU9Jyc7JCgncGF5QW1vdW50JykubWF4PVN0cmluZyhyZW1haW5pbmcpOwogICAkKCdwYXlEYXRlJykudmFsdWU9bmV3IERhdGUoKS50b0lTT1N0cmluZygpLnNsaWNlKDAsMTApOwogICAkKCdwYXlNb2RhbCcpLmNsYXNzTGlzdC5hZGQoJ29wZW4nKTsKICB9KSk7CiAgJCgndHJhbnNhY3Rpb25zJykucXVlcnlTZWxlY3RvckFsbCgnW2RhdGEtcmVtaW5kXScpLmZvckVhY2goYnRuPT5idG4uYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT57CiAgIGNvbnN0IHg9cm93cy5maW5kKHI9PnIua2V5PT09YnRuLmRhdGFzZXQucmVtaW5kKTtpZih4KWNyZWF0ZVJlbWluZGVyKHgpOwogIH0pKTsKIH0KICQoJ2NhbmNlbFBheScpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywoKT0+eyQoJ3BheU1vZGFsJykuY2xhc3NMaXN0LnJlbW92ZSgnb3BlbicpO30pOwogJCgncGF5TW9kYWwnKS5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsZT0+e2lmKGUudGFyZ2V0PT09JCgncGF5TW9kYWwnKSkkKCdwYXlNb2RhbCcpLmNsYXNzTGlzdC5yZW1vdmUoJ29wZW4nKTt9KTsKICQoJ3NhdmVQYXknKS5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsKCk9PnsKICBjb25zdCBrZXk9JCgncGF5TW9kYWwnKS5kYXRhc2V0LmtleTtjb25zdCByb3c9aGlzdG9yeURhdGEubWFwKGg9Pih7aCxrZXk6aW52b2ljZUtleShoKSx0b3RhbDp0b3RhbE9mKGgpfSkpLmZpbmQoeD0+eC5rZXk9PT1rZXkpO2lmKCFyb3cpcmV0dXJuOwogIGNvbnN0IGFtb3VudD1OdW1iZXIoJCgncGF5QW1vdW50JykudmFsdWUpO2NvbnN0IGRhdGU9JCgncGF5RGF0ZScpLnZhbHVlOwogIGlmKCFOdW1iZXIuaXNTYWZlSW50ZWdlcihhbW91bnQpfHxhbW91bnQ8PTApe2FsZXJ0KCdNYXN1a2thbiBub21pbmFsIGNpY2lsYW4gYmVydXBhIGFuZ2thIHJ1cGlhaCBidWxhdCB5YW5nIGxlYmloIGRhcmkgbm9sLicpO3JldHVybjt9CiAgaWYoIS9eXGR7NH0tXGR7Mn0tXGR7Mn0kLy50ZXN0KGRhdGUpIHx8ICFkYXlEYXRlKGRhdGUpIHx8IGRheURhdGUoZGF0ZSkuZ2V0RnVsbFllYXIoKSE9PU51bWJlcihkYXRlLnNsaWNlKDAsNCkpIHx8IGRheURhdGUoZGF0ZSkuZ2V0TW9udGgoKSsxIT09TnVtYmVyKGRhdGUuc2xpY2UoNSw3KSkgfHwgZGF5RGF0ZShkYXRlKS5nZXREYXRlKCkhPT1OdW1iZXIoZGF0ZS5zbGljZSg4LDEwKSkpe2FsZXJ0KCdQaWxpaCB0YW5nZ2FsIHBlbWJheWFyYW4geWFuZyBiZW5hci4nKTtyZXR1cm47fQogIGNvbnN0IGxpc3Q9KHBheW1lbnRNYXBba2V5XXx8W10pLnNsaWNlKCk7Y29uc3Qgb2xkUGFpZD1saXN0LnJlZHVjZSgoYSxwKT0+YSsoTnVtYmVyKHAuYW1vdW50KXx8MCksMCk7Y29uc3QgcmVtYWluaW5nPU1hdGgubWF4KDAscm93LnRvdGFsLW9sZFBhaWQpOwogIGlmKGFtb3VudD5yZW1haW5pbmcpe2FsZXJ0KCdOb21pbmFsIG1lbGViaWhpIHNpc2EgdGFnaWhhbiAnK21vbmV5KHJlbWFpbmluZykrJy4gUGVtYmF5YXJhbiB0aWRhayBkaXNpbXBhbi4nKTtyZXR1cm47fQogIGxpc3QucHVzaCh7YW1vdW50LGRhdGUsY3JlYXRlZEF0Om5ldyBEYXRlKCkudG9JU09TdHJpbmcoKX0pO3BheW1lbnRNYXBba2V5XT1saXN0OwogIGNvbnN0IHBhaWQ9bGlzdC5yZWR1Y2UoKGEscCk9PmErKE51bWJlcihwLmFtb3VudCl8fDApLDApO3N0YXR1c01hcFtrZXldPXBhaWQ9PT1yb3cudG90YWw/J0x1bmFzJzonVGVtcG8nOwogIGlmKHBhaWQ9PT1yb3cudG90YWwpcGFpZERhdGVNYXBba2V5XT1kYXRlO2Vsc2UgZGVsZXRlIHBhaWREYXRlTWFwW2tleV07CiAgdHJ5e2xvY2FsU3RvcmFnZS5zZXRJdGVtKHBheW1lbnRTdG9yZUtleSxKU09OLnN0cmluZ2lmeShwYXltZW50TWFwKSk7bG9jYWxTdG9yYWdlLnNldEl0ZW0oc3RhdHVzU3RvcmVLZXksSlNPTi5zdHJpbmdpZnkoc3RhdHVzTWFwKSk7bG9jYWxTdG9yYWdlLnNldEl0ZW0ocGFpZERhdGVTdG9yZUtleSxKU09OLnN0cmluZ2lmeShwYWlkRGF0ZU1hcCkpO30KICBjYXRjaChlcnIpe2FsZXJ0KCdHYWdhbCBtZW55aW1wYW4gcGVtYmF5YXJhbi4gVGlkYWsgYWRhIHBlcnViYWhhbiB5YW5nIGRhcGF0IGRpcGFzdGlrYW4gdGVyc2ltcGFuLicpO3JldHVybjt9CiAgJCgncGF5TW9kYWwnKS5jbGFzc0xpc3QucmVtb3ZlKCdvcGVuJyk7c2hvd1N0YXR1cyhwYWlkPT09cm93LnRvdGFsPydQZW1iYXlhcmFuIHRlcmFraGlyIHRlcnNpbXBhbi4gU3RhdHVzIGJlcnViYWggbWVuamFkaSBMdW5hcyAoYmlydSkuIFRhbmdnYWwgcGVsdW5hc2FuOiAnK2Rpc3BsYXlEYXRlKGRhdGUpKycuJzonQ2ljaWxhbiB0ZXJzaW1wYW4uIFRvdGFsIGRpYmF5YXIgJyttb25leShwYWlkKSsnLCBzaXNhICcrbW9uZXkocm93LnRvdGFsLXBhaWQpKycuJyk7cmVuZGVyKCk7CiB9KTsKIGZ1bmN0aW9uIHJlbWluZGVyUGF5bG9hZCh4KXsKICBjb25zdCBkdWU9YWRkRGF5cyh4LmguZGF0ZSwzMCk7CiAgaWYoIWR1ZSlyZXR1cm4gbnVsbDsKICByZXR1cm4gewogICBkdWVEYXRlOmR1ZS5nZXRGdWxsWWVhcigpKyctJytTdHJpbmcoZHVlLmdldE1vbnRoKCkrMSkucGFkU3RhcnQoMiwnMCcpKyctJytTdHJpbmcoZHVlLmdldERhdGUoKSkucGFkU3RhcnQoMiwnMCcpLAogICBjdXN0b21lcjpTdHJpbmcoeC5oLmN1c3RvbWVyfHwnUGVsYW5nZ2FuJyksCiAgIGFtb3VudDptb25leSh4LnRvdGFsKSwKICAgcmVmZXJlbmNlOlN0cmluZyh4LmguaWR8fHgua2V5KSwKICAgaW52b2ljZURhdGU6U3RyaW5nKHguaC5kYXRlfHwnJykKICB9OwogfQogZnVuY3Rpb24gY3JlYXRlUmVtaW5kZXIoeCl7CiAgY29uc3QgZHVlPWFkZERheXMoeC5oLmRhdGUsMzApOwogIGlmKCFkdWUpe3Nob3dTdGF0dXMoJ1RhbmdnYWwgbm90YSB0aWRhayB2YWxpZDsgcGVuZ2luZ2F0IHRpZGFrIGRhcGF0IGRpYnVhdC4nKTtyZXR1cm47fQogIGNvbnN0IHBheWxvYWQ9cmVtaW5kZXJQYXlsb2FkKHgpOwogIGlmKHdpbmRvdy5BbmRyb2lkQXNpZG8mJnR5cGVvZiB3aW5kb3cuQW5kcm9pZEFzaWRvLnNjaGVkdWxlVGVtcG9SZW1pbmRlcj09PSdmdW5jdGlvbicpewogICB0cnl7CiAgICB3aW5kb3cuQW5kcm9pZEFzaWRvLnNjaGVkdWxlVGVtcG9SZW1pbmRlcihwYXlsb2FkLmR1ZURhdGUscGF5bG9hZC5jdXN0b21lcixwYXlsb2FkLmFtb3VudCxwYXlsb2FkLnJlZmVyZW5jZSk7CiAgICBzaG93U3RhdHVzKCdQZXJtaW50YWFuIHBlbmdpbmdhdCBUZW1wbyBkaWtpcmltIGtlIGthbGVuZGVyIEFuZHJvaWQgdW50dWsgJytwYXlsb2FkLmN1c3RvbWVyKycgcGFkYSAnK2Zvcm1hdFNsYXNoKGR1ZSkrJy4nKTsKICAgfWNhdGNoKGUpe3Nob3dTdGF0dXMoJ1RpZGFrIGRhcGF0IG1lbmphZHdhbGthbiBLYWxlbmRlcjogJysoZS5tZXNzYWdlfHxTdHJpbmcoZSkpKTt9CiAgIHJldHVybjsKICB9CiAgY29uc3Qgbm90ZT0nSmF0dWggdGVtcG8gcGVtYmF5YXJhbiBBU0lETzogJytmb3JtYXRTbGFzaChkdWUpKycuIFRvdGFsICcrbW9uZXkoeC50b3RhbCkrJy4gTm90YSAnK1N0cmluZyh4LmguaWR8fCcnKSsnLiBNb2hvbiB0YWdpaCBwZW1iYXlhcmFuIFRlbXBvLic7CiAgaWYod2luZG93LkFuZHJvaWRBc2lkbyYmdHlwZW9mIHdpbmRvdy5BbmRyb2lkQXNpZG8uYWRkQ2FsZW5kYXJSZW1pbmRlcj09PSdmdW5jdGlvbicpewogICB3aW5kb3cuQW5kcm9pZEFzaWRvLmFkZENhbGVuZGFyUmVtaW5kZXIobm90ZSxwYXlsb2FkLmN1c3RvbWVyKTsKICAgc2hvd1N0YXR1cygnS2FsZW5kZXIgZGlidWthIHVudHVrICcrcGF5bG9hZC5jdXN0b21lcisnLiBUZWthbiBTaW1wYW4gcGFkYSBmb3JtdWxpciBrYWxlbmRlci4nKTsKICAgcmV0dXJuOwogIH0KICBjb25zdCBzdGFydD1uZXcgRGF0ZShkdWUuZ2V0RnVsbFllYXIoKSxkdWUuZ2V0TW9udGgoKSxkdWUuZ2V0RGF0ZSgpLDksMCwwKTsKICBjb25zdCBlbmQ9bmV3IERhdGUoZHVlLmdldEZ1bGxZZWFyKCksZHVlLmdldE1vbnRoKCksZHVlLmdldERhdGUoKSwxMCwwLDApOwogIGNvbnN0IGZtdD1kPT5kLmdldEZ1bGxZZWFyKCkrU3RyaW5nKGQuZ2V0TW9udGgoKSsxKS5wYWRTdGFydCgyLCcwJykrU3RyaW5nKGQuZ2V0RGF0ZSgpKS5wYWRTdGFydCgyLCcwJykrJ1QnK1N0cmluZyhkLmdldEhvdXJzKCkpLnBhZFN0YXJ0KDIsJzAnKStTdHJpbmcoZC5nZXRNaW51dGVzKCkpLnBhZFN0YXJ0KDIsJzAnKSsnMDAnOwogIGNvbnN0IHBhcmFtcz1uZXcgVVJMU2VhcmNoUGFyYW1zKHthY3Rpb246J1RFTVBMQVRFJyx0ZXh0OidKYXR1aCBUZW1wbyBBU0lETyDigJQgJytwYXlsb2FkLmN1c3RvbWVyLGRhdGVzOmZtdChzdGFydCkrJy8nK2ZtdChlbmQpLGRldGFpbHM6bm90ZX0pOwogIHdpbmRvdy5vcGVuKCdodHRwczovL2NhbGVuZGFyLmdvb2dsZS5jb20vY2FsZW5kYXIvcmVuZGVyPycrcGFyYW1zLnRvU3RyaW5nKCksJ19ibGFuaycpOwogIHNob3dTdGF0dXMoJ0dvb2dsZSBDYWxlbmRhciBkaWJ1a2EgZGVuZ2FuIGRldGFpbCBwZW5naW5nYXQuIFRla2FuIFNpbXBhbiBkaSBHb29nbGUgQ2FsZW5kYXIuJyk7CiB9CiBmdW5jdGlvbiBjcmVhdGVBbGxUZW1wb1JlbWluZGVycygpewogIGNvbnN0IGFsbD1oaXN0b3J5RGF0YS5tYXAoaD0+KHtoLGtleTppbnZvaWNlS2V5KGgpLHN0YXR1czpndWVzc1N0YXR1cyhoKSx0b3RhbDp0b3RhbE9mKGgpfSkpLmZpbHRlcih4PT54LnN0YXR1cz09PSdUZW1wbycpOwogIGNvbnN0IHBheWxvYWQ9YWxsLm1hcChyZW1pbmRlclBheWxvYWQpLmZpbHRlcihCb29sZWFuKTsKICBpZighcGF5bG9hZC5sZW5ndGgpe3Nob3dTdGF0dXMoJ0JlbHVtIGFkYSB0cmFuc2Frc2kgVGVtcG8gZGVuZ2FuIHRhbmdnYWwgbm90YSB5YW5nIHZhbGlkLicpO3JldHVybjt9CiAgaWYod2luZG93LkFuZHJvaWRBc2lkbyYmdHlwZW9mIHdpbmRvdy5BbmRyb2lkQXNpZG8uc2NoZWR1bGVUZW1wb1JlbWluZGVycz09PSdmdW5jdGlvbicpewogICB3aW5kb3cuQW5kcm9pZEFzaWRvLnNjaGVkdWxlVGVtcG9SZW1pbmRlcnMoSlNPTi5zdHJpbmdpZnkocGF5bG9hZCkpOwogICBzaG93U3RhdHVzKCdNZW1pbnRhIEFuZHJvaWQgbWVuamFkd2Fsa2FuICcrcGF5bG9hZC5sZW5ndGgrJyBwZW5naW5nYXQgVGVtcG8gcGFkYSB0YW5nZ2FsIG5vdGEgKzMwIGhhcmkuIEthbGVuZGVyIEdvb2dsZSBkaSBha3VuIEhQIGFrYW4gbWVuZXJpbWEgcGVuZ2luZ2F0IHlhbmcgYmVyaGFzaWwgZGlidWF0LicpOwogICByZXR1cm47CiAgfQogIHNob3dTdGF0dXMoJ0ZpdHVyIGphZHdhbGthbiBzZW11YSBUZW1wbyBvdG9tYXRpcyBtZW1lcmx1a2FuIEFQSyBBU0lETyB2ZXJzaSB0ZXJiYXJ1LiBBbmRhIG1hc2loIGRhcGF0IG1lbWJ1YXQgcGVuZ2luZ2F0IHNhdHUgcGVyIHNhdHUgbWVsYWx1aSB0b21ib2wgcGFkYSB0aWFwIG5vdGEuJyk7CiB9CiAkKCdyZW1pbmRBbGxUZW1wbycpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJyxjcmVhdGVBbGxUZW1wb1JlbWluZGVycyk7CiAkKCdyZWZyZXNoJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGxvYWREYXRhKTsKICQoJ21vbnRoRmlsdGVyJykuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJyxyZW5kZXIpOwogJCgnc3RhdHVzRmlsdGVyJykuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJyxyZW5kZXIpOwogJCgnY2xlYXJGaWx0ZXJzJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT57JCgnbW9udGhGaWx0ZXInKS52YWx1ZT0nJzskKCdzdGF0dXNGaWx0ZXInKS52YWx1ZT0nYWxsJztyZW5kZXIoKTt9KTsKICQoJ3ByaW50JykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT53aW5kb3cucHJpbnQoKSk7CiBsb2FkRGF0YSgpOwp9KSgpOwo8L3NjcmlwdD4KCjxzY3JpcHQ+CmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd1bmlmaWVkQmFja1RvTm90YScpPy5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsZnVuY3Rpb24oZSl7CiAgZS5wcmV2ZW50RGVmYXVsdCgpOwogIHBhcmVudC5wb3N0TWVzc2FnZSh7dHlwZTonQVNJRE9fU0hPV19OT1RBJ30sJyonKTsKfSk7Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4=')));
+  let loaded=false;
+  function showNota(){
+    shell.style.display='none';
+    shell.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+    window.scrollTo(0,window.__asidoNotaScrollY||0);
+  }
+  function showBookkeeping(){
+    window.__asidoNotaScrollY=window.scrollY;
+    if(!loaded){frame.srcdoc=bookHtml;loaded=true;}
+    shell.style.display='block';
+    shell.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  openBtn?.addEventListener('click',showBookkeeping);
+  backBtn?.addEventListener('click',showNota);
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='ASIDO_SHOW_NOTA')showNota();
+  });
+})();
+</script>
+</body></html>
