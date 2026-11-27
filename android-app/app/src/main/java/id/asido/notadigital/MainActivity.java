@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
         bar.setPadding(dp(12), dp(7), dp(8), dp(7));
         bar.setBackgroundColor(0xFF143C73);
         TextView title = new TextView(this);
-        title.setText("ASIDO Nota Digital");
+        title.setText("ASIDO Nota Digital Mandiri");
         title.setTextColor(-1);
         title.setTextSize(18);
         title.setTypeface(null, 1);
@@ -194,7 +194,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void scheduleTempoReminders(String json) {
             runOnUiThread(() -> requestOrScheduleTempoReminders(json));
         }
-        @JavascriptInterface public String version() { return "1.5.0"; }
+        @JavascriptInterface public String version() { return "2.1.0"; }
     }
     private void nativeSharePng(String dataUrl, String fileName, String customer) {
         try {
