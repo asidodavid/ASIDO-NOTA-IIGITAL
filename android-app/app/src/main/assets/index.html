@@ -109,7 +109,8 @@ const CATALOG_VERSION='2026-11-25-v2';
 const CATALOG_KEY='asido_newapp_v1_products';
 let storedProducts;
 try{storedProducts=JSON.parse(localStorage.getItem(CATALOG_KEY)||'null');}catch(e){storedProducts=null;}
-const savedCatalogVersion=localStorage.getItem('asido_newapp_catalog_version');
+let savedCatalogVersion=null;
+try{savedCatalogVersion=localStorage.getItem('asido_newapp_catalog_version');}catch(storageError){console.warn('Versi katalog belum dapat dibaca:',storageError);}
 /* The new application starts with its own catalogue. Upgrade only this app's catalogue once;
    invoice history and bookkeeping records are deliberately left untouched. */
 let products;
