@@ -135,6 +135,15 @@ public class MainActivity extends Activity {
                 catch (Exception e) { toast("Tidak dapat membuka tautan."); }
                 return true;
             }
+            @Override public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                Uri uri = request.getUrl();
+                String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase(Locale.ROOT);
+                if ("http".equals(scheme) || "https".equals(scheme)) {
+                    // This APK is self-contained: never load remote scripts, pages, styles, APIs or assets.
+                    return new android.webkit.WebResourceResponse("text/plain", "UTF-8", 403, "Blocked: offline ASIDO app", new java.util.HashMap<>(), new java.io.ByteArrayInputStream(new byte[0]));
+                }
+                return super.shouldInterceptRequest(view, request);
+            }
             @Override public void onPageFinished(WebView view, String url) {
                 status.setText("Offline siap · Program HTML/CSS/JavaScript tertanam di APK");
             }
