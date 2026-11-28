@@ -1035,7 +1035,9 @@ renderProducts();renderRows();renderHistory();asidoSetTodayIfEmpty();
   openBtn?.addEventListener('click',showBookkeeping);
   backBtn?.addEventListener('click',showNota);
   window.addEventListener('message',function(e){
-    if(e.data&&e.data.type==='ASIDO_SHOW_NOTA')showNota();
+    if(!e.data)return;
+    if(e.data.type==='ASIDO_SHOW_NOTA')showNota();
+    if(e.data.type==='ASIDO_BOOKKEEPING_READY')sendBookkeepingData();
   });
 })();
 </script>
