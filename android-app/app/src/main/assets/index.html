@@ -1021,13 +1021,16 @@ renderProducts();renderRows();renderHistory();asidoSetTodayIfEmpty();
     document.body.style.overflow='';
     window.scrollTo(0,window.__asidoNotaScrollY||0);
   }
+  function sendBookkeepingData(){
+    frame.contentWindow?.postMessage({type:'ASIDO_BOOKKEEPING_DATA',history:historyData,bookkeepingStatus:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}'),bookkeepingPayments:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}'),bookkeepingPaidDates:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')},'*');
+  }
   function showBookkeeping(){
     window.__asidoNotaScrollY=window.scrollY;
-    if(!loaded){frame.srcdoc=bookHtml;loaded=true;}
+    if(!loaded){frame.addEventListener('load',sendBookkeepingData,{once:true});frame.srcdoc=bookHtml;loaded=true;}
+    else sendBookkeepingData();
     shell.style.display='block';
     shell.setAttribute('aria-hidden','false');
     document.body.style.overflow='hidden';
-    frame.contentWindow?.postMessage({type:'ASIDO_BOOKKEEPING_DATA',history:historyData,bookkeepingStatus:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_status')||'{}'),bookkeepingPayments:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_payments')||'{}'),bookkeepingPaidDates:JSON.parse(localStorage.getItem('asido_newapp_v1_bookkeeping_paid_dates')||'{}')},'*');
   }
   openBtn?.addEventListener('click',showBookkeeping);
   backBtn?.addEventListener('click',showNota);
