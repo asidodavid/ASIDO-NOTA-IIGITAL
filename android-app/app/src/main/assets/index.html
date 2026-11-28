@@ -1038,6 +1038,13 @@ renderProducts();renderRows();renderHistory();asidoSetTodayIfEmpty();
     if(!e.data)return;
     if(e.data.type==='ASIDO_SHOW_NOTA')showNota();
     if(e.data.type==='ASIDO_BOOKKEEPING_READY')sendBookkeepingData();
+    if(e.data.type==='ASIDO_BOOKKEEPING_UPDATE'){
+      try{
+        localStorage.setItem('asido_newapp_v1_bookkeeping_status',JSON.stringify(e.data.bookkeepingStatus||{}));
+        localStorage.setItem('asido_newapp_v1_bookkeeping_payments',JSON.stringify(e.data.bookkeepingPayments||{}));
+        localStorage.setItem('asido_newapp_v1_bookkeeping_paid_dates',JSON.stringify(e.data.bookkeepingPaidDates||{}));
+      }catch(err){console.warn('Sinkronisasi Pembukuan gagal:',err);}
+    }
   });
 })();
 </script>
