@@ -6,11 +6,11 @@ android {
     compileSdk 35
     defaultConfig {
         // Unique package: installs alongside the existing ASIDO Nota Digital 2.0.0.
-        applicationId 'id.asido.notadigital.mandiri.offline'
+        applicationId 'id.asido.notadigital.mandiri.offline.catalogfix'
         minSdk 29
         targetSdk 34
         versionCode 2
-        versionName '2.1.1'
+        versionName '2.1.1-catalogfix1'
     }
 }
 dependencies {
