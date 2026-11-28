@@ -1,0 +1,1 @@
+Folder aset untuk aplikasi ASIDO Nota Digital ketujuh. Letakkan file logo asli di sini dengan nama asido-logo.png. Jangan mengubah isi gambar logo.
