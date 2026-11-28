@@ -6,7 +6,7 @@
 <header><div class="wrap"><h1>ASIDO Nota Digital</h1><p>Nota penjualan · input suara · dua tanda tangan · PDF dan gambar nota</p><p style="font-size:12px;font-weight:700;opacity:.95">Aplikasi mandiri · Nota + Pembukuan + Riwayat Cicilan</p><div style="margin-top:13px"><button type="button" id="installAppBtn" style="background:#fff;color:#123c7a;border-radius:11px;padding:10px 14px">＋ Pasang aplikasi di HP</button></div><p id="installHelp" style="font-size:12px;opacity:.9;margin-top:8px">Pasang sekali, lalu buka ASIDO dari ikon di layar utama.</p></div></header>
 <main class="wrap">
 <section class="card"><h2>1. Informasi Nota</h2><div class="grid">
-<div class="field"><label>Tanggal nota</label><input id="date" type="date"></div>
+<div class="field"><label>Tanggal nota *</label><input id="date" type="date" required></div>
 <div class="field"><label>Nama pelanggan / toko *</label><input id="customer" placeholder="Contoh: Toko Sinar Baru"></div>
 </div></section>
 <section class="card"><h2>2. Daftar Barang</h2>
@@ -250,7 +250,9 @@ $('addCalendarReminder').onclick=()=>{
  if(!win)window.location.href=url;
 };
 function invoice(){return {date:$('date').value,customer:$('customer').value.trim(),items:rows.map(r=>({...r})),total:renderTotal(),paymentStatus:$('paymentStatus').value||'Cash',notes:$('notes').value.trim(),buyer:signatureData('buyerSig'),seller:signatureData('sellerSig'),savedAt:new Date().toISOString()}}
-function validate(v){if(!v.customer){alert('Isi nama pelanggan terlebih dahulu.');return false}if(!v.items.some(r=>r.name.trim()&&r.qty>0)){alert('Tambahkan setidaknya satu barang dengan jumlah lebih dari nol.');return false}return true}
+function asidoTodayLocal(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function asidoSetTodayIfEmpty(){const field=$('date');if(field&&!field.value)field.value=asidoTodayLocal()}
+function validate(v){if(!v.date){alert('Pilih tanggal nota terlebih dahulu. Tanggal nota harus sesuai tanggal transaksi.');$('date').focus();return false}if(!v.customer){alert('Isi nama pelanggan terlebih dahulu.');$('customer').focus();return false}if(!v.items.some(r=>String(r.name||'').trim()&&Number(r.qty)>0)){alert('Tambahkan setidaknya satu barang dengan jumlah lebih dari nol.');return false}return true}
 function saveHistory(){
  const v=invoice();if(!validate(v))return;
  v.id=v.id||('ASD-'+Date.now());
@@ -609,7 +611,7 @@ try{
  if(localStorage.getItem('asido_newapp_v1_pre_sync_backup'))$('restorePreSyncBtn').hidden=false;
  if(localStorage.getItem('asido_newapp_v1_pre_merge_backup'))$('restorePreMergeBtn').hidden=false;
 }catch(storageError){console.warn('Pemeriksaan cadangan lokal dilewati:',storageError);}
-$('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('customer').value='';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap.';window.scrollTo({top:0,behavior:'smooth'})};
+$('newInvoice').onclick=()=>{if(!confirm('Mulai nota baru? Pastikan nota saat ini sudah disimpan atau PDF sudah diunduh.'))return;$('date').value=asidoTodayLocal();$('customer').value='';$('paymentStatus').value='Cash';$('notes').value='';rows=[];renderRows();clearSignature('buyerSig');clearSignature('sellerSig');$('status').textContent='Form nota baru siap. Tanggal nota diisi otomatis hari ini.';window.scrollTo({top:0,behavior:'smooth'})};
 function parseVoice(text){
  const low=text.toLowerCase();
  const cleanName=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
@@ -976,8 +978,9 @@ window.addEventListener('appinstalled',()=>{
  if(asidoInstallBtn)asidoInstallBtn.hidden=true;
  if($('installHelp'))$('installHelp').textContent='ASIDO berhasil dipasang. Buka lewat ikon ASIDO di layar utama.';
 });
+if(window.AndroidAsido){if(asidoInstallBtn)asidoInstallBtn.hidden=true;if($('installHelp'))$('installHelp').hidden=true;}
 updateInstallButton();
-if('serviceWorker' in navigator){
+if(!window.AndroidAsido && 'serviceWorker' in navigator){
  window.addEventListener('load',async()=>{
   try{
    const registration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
@@ -989,42 +992,7 @@ if('serviceWorker' in navigator){
 
 renderProducts();renderRows();renderHistory();
 </script>
-<script>
-/* ASIDO catalog recovery: independent from the main application script. */
-(function(){
-  const key='asido_newapp_v1_products';
-  const defaults=[
-    {name:'Sapu ijuk',price:15000},
-    {name:'Sapu lidi',price:10000},
-    {name:'Pel lobi besi',price:58000},
-    {name:'Pel capit katun',price:35000},
-    {name:'Pel capit kartun warna',price:26500},
-    {name:'Pel peras otomatis',price:24000},
-    {name:'Sikat dorong senar',price:25000},
-    {name:'Sikat dorong ijuk',price:25000}
-  ];
-  function loadCatalog(){
-    const select=document.getElementById('productSelect');
-    if(!select) return;
-    let list=[];
-    try { list=JSON.parse(localStorage.getItem(key)||'[]'); } catch(e) { list=[]; }
-    if(!Array.isArray(list)||list.length===0){ list=defaults.map(p=>({...p})); }
-    list=list.filter(p=>p&&typeof p.name==='string'&&p.name.trim()&&Number.isFinite(Number(p.price))&&Number(p.price)>=0);
-    if(!list.length) list=defaults.map(p=>({...p}));
-    try { localStorage.setItem(key,JSON.stringify(list)); } catch(e) {}
-    const current=select.value;
-    select.innerHTML='<option value="">Pilih produk...</option>'+
-      list.map((p,i)=>'<option value="'+i+'">'+(i+1)+'. '+p.name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+' — Rp'+Number(p.price).toLocaleString('id-ID')+'</option>').join('');
-    if(current!==''&&Number(current)<list.length) select.value=current;
-    const manage=document.getElementById('manageProductSelect');
-    if(manage){
-      manage.innerHTML='<option value="">Pilih produk untuk diedit...</option>'+list.map((p,i)=>'<option value="'+i+'">'+(i+1)+'. '+p.name+' — Rp'+Number(p.price).toLocaleString('id-ID')+'</option>').join('');
-    }
-  }
-  loadCatalog();
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)loadCatalog();});
-})();
-</script>
+
 <style>
 #asidoUnifiedBookkeepingShell{display:none;position:fixed;inset:0;z-index:99999;background:#edf2f8;}
 #asidoUnifiedBookkeepingShell .unified-toolbar{height:54px;display:flex;align-items:center;gap:10px;padding:7px 12px;background:#123c7a;color:#fff;font:600 15px system-ui,sans-serif;}
