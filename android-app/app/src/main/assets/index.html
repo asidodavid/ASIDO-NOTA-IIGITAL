@@ -81,6 +81,7 @@
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>'Rp'+Math.max(0,Number(n)||0).toLocaleString('id-ID');
+const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const defaultProducts=[
  {name:'Pel capit kartun warna',price:26500},
  {name:'Pel capit katun',price:24500},
